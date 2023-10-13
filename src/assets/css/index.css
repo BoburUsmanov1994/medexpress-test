@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+    margin: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #222222;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.25;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #ECECEC;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #006D85;
+}
+
+.title-color {
+    color: #fff;
+}
+
+.checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    margin-right: 6px;
+    border: 1px solid #D3D3D3;
+    outline: none;
+    cursor: pointer;
+}
+
+input.checked {
+    background-color: #006D85;
+    border-color: #006D85;
+    position: relative;
+}
+
+input.checked::before {
+    content: "\2713";
+    font-size: 13px;
+    font-weight: 900;
+    color: #fff;
+    position: absolute;
+    right: 4px;
+    top: 1px;
+}
+
+@layer components {
+    .form-group {
+        @apply mb-4;
+    }
+
+    .form-label {
+        @apply mb-1.5 block text-secondary-300 font-semibold;
+    }
+
+    .form-error {
+        @apply text-[#EB5757] text-xs block text-right mt-1;
+    }
+
+    .form-input {
+        @apply block p-3 w-full border border-secondary-100 rounded-lg focus:border-primary focus:outline-none placeholder-secondary-200 h-12;
+    }
+
+    .menu__item {
+        @apply hover:text-primary transition ml-8 text-secondary-300 font-semibold relative
+    }
+
+
+    .menu__item_link {
+        @apply py-4 inline-block relative before:w-full before:h-2  before:absolute before:-top-3.5 before:rounded-b-xl
+    }
+
+    .menu__item ul li > a.active {
+        @apply text-primary bg-[#D9D9D9]
+    }
+
+    .menu__item_link.active {
+        @apply text-primary  before:bg-primary
+    }
+
+    .tab__item_link {
+        @apply text-[#4A4A4A] font-bold pt-2 pb-4 px-4  mr-6 relative before:w-full before:h-1.5  before:absolute before:bottom-0 before:rounded-t-xl before:left-1/2 before:-translate-x-1/2
+    }
+
+    .tab__item_link.active {
+        @apply text-primary  before:bg-primary
+    }
+
+    .table {
+        @apply w-full
+    }
+
+
+    .thead .tr {
+        @apply border-b border-b-['#EDEDED'] sticky top-0 bg-white z-10
+    }
+
+    .th {
+        @apply py-5 px-4   uppercase text-[#222] text-center whitespace-nowrap   max-w-[320px] text-sm font-bold;
+    }
+
+
+    .th:first-child, .th:nth-child(2) {
+        @apply text-left
+    }
+
+
+    .td {
+        @apply py-3 px-4 text-center  max-w-[500px]  text-[#222]
+    }
+
+    .td:first-child, .td:nth-child(2) {
+        @apply text-left
+    }
+
+
+    .tbody .tr {
+        @apply bg-white  hover:bg-[#E6F1F3] transition cursor-pointer   border-b border-b-['#EDEDED'] align-middle
+    }
+
+    .pagination {
+        @apply flex justify-end;
+    }
+
+    .pagination li {
+        @apply text-secondary-300 p-1 w-10 h-10 text-center rounded-lg  flex justify-center items-center border border-transparent font-semibold;
+    }
+
+    .pagination li.selected {
+        @apply border-primary text-primary;
+    }
+}

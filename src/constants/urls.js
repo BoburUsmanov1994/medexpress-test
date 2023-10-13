@@ -1,0 +1,18 @@
+export const URLS = {
+    oauth:'/oauth/authorize',
+    token:'/oauth/token',
+    getMe: '/auth/me',
+    login: '/auth/login',
+    locales:'/site/locales',
+    translations:'/site/translations',
+    translationsKey:'/site/translations/key',
+    organizations:'/organizations',
+    organizationsListForSelect:'/organizations/list-for-select',
+    organizationTypeLevel:'/reference-books/organization-type-level',
+    organizationTypeMedical:'/reference-books/organization-type-medical',
+    organizationLegalForm:'/reference-books/legal-form',
+    organizationTypeService:'/reference-books/organization-type-service',
+    organizationManagementForm:'/reference-books/management-form',
+    organizationCountry:'/reference-books/country',
+    organizationTerritory:'/reference-books/administrative-territory',
+}
