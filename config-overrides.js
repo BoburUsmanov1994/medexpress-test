@@ -1,6 +1,7 @@
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const webpack = require('webpack');
 
-module.exports = function override(config, env) {
+module.exports = function override(config) {
+    const fallback = config.resolve.fallback || {};
     Object.assign(fallback, {
         "crypto": require.resolve("crypto-browserify"),
         "stream": require.resolve("stream-browserify"),
@@ -10,7 +11,12 @@ module.exports = function override(config, env) {
         "os": require.resolve("os-browserify"),
         "url": require.resolve("url")
     })
-    config.resolve.plugins = config.resolve.plugins.filter(plugin => !(plugin instanceof ModuleScopePlugin));
-
+    config.resolve.fallback = fallback;
+    config.plugins = (config.plugins || []).concat([
+        new webpack.ProvidePlugin({
+            process: 'process/browser',
+            Buffer: ['buffer', 'Buffer']
+        })
+    ])
     return config;
-};
+}

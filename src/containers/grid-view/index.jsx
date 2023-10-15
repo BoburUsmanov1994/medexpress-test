@@ -3,7 +3,6 @@ import {useDeleteQuery, useGetAllQuery, useGetOneQuery, usePostQuery} from "../.
 import {ContentLoader, OverlayLoader} from "../../components/loader";
 import clsx from "clsx";
 import {get, ceil, forEach, head, omit} from "lodash"
-import {Navigate} from 'react-router-dom'
 import Select from "../../components/select";
 import {PER_PAGES} from "../../constants";
 import ReactPaginate from 'react-paginate';
@@ -119,9 +118,9 @@ const GridView = ({
                 <table className="table">
                     <thead className={'thead'}>
                     <tr className={'tr'}>
-                        <th className={'th !pr-0'}>
-                            <Checkbox />
-                        </th>
+                        {/*<th className={'th !pr-0'}>*/}
+                        {/*    <Checkbox />*/}
+                        {/*</th>*/}
                         {columns && columns.map(th => <th
                             className={clsx(`th`, get(th, "classnames", ""))}
                             key={get(th, 'title')}>
@@ -140,9 +139,9 @@ const GridView = ({
                                 className={"tr"}
                                 key={get(tr, get(columns, '[0].key', index))}
                             >
-                                <td className={'td'}>
-                                    <Checkbox />
-                                </td>
+                                {/*<td className={'td'}>*/}
+                                {/*    <Checkbox />*/}
+                                {/*</td>*/}
                                 {columns.map((th, j) => <td key={get(th, 'key', j)}
                                                             className={clsx(`td`, get(th, "classnames", ""), {'!px-0': doubleRow})}>
                                     {get(th, 'render') ? get(th, 'render')({
@@ -153,8 +152,8 @@ const GridView = ({
                                 </td>)}
                                 {hasActionColumn && <td className={'td  !max-w-full pr-10 '}>
                                     <Edit2 className={'mx-3.5 inline'} color={'#2F68FC'} size={22}
-                                           onClick={() => setRowId(get(tr, rowKey))}/>
-                                    <Trash2 className={'inline'} onClick={() => remove(get(tr, rowKey))} color={'#F25886'} size={22}/>
+                                           onClick={() => console.log()}/>
+                                    <Trash2 className={'inline'} onClick={() => console.log()} color={'#F25886'} size={22}/>
                                 </td>}
                             </tr>
                         </>);
@@ -173,7 +172,7 @@ const GridView = ({
                         className={'ml-3 text-secondary-300 text-sm font-semibold'}>{t("Show")} 1-{get(pageSize, 'value', 0)} {t("from")} {get(data, 'data.meta.total', 0)}</span>
                 </div>
                 <ReactPaginate forcePage={page - 1} onPageChange={({selected}) => setPage(selected + 1)}
-                               pageCount={ceil(get(data, 'data.meta.total', 0) / get(pageSize, 'value', 1))}
+                               pageCount={ceil(get(data, 'data.meta.total_pages', 0))}
                                nextLabel={<img src={nextImg} alt="next"/>}
                                previousLabel={<img src={prevImg} alt="prev"/>} className={'pagination'}/>
             </div>}
