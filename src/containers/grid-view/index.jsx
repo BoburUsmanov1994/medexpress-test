@@ -42,11 +42,12 @@ const GridView = ({
         const {data, isLoading, isError} = useGetAllQuery({
             key: listKey, url, params: {
                 params: {
-                    ...params, page
+                    ...params, page,
+                    // limit: get(pageSize, 'value')
                 }
             }
         })
-    // limit: get(pageSize, 'value')
+
         const {data: defaultValues = {}, isLoading: isLoadingOne} = useGetOneQuery({
             id: rowId, key: [listKey, rowId], url:viewUrl ?? url, enabled: !!(rowId)
         })
@@ -158,7 +159,7 @@ const GridView = ({
                             </tr>
                         </>);
                     }) : <tr>
-                        <td colSpan={columns?.length || 12}>
+                        <td colSpan={columns?.length+1 || 12}>
                             <Nodata/>
                         </td>
                     </tr>}

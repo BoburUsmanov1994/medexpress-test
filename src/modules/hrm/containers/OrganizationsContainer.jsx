@@ -3,7 +3,7 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get} from "lodash"
+import {get,isObject} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
@@ -17,6 +17,9 @@ import {Minus, Plus} from "react-feather";
 import {useGetAllQuery} from "../../../hooks/api";
 import clsx from "clsx";
 import PhoneNumber from "../../../containers/form/components/PhoneNumber";
+import Search from "../../../components/search"
+import SelectComponent from "../../../components/select";
+import InputMaskComponent from "../../../components/input-mask";
 
 
 const OrganizationsContainer = () => {
@@ -27,6 +30,7 @@ const OrganizationsContainer = () => {
     let [regionId, setRegionId] = useState(null);
     let [districtId, setDistrictId] = useState(null);
     let [increment, setIncrement] = useState(0);
+    const [search, setSearch] = useState(null)
     const {t} = useTranslation();
     const {data: orgSelectList} = useGetAllQuery({
         key: KEYS.organizationsListForSelect,
@@ -79,7 +83,7 @@ const OrganizationsContainer = () => {
         params: {
             params: {
                 level: 2,
-                parent_id: regionId
+                parent_id: isObject(regionId) ? get(regionId,'value') : regionId
             },
         },
         enabled: !!(regionId)
@@ -90,7 +94,7 @@ const OrganizationsContainer = () => {
         params: {
             params: {
                 level: 3,
-                parent_id: districtId
+                parent_id:isObject(districtId) ? get(districtId,'value') : districtId
             },
         },
         enabled: !!(districtId)
@@ -122,6 +126,7 @@ const OrganizationsContainer = () => {
 
     }
 
+
     return (
         <div>
             <div className="grid grid-cols-12 items-center">
@@ -141,21 +146,39 @@ const OrganizationsContainer = () => {
                         {t("Export")}
                     </button>
                 </div>
-                <div className="col-span-4">
-
+                <div className="col-span-4 mt-5">
+                    <Search handleSearch={setSearch}/>
                 </div>
-                <div className="col-span-8">
-
+                <div className="col-span-8 mt-5 flex justify-end">
+                    <div className="mr-6"><SelectComponent
+                        value={regionId}
+                        setValue={(val)=>setRegionId(val)}
+                        label={t('Регион')} options={get(organizationRegions, 'data', []).map(_option => ({
+                        value: get(_option, 'id'),
+                        label: get(_option, 'display')
+                    }))}/></div>
+                    <div className="mr-6">
+                        <SelectComponent
+                            setValue={(val)=>setDistrictId(val)}
+                            value={districtId}
+                            options={get(organizationDistricts, 'data', []).map(_option => ({
+                                value: get(_option, 'id'),
+                                label: get(_option, 'display')
+                            }))}
+                            label={t('Район')} />
+                    </div>
+                    <InputMaskComponent mask={'999999999'} label={'ИНН'}/>
                 </div>
-                <div className="col-span-12 mt-8">
+                <div className="col-span-12 mt-6">
                     <GridView
+                        params={{search: search ?? null}}
                         hasActionColumn
                         listKey={KEYS.organizations} url={URLS.organizations}
                         columns={columns}/>
                 </div>
             </div>
             <Modal open={open} onClose={() => setOpen(false)} classNames={'!w-[1080px] !pb-0'}
-                   title={'Добавление организации'}>
+                   title={t('Добавление организации')}>
                 <Tabs>
                     <Tab label={t('Информация')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>

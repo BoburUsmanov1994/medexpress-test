@@ -19,14 +19,13 @@ const customStyles = (sm = false) => ({
         borderColor: "rgba(0, 0, 0, 0.1)",
         borderRadius: '8px',
         outline: "none",
-        // boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
         color: "#222",
         display: "flex",
         overflow: 'hidden',
         padding: '4px 8px',
         width: sm ? '125px' : '100%',
         minWidth: sm ? '80px' : '200px',
-        minHeight: '48px',
+        minHeight: '40px',
         fontSize: '16px',
         fontWeight: '600',
         "&:hover": {
@@ -54,10 +53,9 @@ const Select = ({
                 }) => {
 
     return (
-        <div className={clsx({'flex items-center': sm})}>
-            {label && <label className={clsx('mb-1.5 text-secondary-300 font-bold flex items-center')}
-                             htmlFor={label}>{label}<span
-                className={'ml-1.5 inline-block bg-[#006D85] w-1.5 h-1.5 rounded-full'}></span></label>}
+        <div className={clsx('flex items-center z-50 relative')}>
+            {label && <label className={clsx('mr-2 text-secondary-300 font-bold flex items-center')}
+                             htmlFor={label}>{label}</label>}
             <RSelect
                 isClearable
                 name={name}
