@@ -22,10 +22,9 @@ const customStyles = (sm = false) => ({
         color: "#222",
         display: "flex",
         overflow: 'hidden',
-        padding: '4px 8px',
-        width: sm ? '125px' : '100%',
-        minWidth: sm ? '80px' : '200px',
-        minHeight: '40px',
+        padding: '2px 8px',
+        width: '200px',
+        height: '40px',
         fontSize: '16px',
         fontWeight: '600',
         "&:hover": {
