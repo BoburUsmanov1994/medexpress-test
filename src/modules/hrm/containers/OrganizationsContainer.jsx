@@ -33,7 +33,7 @@ const OrganizationsContainer = () => {
     let [regionId, setRegionId] = useState(null);
     let [districtId, setDistrictId] = useState(null);
     let [increment, setIncrement] = useState(0);
-    const [search, setSearch] = useState(null)
+    const [filter,setFilter] = useState({name:'',state_id:null,city_id:null})
     const {t} = useTranslation();
     const {data: orgSelectList} = useGetAllQuery({
         key: KEYS.organizationsListForSelect,
@@ -171,19 +171,19 @@ const OrganizationsContainer = () => {
                     </button>
                 </div>
                 <div className="col-span-4 mt-5">
-                    <Search handleSearch={setSearch}/>
+                    <Search handleSearch={(val)=>setFilter(prev=>({...prev,name:val}))}/>
                 </div>
                 <div className="col-span-8 mt-5 flex justify-end">
                     <div className="mr-6"><SelectComponent
                         value={regionId}
-                        setValue={(val) => setRegionId(val)}
+                        setValue={(val) => setFilter(prev=>({...prev,state_id:get(val,'value')}))}
                         label={t('Регион')} options={get(organizationRegions, 'data', []).map(_option => ({
                         value: get(_option, 'id'),
                         label: get(_option, 'display')
                     }))}/></div>
                     <div className="mr-6">
                         <SelectComponent
-                            setValue={(val) => setDistrictId(val)}
+                            setValue={(val) => setFilter(prev=>({...prev,city_id:get(val,'value')}))}
                             value={districtId}
                             options={get(organizationDistricts, 'data', []).map(_option => ({
                                 value: get(_option, 'id'),
