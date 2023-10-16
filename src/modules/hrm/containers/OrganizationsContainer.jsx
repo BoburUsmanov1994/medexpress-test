@@ -3,7 +3,7 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get, isObject} from "lodash"
+import {get, isObject, range} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
@@ -14,18 +14,20 @@ import {InputMask, Select} from "../../../containers/form/components";
 import Input from "../../../containers/form/components/Input";
 import orgIcon from "../../../assets/icons/org.svg"
 import {Minus, Plus} from "react-feather";
-import {useGetAllQuery} from "../../../hooks/api";
+import {useGetAllQuery, usePostQuery} from "../../../hooks/api";
 import clsx from "clsx";
 import PhoneNumber from "../../../containers/form/components/PhoneNumber";
 import Search from "../../../components/search"
 import SelectComponent from "../../../components/select";
 import InputMaskComponent from "../../../components/input-mask";
+import fileUploadImg from "../../../assets/images/fileUpload.png"
+import {ContentLoader, OverlayLoader} from "../../../components/loader";
 
 
 const OrganizationsContainer = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     let [lang, setLang] = useState('uz');
     let [orgData, setOrgData] = useState({});
     let [regionId, setRegionId] = useState(null);
@@ -101,6 +103,10 @@ const OrganizationsContainer = () => {
         enabled: !!(districtId)
     })
 
+    const {
+        mutate: addRequest, isLoading: isLoadingPost
+    } = usePostQuery({listKeyId: KEYS.organizations})
+
     const columns = [
         {
             title: t('НАИМЕНОВАНИЕ'),
@@ -123,11 +129,27 @@ const OrganizationsContainer = () => {
             key: 'active',
         }
     ]
-    const onSubmit = (data,tab) => {
-        debugger
+    const onSubmit = ({data}, tab) => {
+        setOrgData(prev => ({...prev, ...data}))
         setSearchParams(`tab=${tab}`)
     }
 
+    const add = () => {
+        addRequest({
+            url: URLS.organizations,
+            attributes: {...orgData}
+        }, {
+            onSuccess: () => {
+                closeModal();
+            }
+        })
+    }
+
+    const closeModal = () => {
+        setOpen(false)
+        setOrgData({})
+        setSearchParams(``)
+    }
 
     return (
         <div>
@@ -173,18 +195,26 @@ const OrganizationsContainer = () => {
                 </div>
                 <div className="col-span-12 mt-6">
                     <GridView
-                        params={{search: search ?? null}}
+                        params={{
+                            name: search ?? null,
+                            state_id: isObject(regionId) ? get(regionId, 'value') : regionId,
+                            city_id: isObject(districtId) ? get(districtId, 'value') : districtId
+                        }}
                         hasActionColumn
                         listKey={KEYS.organizations} url={URLS.organizations}
                         columns={columns}/>
                 </div>
             </div>
-            <Modal open={open} onClose={() => setOpen(false)} classNames={'!w-[1080px] !pb-0'}
+            <Modal open={open} onClose={closeModal} classNames={'!w-[1080px] !pb-0'}
                    title={t('Добавление организации')}>
+                {isLoadingPost && <ContentLoader/>}
                 <Tabs isLabelDisabled>
                     <Tab tab={'info'} label={t('Информация')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data)=>onSubmit(data,'info')}>
-                            <InputMask params={{required: true}} classNames={'col-span-6'} name={'tin'}
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'name')}>
+                            <InputMask params={{required: true}}
+                                       classNames={'col-span-6'}
+                                       name={'tin'}
+                                       defaultValue={get(orgData, 'tin')}
                                        property={{
                                            placeholder: t('Введите ИНН организации'),
                                            mask: '999999999',
@@ -193,32 +223,38 @@ const OrganizationsContainer = () => {
                                        label={<div className={'flex'}><span>{t('ИНН организации')}</span><img
                                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Select classNames={'col-span-6'} name={'parent'}
+                            <Select classNames={'col-span-6'}
+                                    name={'parent'}
+                                    defaultValue={get(orgData, 'parent')}
                                     label={t('Родительская организация')}
                                     options={get(orgSelectList, 'data', [])}/>
-                            <Select classNames={'col-span-6'} name={'level'}
+                            <Select defaultValue={get(orgData, 'level')} classNames={'col-span-6'} name={'level'}
                                     label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
                                     options={get(organizationTypeLevelList, 'data', [])}/>
-                            <Select classNames={'col-span-6'} name={'medical_type'}
+                            <Select defaultValue={get(orgData, 'medical_type')} classNames={'col-span-6'}
+                                    name={'medical_type'}
                                     label={<div className={'flex'}><span>{t('Тип организации')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
                                     options={get(organizationTypeMedicalList, 'data', [])}/>
-                            <Select classNames={'col-span-6'} name={'legal_form'}
+                            <Select defaultValue={get(orgData, 'legal_form')} classNames={'col-span-6'}
+                                    name={'legal_form'}
                                     label={t('Организационно-правовая форма')}
                                     options={get(organizationLegalFormList, 'data', [])}/>
-                            <Select classNames={'col-span-6'} name={'service_types'}
+                            <Select defaultValue={get(orgData, 'service_types')} classNames={'col-span-6'}
+                                    name={'service_types'}
                                     label={t('Виды оказания услуг')}
                                     isMulti
                                     options={get(organizationTypeServiceList, 'data', [])}/>
-                            <Select classNames={'col-span-6'} name={'affiliation'}
+                            <Select defaultValue={get(orgData, 'affiliation')} classNames={'col-span-6'}
+                                    name={'affiliation'}
                                     label={t('Орган государственного управления')}
                                     options={get(organizationManagementFormList, 'data', [])}/>
 
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
-                                    <button onClick={() => setOpen(false)} type={'button'}
+                                    <button onClose={closeModal} type={'button'}
                                             className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
                                         {t('Назад')}
                                     </button>
@@ -231,15 +267,15 @@ const OrganizationsContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'name'} label={t('Наименование')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'address')}>
                             <div className={'flex col-span-12 mb-4'}>
-                                <button onClick={() => setLang('uz')}
+                                <button type={'button'} onClick={() => setLang('uz')}
                                         className={clsx('py-2 px-4 border border-[#EAEFF8] rounded-lg mr-2.5 ', {'!bg-[#E5F0F3] !border-[#E5F0F3]': lang == 'uz'})}>O’zbekcha
                                 </button>
-                                <button onClick={() => setLang('ru')}
+                                <button type={'button'} onClick={() => setLang('ru')}
                                         className={clsx('py-2 px-4 border border-[#EAEFF8] rounded-lg mr-2.5', {'!bg-[#E5F0F3] !border-[#E5F0F3]': lang == 'ru'})}>Русский
                                 </button>
-                                <button onClick={() => setLang('en')}
+                                <button type={'button'} onClick={() => setLang('en')}
                                         className={clsx('py-2 px-4 border border-[#EAEFF8] rounded-lg mr-2.5', {'!bg-[#E5F0F3] !border-[#E5F0F3]': lang == 'en'})}>English
                                 </button>
                             </div>
@@ -255,13 +291,15 @@ const OrganizationsContainer = () => {
                                    label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-5'} name={`names[0].value_short`}
+                            <Input defaultValue={get(orgData, `names[0].value_short`)} classNames={'col-span-5'}
+                                   name={`names[0].value_short`}
                                    placeholder={t('Введите краткое наименование')}
                                    property={{type: lang == 'uz' ? 'text' : 'hidden'}}
                                    label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-7'} name={'names[0].value'}
+                            <Input defaultValue={get(orgData, `names[0].value`)} classNames={'col-span-7'}
+                                   name={'names[0].value'}
                                    placeholder={t('Введите полное наименование')}
                                    property={{type: lang == 'uz' ? 'text' : 'hidden'}}
                                    label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
@@ -279,13 +317,15 @@ const OrganizationsContainer = () => {
                                    label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-5'} name={'names[1].value_short'}
+                            <Input defaultValue={get(orgData, `names[1].value_short`)} classNames={'col-span-5'}
+                                   name={'names[1].value_short'}
                                    property={{type: lang == 'ru' ? 'text' : 'hidden'}}
                                    placeholder={t('Введите краткое наименование')}
                                    label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-7'} name={'names[1].value'}
+                            <Input defaultValue={get(orgData, `names[1].value`)} classNames={'col-span-7'}
+                                   name={'names[1].value'}
                                    property={{type: lang == 'ru' ? 'text' : 'hidden'}}
                                    placeholder={t('Введите полное наименование')}
                                    label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
@@ -303,13 +343,15 @@ const OrganizationsContainer = () => {
                                    label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-5'} name={'names[2].value_short'}
+                            <Input defaultValue={get(orgData, `names[2].value_short`)} classNames={'col-span-5'}
+                                   name={'names[2].value_short'}
                                    property={{type: lang == 'en' ? 'text' : 'hidden'}}
                                    placeholder={t('Введите краткое наименование')}
                                    label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-7'} name={'names[2].value'}
+                            <Input defaultValue={get(orgData, `names[2].value`)} classNames={'col-span-7'}
+                                   name={'names[2].value'}
                                    property={{type: lang == 'en' ? 'text' : 'hidden'}}
                                    placeholder={t('Введите полное наименование')}
                                    label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
@@ -317,7 +359,7 @@ const OrganizationsContainer = () => {
                             />
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
-                                    <button onClick={() => setOpen(false)} type={'button'}
+                                    <button onClick={() => setSearchParams(`tab=info`)} type={'button'}
                                             className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
                                         {t('Назад')}
                                     </button>
@@ -330,64 +372,57 @@ const OrganizationsContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'address'} label={t('Адрес')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
-                            <Select classNames={'col-span-4'} name={'medical_type'}
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'region')}>
+                            <Select defaultValue={get(orgData, 'locations[0].address.country')}
+                                    classNames={'col-span-4'} name={'locations[0].address.country'}
                                     label={<div className={'flex'}><span>{t('Страна')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
-                                    options={get(organizationCountryList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
-                            <Select classNames={'col-span-4'} name={'medical_type'}
+                                    options={get(organizationCountryList, 'data', [])}/>
+                            <Select defaultValue={get(orgData, 'locations[0].address.state')} classNames={'col-span-4'}
+                                    name={'locations[0].address.state'}
                                     label={<div className={'flex'}><span>{t('Регион')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
-                                    property={{onChange: (val) => setRegionId(get(val, 'value'))}}
-                                    options={get(organizationRegions, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
-                            <Select classNames={'col-span-4'} name={'medical_type'}
+                                    property={{onChange: (val) => setRegionId(get(val, 'id'))}}
+                                    options={get(organizationRegions, 'data', [])}/>
+                            <Select defaultValue={get(orgData, 'locations[0].address.city')} classNames={'col-span-4'}
+                                    name={'locations[0].address.city'}
                                     label={<div className={'flex'}><span>{t('Район')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
-                                    property={{onChange: (val) => setDistrictId(get(val, 'value'))}}
-                                    options={get(organizationDistricts, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display'),
-                                        ..._option
-                                    }))}
+                                    property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
+                                    options={get(organizationDistricts, 'data', [])}
                             />
-                            <Select classNames={'col-span-4'} name={'medical_type'}
+                            <Select defaultValue={get(orgData, 'locations[0].address.use')} classNames={'col-span-4'}
+                                    name={'locations[0].address.use'}
                                     label={<div className={'flex'}><span>{t('Махалля')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
-                                    options={get(organizationNeighbors, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display'),
-                                        ..._option
-                                    }))}
+                                    options={get(organizationNeighbors, 'data', [])}
                             />
-                            <Input classNames={'col-span-4'} name={'locations[0].address.line'}
+                            <Input defaultValue={get(orgData, 'locations[0].address.line')} classNames={'col-span-4'}
+                                   name={'locations[0].address.line'}
                                    params={{required: true}}
                                    placeholder={t('Улица')}
                                    label={<div className={'flex'}><span>{t('Улица')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-2'} name={'locations[0].address.block'}
+                            <Input defaultValue={get(orgData, 'locations[0].address.block')} classNames={'col-span-2'}
+                                   name={'locations[0].address.block'}
                                    params={{required: true}}
                                    placeholder={t('Дом')}
                                    label={<div className={'flex'}><span>{t('Дом')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-2'} name={'locations[0].address.postal_code'}
+                            <Input defaultValue={get(orgData, 'locations[0].address.postal_code')}
+                                   classNames={'col-span-2'} name={'locations[0].address.postal_code'}
                                    placeholder={t('Почтовый индекс')}
                                    label={t('Почтовый индекс')}
                             />
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
-                                    <button onClick={() => setOpen(false)} type={'button'}
+                                    <button onClick={() => setSearchParams(`tab=name`)} type={'button'}
                                             className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
                                         {t('Назад')}
                                     </button>
@@ -399,23 +434,19 @@ const OrganizationsContainer = () => {
                             </div>
                         </Form>
                     </Tab>
-                    <Tab tab={'region'}  label={t('Регион обслуживания')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
+                    <Tab tab={'region'} label={t('Регион обслуживания')}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'contact')}>
 
-                            <Select classNames={'col-span-6'} name={'medical_type'}
+                            <Select defaultValue={get(orgData, 'service_area[0].state')} classNames={'col-span-6'}
+                                    name={'service_area[0].state'}
                                     label={<div className={'flex'}><span>{t('Регион')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
-                                    isMulti
-                                    property={{onChange: (val) => setRegionId(get(val, 'value'))}}
-                                    options={get(organizationRegions, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(organizationRegions, 'data', [])}/>
 
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
-                                    <button onClick={() => setOpen(false)} type={'button'}
+                                    <button onClick={() => setSearchParams(`tab=address`)} type={'button'}
                                             className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
                                         {t('Назад')}
                                     </button>
@@ -428,67 +459,53 @@ const OrganizationsContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'contact'} label={t('Контакты')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'photo')}>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Контактная информация</h3>
-                            {/*{*/}
-                            {/*    range(0,increment+1).map(inc=><>*/}
-                            {/*        <PhoneNumber classNames={'col-span-4'} name={`contacts[${inc}].telecoms[0].value`}*/}
-                            {/*            // params={{*/}
-                            {/*            //     required: {*/}
-                            {/*            //         value:true,*/}
-                            {/*            //         message:'ddd'*/}
-                            {/*            //     },*/}
-                            {/*            //     pattern: {*/}
-                            {/*            //         value: /^998(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,*/}
-                            {/*            //         message: 'Invalid format'*/}
-                            {/*            //     }*/}
-                            {/*            // }}*/}
-                            {/*                     placeholder={t('Телефон')}*/}
-                            {/*                     label={<div className={'flex'}><span>{t('Телефон')}</span><img*/}
-                            {/*                         className={'ml-1'} src={orgIcon} alt="org"/></div>}*/}
-                            {/*        />*/}
-                            {/*        <Input classNames={'col-span-4'} name={`contacts[${inc}].address.block`}*/}
-                            {/*               placeholder={t('E-mail')}*/}
-                            {/*               params={{*/}
-                            {/*                   pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/*/}
-                            {/*               }}*/}
-                            {/*               label={t('E-mail')}*/}
-                            {/*        />*/}
-                            {/*        <Input classNames={'col-span-4'} name={`contacts[${inc}].address.postal_code`}*/}
-                            {/*               placeholder={t('URL адрес')}*/}
-                            {/*               label={t('URL адрес')}*/}
-                            {/*        />*/}
-                            {/*    </>)*/}
-                            {/*}*/}
-                            <PhoneNumber classNames={'col-span-4'} name={`contacts[0].telecoms[0].value`}
-                                // params={{
-                                //     required: {
-                                //         value:true,
-                                //         message:'ddd'
-                                //     },
-                                //     pattern: {
-                                //         value: /^998(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
-                                //         message: 'Invalid format'
-                                //     }
-                                // }}
+
+                            <PhoneNumber defaultValue={get(orgData, 'contacts[0].telecoms[0].value')}
+                                         classNames={'col-span-4'} name={`contacts[0].telecoms[0].value`}
+                                         property={{mask: '99-999-99-99'}}
+                                         params={{
+                                             required: true,
+                                             // pattern: {
+                                             //     value: /^(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
+                                             //     message: 'Invalid format'
+                                             // }
+                                         }}
                                          placeholder={t('Телефон')}
                                          label={<div className={'flex'}><span>{t('Телефон')}</span><img
                                              className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input classNames={'col-span-4'} name={`contacts[0].address.block`}
+
+
+                            <Input defaultValue={get(orgData, 'contacts[0].telecoms[1].value')}
+                                   classNames={'col-span-4'} name={`contacts[0].telecoms[1].value`}
                                    placeholder={t('E-mail')}
-                                   params={{
-                                       pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                                   }}
+                                // params={{
+                                //     pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                                // }}
                                    label={t('E-mail')}
                             />
-                            <Input classNames={'col-span-4'} name={`contacts[0].address.postal_code`}
+
+
+                            <Input defaultValue={get(orgData, 'contacts[0].telecoms[2].value')}
+                                   classNames={'col-span-4'} name={`contacts[0].telecoms[2].value`}
                                    placeholder={t('URL адрес')}
                                    label={t('URL адрес')}
                             />
+                            <Input defaultValue={1} classNames={'col-span-4'} name={`contacts[0].telecoms[0].system.id`}
+                                   property={{type: 'hidden'}}
+                            />
+                            <Input defaultValue={2} classNames={'col-span-4'} name={`contacts[0].telecoms[1].system.id`}
+                                   property={{type: 'hidden'}}
+                            />
+                            <Input defaultValue={3} classNames={'col-span-4'} name={`contacts[0].telecoms[2].system.id`}
+                                   property={{type: 'hidden'}}
+                            />
                             <div className={'col-span-12'}>
                                 <button
-                                    onClick={() => setIncrement(prev => ++prev)}
+                                    type={"button"}
+                                    // onClick={() => setIncrement(prev => ++prev)}
                                     className={'mr-6 p-2.5 !pr-6 text-[#006D85] rounded-lg inline-flex  border border-[#006D85] font-bold text-center  mt-3  items-center '}>
                                     <Plus className={'mr-1'}/> <span>Добавить
                                     поле</span>
@@ -506,17 +523,19 @@ const OrganizationsContainer = () => {
                                 <hr className={'my-4'}/>
                             </div>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
-                            <Input classNames={'col-span-4'} name={`contacts[0].address.postal_code`}
+                            <Input defaultValue={get(orgData, 'locations[0].latitude')} classNames={'col-span-4'}
+                                   name={`locations[0].latitude`}
                                    placeholder={t('Широта')}
                                    label={t('Широта')}
                             />
-                            <Input classNames={'col-span-4'} name={`contacts[0].address.postal_code`}
+                            <Input defaultValue={get(orgData, 'locations[0].longitude')} classNames={'col-span-4'}
+                                   name={`locations[0].longitude`}
                                    placeholder={t('Долгота')}
                                    label={t('Долгота')}
                             />
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
-                                    <button onClick={() => setOpen(false)} type={'button'}
+                                    <button onClick={() => setSearchParams(`tab=region`)} type={'button'}
                                             className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
                                         {t('Назад')}
                                     </button>
@@ -529,7 +548,19 @@ const OrganizationsContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'photo'} label={t('Изображение')}>
-                       img
+                        <img src={fileUploadImg}/>
+                        <div className={'col-span-12 '}>
+                            <div className="flex justify-end">
+                                <button onClick={() => setSearchParams(`tab=contact`)} type={'button'}
+                                        className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                    {t('Назад')}
+                                </button>
+                                <button onClick={add} type={'submit'}
+                                        className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                    {t('Сохранить')}
+                                </button>
+                            </div>
+                        </div>
                     </Tab>
                 </Tabs>
             </Modal>

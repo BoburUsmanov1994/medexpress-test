@@ -43,7 +43,7 @@ const GridView = ({
             key: listKey, url, params: {
                 params: {
                     ...params, page,
-                    // limit: get(pageSize, 'value')
+                    per_page: get(pageSize, 'value')
                 }
             }
         })

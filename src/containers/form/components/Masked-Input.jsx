@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import InputMask from 'react-input-mask';
 import {Controller} from "react-hook-form";
 import {get, hasIn} from "lodash";
 import clsx from "clsx";
+import {isFunction} from "lodash/lang";
 
 
 const MaskedInput = ({
@@ -15,7 +16,15 @@ const MaskedInput = ({
                          defaultValue = '',
                          label,
                          classNames = '',
+                         getValues = () => {},
+                         watch=()=>{}
                      }) => {
+    useEffect(() => {
+        if(isFunction(get(property,'onChange'))){
+            console.log(getValues(name), name)
+        }
+
+    }, [watch(name)]);
     return (
         <div className={clsx("form-group", classNames)}>
             <label className={'form-label'}>{label ?? name}</label>
@@ -42,12 +51,12 @@ const MaskedInput = ({
                 </InputMask>)
                 }
             />
-            {errors[name]?.type === 'required' &&
-            <span className={'form-error'}>This field is required</span>}
-            {errors[name]?.type === 'pattern' &&
-            <span className={'form-error'}>Value is not valid</span>}
-            {errors[name]?.type === 'validation' &&
-            <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
+            {get(errors,`${name}.type`) === "required" &&
+                <span className={'form-error'}>This field is required</span>}
+            {get(errors,`${name}.type`) === 'validation' &&
+                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
+            {get(errors,`${name}.type`) === 'pattern' &&
+                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
 
         </div>
     );

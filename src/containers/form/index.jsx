@@ -3,11 +3,11 @@ import {useForm} from "react-hook-form";
 
 const Form = ({defaultValues, children, onSubmit, classNames = ''}) => {
     const methods = useForm({defaultValues});
-    const {handleSubmit, formState: {errors}, setError, clearErrors, reset} = methods;
+    const {handleSubmit, formState: {errors}, setError, clearErrors, reset,    getValues, setValue,watch} = methods;
     const onSubmitRequest = (data) => {
         onSubmit({data, setError, clearErrors, reset})
     }
-    console.log('methods',methods)
+
     return (
         <form className={classNames} onSubmit={handleSubmit(onSubmitRequest)}>
             {React?.Children?.map(children, child => {
@@ -17,6 +17,8 @@ const Form = ({defaultValues, children, onSubmit, classNames = ''}) => {
                             ...child?.props,
                             control: methods?.control,
                             setValue: methods?.setValue,
+                            getValues:getValues,
+                            watch: watch,
                             register: methods?.register,
                             key: child?.props?.name,
                             errors: errors

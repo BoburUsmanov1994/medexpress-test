@@ -15,9 +15,8 @@ const PhoneInput = ({
                         defaultValue = '',
                         label,
                         classNames = '',
-                        format = "+998(##) ### ## ##"
+                        format = "998(##) ### ## ##"
                     }) => {
-    console.log('name',name)
     return (
         <div className={clsx("form-group", classNames)}>
             <label className={'form-label'}>{label ?? name}</label>
@@ -26,23 +25,21 @@ const PhoneInput = ({
                 name={name}
                 rules={params}
                 defaultValue={defaultValue}
-                render={({field, value, onChange}) => (
+                render={({field}) => (
                     <PatternFormat name={name}
                                    {...field}
                                    format={format}
                                    className={clsx('form-input  w-full', {'border-red-600': hasIn(errors, name)})}
-                                   value={value}
-                                   onChange={onChange}
                                    mask={"_"}
                                    allowEmptyFormatting
                     />)
                 }
             />
-            {errors[name]?.type == "required" &&
+            {get(errors,`${name}.type`) === "required" &&
                 <span className={'form-error'}>This field is required</span>}
-            {errors[name]?.type === 'validation' &&
+            {get(errors,`${name}.type`) === 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
-            {errors[name]?.type === 'pattern' &&
+            {get(errors,`${name}.type`) === 'pattern' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
 
 

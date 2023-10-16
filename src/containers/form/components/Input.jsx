@@ -3,6 +3,8 @@ import clsx from "clsx";
 import {get, hasIn} from "lodash";
 
 const Input = ({register=()=>{}, name='name', errors, property, params, label = '', classNames = '', ...rest}) => {
+    // console.log('errors',errors,name)
+    // console.log('err',get(errors,name))
     return (
         <>
             <div className={clsx("form-group", classNames,{'!mb-0':get(property, 'type') == 'hidden'})}>
