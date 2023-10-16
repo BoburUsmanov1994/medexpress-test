@@ -3,9 +3,9 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get,isObject} from "lodash"
+import {get, isObject} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
 import Modal from "../../../components/modal";
 import {Tab, Tabs} from "../../../components/tab";
@@ -24,7 +24,8 @@ import InputMaskComponent from "../../../components/input-mask";
 
 const OrganizationsContainer = () => {
     const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [open, setOpen] = useState(true);
     let [lang, setLang] = useState('uz');
     let [orgData, setOrgData] = useState({});
     let [regionId, setRegionId] = useState(null);
@@ -83,7 +84,7 @@ const OrganizationsContainer = () => {
         params: {
             params: {
                 level: 2,
-                parent_id: isObject(regionId) ? get(regionId,'value') : regionId
+                parent_id: isObject(regionId) ? get(regionId, 'value') : regionId
             },
         },
         enabled: !!(regionId)
@@ -94,7 +95,7 @@ const OrganizationsContainer = () => {
         params: {
             params: {
                 level: 3,
-                parent_id:isObject(districtId) ? get(districtId,'value') : districtId
+                parent_id: isObject(districtId) ? get(districtId, 'value') : districtId
             },
         },
         enabled: !!(districtId)
@@ -122,8 +123,9 @@ const OrganizationsContainer = () => {
             key: 'active',
         }
     ]
-    const onSubmit = () => {
-
+    const onSubmit = (data,tab) => {
+        debugger
+        setSearchParams(`tab=${tab}`)
     }
 
 
@@ -152,20 +154,20 @@ const OrganizationsContainer = () => {
                 <div className="col-span-8 mt-5 flex justify-end">
                     <div className="mr-6"><SelectComponent
                         value={regionId}
-                        setValue={(val)=>setRegionId(val)}
+                        setValue={(val) => setRegionId(val)}
                         label={t('Регион')} options={get(organizationRegions, 'data', []).map(_option => ({
                         value: get(_option, 'id'),
                         label: get(_option, 'display')
                     }))}/></div>
                     <div className="mr-6">
                         <SelectComponent
-                            setValue={(val)=>setDistrictId(val)}
+                            setValue={(val) => setDistrictId(val)}
                             value={districtId}
                             options={get(organizationDistricts, 'data', []).map(_option => ({
                                 value: get(_option, 'id'),
                                 label: get(_option, 'display')
                             }))}
-                            label={t('Район')} />
+                            label={t('Район')}/>
                     </div>
                     <InputMaskComponent mask={'999999999'} label={'ИНН'}/>
                 </div>
@@ -179,9 +181,9 @@ const OrganizationsContainer = () => {
             </div>
             <Modal open={open} onClose={() => setOpen(false)} classNames={'!w-[1080px] !pb-0'}
                    title={t('Добавление организации')}>
-                <Tabs>
-                    <Tab label={t('Информация')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
+                <Tabs isLabelDisabled>
+                    <Tab tab={'info'} label={t('Информация')}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data)=>onSubmit(data,'info')}>
                             <InputMask params={{required: true}} classNames={'col-span-6'} name={'tin'}
                                        property={{
                                            placeholder: t('Введите ИНН организации'),
@@ -193,49 +195,27 @@ const OrganizationsContainer = () => {
                             />
                             <Select classNames={'col-span-6'} name={'parent'}
                                     label={t('Родительская организация')}
-                                    options={get(orgSelectList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(orgSelectList, 'data', [])}/>
                             <Select classNames={'col-span-6'} name={'level'}
                                     label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
-                                    options={get(organizationTypeLevelList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(organizationTypeLevelList, 'data', [])}/>
                             <Select classNames={'col-span-6'} name={'medical_type'}
                                     label={<div className={'flex'}><span>{t('Тип организации')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
-                                    options={get(organizationTypeMedicalList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(organizationTypeMedicalList, 'data', [])}/>
                             <Select classNames={'col-span-6'} name={'legal_form'}
                                     label={t('Организационно-правовая форма')}
-                                    options={get(organizationLegalFormList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(organizationLegalFormList, 'data', [])}/>
                             <Select classNames={'col-span-6'} name={'service_types'}
                                     label={t('Виды оказания услуг')}
                                     isMulti
-                                    options={get(organizationTypeServiceList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(organizationTypeServiceList, 'data', [])}/>
                             <Select classNames={'col-span-6'} name={'affiliation'}
                                     label={t('Орган государственного управления')}
-                                    options={get(organizationManagementFormList, 'data', []).map(_option => ({
-                                        value: get(_option, 'id'),
-                                        label: get(_option, 'display')
-                                    }))}/>
+                                    options={get(organizationManagementFormList, 'data', [])}/>
 
-                            {/*<Input classNames={'col-span-6'} name={'founder'}*/}
-                            {/*       placeholder={t('Учредитель')}*/}
-                            {/*       label={t('Учредитель')}*/}
-                            {/*/>*/}
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
                                     <button onClick={() => setOpen(false)} type={'button'}
@@ -250,7 +230,7 @@ const OrganizationsContainer = () => {
                             </div>
                         </Form>
                     </Tab>
-                    <Tab label={t('Наименование')}>
+                    <Tab tab={'name'} label={t('Наименование')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
                             <div className={'flex col-span-12 mb-4'}>
                                 <button onClick={() => setLang('uz')}
@@ -349,7 +329,7 @@ const OrganizationsContainer = () => {
                             </div>
                         </Form>
                     </Tab>
-                    <Tab label={t('Адрес')}>
+                    <Tab tab={'address'} label={t('Адрес')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
                             <Select classNames={'col-span-4'} name={'medical_type'}
                                     label={<div className={'flex'}><span>{t('Страна')}</span><img
@@ -419,7 +399,7 @@ const OrganizationsContainer = () => {
                             </div>
                         </Form>
                     </Tab>
-                    <Tab label={t('Регион обслуживания')}>
+                    <Tab tab={'region'}  label={t('Регион обслуживания')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
 
                             <Select classNames={'col-span-6'} name={'medical_type'}
@@ -447,7 +427,7 @@ const OrganizationsContainer = () => {
                             </div>
                         </Form>
                     </Tab>
-                    <Tab label={t('Контакты')}>
+                    <Tab tab={'contact'} label={t('Контакты')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={onSubmit}>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Контактная информация</h3>
                             {/*{*/}
@@ -548,9 +528,9 @@ const OrganizationsContainer = () => {
                             </div>
                         </Form>
                     </Tab>
-                    {/*<Tab label={t('Изображение')}>*/}
-                    {/*   img*/}
-                    {/*</Tab>*/}
+                    <Tab tab={'photo'} label={t('Изображение')}>
+                       img
+                    </Tab>
                 </Tabs>
             </Modal>
         </div>

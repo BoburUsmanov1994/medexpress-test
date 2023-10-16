@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import RSelect, {components} from 'react-select';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
 import {Controller} from "react-hook-form";
-import {get, hasIn} from "lodash";
+import {get, hasIn, isEmpty, isNil, includes} from "lodash";
 
 const DropdownIndicator = props => {
     return (
@@ -44,9 +44,20 @@ const customStyles = (hasError = false) => ({
     })
 });
 const Select = ({
-                    control,property,isMulti = false, name, errors, placeholder = 'Не выбран', params, label = '', options = [],classNames='',
+                    control,
+                    property,
+                    isMulti = false,
+                    name,
+                    errors,
+                    placeholder = 'Не выбран',
+                    params,
+                    label = '',
+                    options = [],
+                    classNames = '',
+
                 }) => {
 
+    console.log('errors', errors)
     return (
         <div className={clsx(`form-group ${classNames}`)}>
             {label && <label className={clsx('form-label')}
@@ -55,22 +66,32 @@ const Select = ({
                 control={control}
                 name={name}
                 rules={params}
-                render={({field}) => <RSelect
-                    {...field}
+                render={({field: { onChange, value, ref }}) => <RSelect
+                    inputRef={ref}
+                    isClearable
                     clearIndicator={true}
                     styles={customStyles(hasIn(errors, name))}
-                    id={label}
+                    getOptionLabel={(option) => get(option, get(property, 'optionLabel', 'display'))}
+                    getOptionValue={(option) => get(option, get(property, 'optionValue', 'id'))}
                     options={options}
-                    onChange={(val)=>get(property,'onChange',()=>{})(val)}
+                    value={isMulti ? options.filter(option => get(option, value?.includes(get(option,get(property, 'optionValue', 'id'))))) :options.find(option => get(option, get(property, 'optionValue', 'id')) === value)}
+                    onChange={isMulti ? val => {
+                        console.log('isMulti',val,get(property, 'optionValue', 'id'),value)
+                        onChange(val.map(_val=>get(_val,get(property, 'optionValue', 'id'))))
+                        console.log(val.map(_val=>get(_val,get(property, 'optionValue', 'id'))))
+                    } :val => {
+                        console.log('val',val)
+                        onChange(get(val,get(property, 'optionValue', 'id')))
+                    }}
                     components={{DropdownIndicator}}
                     placeholder={placeholder}
                     isMulti={isMulti}
                 />}
             />
             {errors[name]?.type == 'required' &&
-                <span className={'form-error'}>This field is required</span>}
+            <span className={'form-error'}>This field is required</span>}
             {errors[name]?.type == 'validation' &&
-                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
+            <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
         </div>
     );
 };

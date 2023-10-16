@@ -27,14 +27,14 @@ const customStyles = (sm = false) => ({
         height: '40px',
         fontSize: '16px',
         fontWeight: '600',
-        "&:hover": {
-            borderColor: '#006D85',
-            outline: "none",
-        },
-        "&:focus": {
-            borderColor: '#006D85',
-            outline: "none",
-        }
+        // "&:hover": {
+        //     borderColor: '#006D85',
+        //     outline: "none",
+        // },
+        // "&:focus": {
+        //     borderColor: '#006D85',
+        //     outline: "none",
+        // }
     }),
     indicatorSeparator: (base, state) => ({
         ...base,

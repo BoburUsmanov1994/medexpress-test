@@ -17,27 +17,37 @@ const MaskedInput = ({
                          classNames = '',
                      }) => {
     return (
-        <div className={clsx("form-group",classNames)}>
+        <div className={clsx("form-group", classNames)}>
             <label className={'form-label'}>{label ?? name}</label>
             <Controller
+                as={InputMask}
                 control={control}
                 name={name}
                 rules={params}
                 defaultValue={defaultValue}
                 render={({field}) => (<InputMask
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange}
                     className={clsx('form-input  w-full', {'border-red-600': hasIn(errors, name)})}
                     placeholder={get(property, "placeholder")}
                     mask={get(property, "mask", "aa")}
-                    maskChar={get(property, "maskChar", " ")}
-                    disabled={disabled}
-                />)
+                    maskChar={get(property, "maskChar", "_")}
+                >
+                    {(inputProps) => (
+                        <input
+                            {...inputProps}
+                            type="text"
+                        />
+                    )}
+                </InputMask>)
                 }
             />
             {errors[name]?.type === 'required' &&
-                <span className={'form-error'}>This field is required</span>}
+            <span className={'form-error'}>This field is required</span>}
+            {errors[name]?.type === 'pattern' &&
+            <span className={'form-error'}>Value is not valid</span>}
             {errors[name]?.type === 'validation' &&
-                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
+            <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
 
         </div>
     );
