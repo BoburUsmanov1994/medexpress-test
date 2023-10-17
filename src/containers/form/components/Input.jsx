@@ -1,10 +1,10 @@
 import React from 'react';
 import clsx from "clsx";
 import {get, hasIn} from "lodash";
+import {useTranslation} from "react-i18next";
 
 const Input = ({register=()=>{}, name='name', errors, property, params, label = '', classNames = '', ...rest}) => {
-    // console.log('errors',errors,name)
-    // console.log('err',get(errors,name))
+    const {t} = useTranslation()
     return (
         <>
             <div className={clsx("form-group", classNames,{'!mb-0':get(property, 'type') == 'hidden'})}>
@@ -14,7 +14,7 @@ const Input = ({register=()=>{}, name='name', errors, property, params, label = 
                         type={get(property, 'type', "text")} disabled={get(property, 'disabled', false)}
                         step={get(property, "step", "any")}/>
                 {errors[name]?.type == 'required' &&
-                    <span className={'form-error'}>This field is required</span>}
+                    <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
                 {errors[name]?.type == 'validation' &&
                     <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
                 {errors[name]?.type === 'pattern' &&

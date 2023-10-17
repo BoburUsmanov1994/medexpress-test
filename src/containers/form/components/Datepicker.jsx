@@ -5,6 +5,7 @@ import {Controller} from "react-hook-form";
 import {get, hasIn} from "lodash";
 import dayjs from "dayjs";
 import clsx from "clsx";
+import {useTranslation} from "react-i18next";
 
 
 const CustomDatepicker = ({
@@ -18,6 +19,7 @@ const CustomDatepicker = ({
                               label,
                               dateFormat = "yyyy/MM/dd",
                           }) => {
+    const {t} = useTranslation()
     return (
         <div className="form-group">
             <label className={'form-label'}>{label ?? name}</label>
@@ -37,7 +39,7 @@ const CustomDatepicker = ({
                 }
             />
             {errors[name]?.type == 'required' &&
-                <span className={'text-red-600 text-xs'}>This field is required</span>}
+                <span className={'text-red-600 text-xs'}>{t('Заполните обязательное поле')}</span>}
             {errors[name]?.type == 'validation' &&
                 <span className={'text-red-600 text-xs'}>{get(errors, `${name}.message`)}</span>}
 

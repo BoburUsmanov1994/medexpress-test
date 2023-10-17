@@ -29,6 +29,7 @@
     "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
     "react-select": "^5.7.2",
+    "react-select-async-paginate": "^0.7.3",
     "react-simple-oauth2-login": "^0.5.4",
     "react-spinners": "^0.13.8",
     "react-toastify": "^9.1.2",

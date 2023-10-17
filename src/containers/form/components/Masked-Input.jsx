@@ -4,6 +4,7 @@ import {Controller} from "react-hook-form";
 import {get, hasIn} from "lodash";
 import clsx from "clsx";
 import {isFunction} from "lodash/lang";
+import {useTranslation} from "react-i18next";
 
 
 const MaskedInput = ({
@@ -19,11 +20,11 @@ const MaskedInput = ({
                          getValues = () => {},
                          watch=()=>{}
                      }) => {
+    const {t} = useTranslation()
     useEffect(() => {
         if(isFunction(get(property,'onChange'))){
             console.log(getValues(name), name)
         }
-
     }, [watch(name)]);
     return (
         <div className={clsx("form-group", classNames)}>
@@ -52,7 +53,7 @@ const MaskedInput = ({
                 }
             />
             {get(errors,`${name}.type`) === "required" &&
-                <span className={'form-error'}>This field is required</span>}
+                <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
             {get(errors,`${name}.type`) === 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
             {get(errors,`${name}.type`) === 'pattern' &&

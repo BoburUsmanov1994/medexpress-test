@@ -3,25 +3,23 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get, isObject, range} from "lodash"
+import {get, isObject} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
 import Modal from "../../../components/modal";
 import {Tab, Tabs} from "../../../components/tab";
 import Form from "../../../containers/form";
-import {InputMask, Select} from "../../../containers/form/components";
-import Input from "../../../containers/form/components/Input";
+import {InputMask, Select, PhoneNumber, Input, AsyncSelect} from "../../../containers/form/components";
 import orgIcon from "../../../assets/icons/org.svg"
 import {Minus, Plus} from "react-feather";
 import {useGetAllQuery, usePostQuery} from "../../../hooks/api";
 import clsx from "clsx";
-import PhoneNumber from "../../../containers/form/components/PhoneNumber";
 import Search from "../../../components/search"
 import SelectComponent from "../../../components/select";
 import InputMaskComponent from "../../../components/input-mask";
 import fileUploadImg from "../../../assets/images/fileUpload.png"
-import {ContentLoader, OverlayLoader} from "../../../components/loader";
+import {ContentLoader} from "../../../components/loader";
 
 
 const OrganizationsContainer = () => {
@@ -33,41 +31,58 @@ const OrganizationsContainer = () => {
     let [regionId, setRegionId] = useState(null);
     let [districtId, setDistrictId] = useState(null);
     let [increment, setIncrement] = useState(0);
-    const [filter,setFilter] = useState({name:'',state_id:null,city_id:null})
+    const [filter, setFilter] = useState({name: '', state_id: null, city_id: null})
     const {t} = useTranslation();
-    const {data: orgSelectList} = useGetAllQuery({
-        key: KEYS.organizationsListForSelect,
-        url: URLS.organizationsListForSelect,
-    })
 
     const {data: organizationTypeLevelList} = useGetAllQuery({
         key: KEYS.organizationTypeLevel,
         url: URLS.organizationTypeLevel,
+        params: {
+            params: {
+                limit: 100
+            }
+        }
     })
 
     const {data: organizationTypeMedicalList} = useGetAllQuery({
         key: KEYS.organizationTypeMedical,
         url: URLS.organizationTypeMedical,
+        params: {
+            params: {
+                limit: 100
+            }
+        }
     })
 
     const {data: organizationLegalFormList} = useGetAllQuery({
         key: KEYS.organizationLegalForm,
         url: URLS.organizationLegalForm,
+        params: {
+            params: {
+                limit: 100
+            }
+        }
     })
 
     const {data: organizationTypeServiceList} = useGetAllQuery({
         key: KEYS.organizationTypeService,
         url: URLS.organizationTypeService,
+        params: {
+            params: {
+                limit: 100
+            }
+        }
     })
 
-    const {data: organizationManagementFormList} = useGetAllQuery({
-        key: KEYS.organizationManagementForm,
-        url: URLS.organizationManagementForm,
-    })
 
     const {data: organizationCountryList} = useGetAllQuery({
         key: KEYS.organizationCountry,
         url: URLS.organizationCountry,
+        params: {
+            params: {
+                limit: 1000
+            }
+        }
     })
 
     const {data: organizationRegions} = useGetAllQuery({
@@ -75,6 +90,7 @@ const OrganizationsContainer = () => {
         url: URLS.organizationTerritory,
         params: {
             params: {
+                limit: 100,
                 level: 1
             }
         }
@@ -85,17 +101,31 @@ const OrganizationsContainer = () => {
         url: URLS.organizationTerritory,
         params: {
             params: {
+                limit: 100,
                 level: 2,
                 parent_id: isObject(regionId) ? get(regionId, 'value') : regionId
             },
         },
         enabled: !!(regionId)
     })
+    const {data: districts} = useGetAllQuery({
+        key: KEYS.organizationTerritory,
+        url: URLS.organizationTerritory,
+        params: {
+            params: {
+                limit: 100,
+                level: 2,
+                parent_id: get(filter, 'state_id.value')
+            },
+        },
+        enabled: !!(get(filter, 'state_id.value'))
+    })
     const {data: organizationNeighbors} = useGetAllQuery({
         key: KEYS.organizationTerritory,
         url: URLS.organizationTerritory,
         params: {
             params: {
+                limit: 1000,
                 level: 3,
                 parent_id: isObject(districtId) ? get(districtId, 'value') : districtId
             },
@@ -135,9 +165,10 @@ const OrganizationsContainer = () => {
     }
 
     const add = () => {
+        const {longitude,latitude,...rest} = orgData;
         addRequest({
             url: URLS.organizations,
-            attributes: {...orgData}
+            attributes: {...orgData,display:get(orgData,'names[0].value'),locations:[{address:get(orgData,'locations[0].address'),longitude:parseFloat(longitude),latitude:parseFloat(latitude)}]}
         }, {
             onSuccess: () => {
                 closeModal();
@@ -150,6 +181,8 @@ const OrganizationsContainer = () => {
         setOrgData({})
         setSearchParams(``)
     }
+
+    console.log('orgData',orgData)
 
     return (
         <div>
@@ -171,21 +204,21 @@ const OrganizationsContainer = () => {
                     </button>
                 </div>
                 <div className="col-span-4 mt-5">
-                    <Search handleSearch={(val)=>setFilter(prev=>({...prev,name:val}))}/>
+                    <Search handleSearch={(val) => setFilter(prev => ({...prev, name: val}))}/>
                 </div>
                 <div className="col-span-8 mt-5 flex justify-end">
                     <div className="mr-6"><SelectComponent
-                        value={regionId}
-                        setValue={(val) => setFilter(prev=>({...prev,state_id:get(val,'value')}))}
+                        value={get(filter, 'state_id')}
+                        setValue={(val) => setFilter(prev => ({...prev, state_id: val}))}
                         label={t('Регион')} options={get(organizationRegions, 'data', []).map(_option => ({
                         value: get(_option, 'id'),
                         label: get(_option, 'display')
                     }))}/></div>
                     <div className="mr-6">
                         <SelectComponent
-                            setValue={(val) => setFilter(prev=>({...prev,city_id:get(val,'value')}))}
-                            value={districtId}
-                            options={get(organizationDistricts, 'data', []).map(_option => ({
+                            setValue={(val) => setFilter(prev => ({...prev, city_id: val}))}
+                            value={get(filter, 'city_id')}
+                            options={get(districts, 'data', []).map(_option => ({
                                 value: get(_option, 'id'),
                                 label: get(_option, 'display')
                             }))}
@@ -196,9 +229,9 @@ const OrganizationsContainer = () => {
                 <div className="col-span-12 mt-6">
                     <GridView
                         params={{
-                            name: search ?? null,
-                            state_id: isObject(regionId) ? get(regionId, 'value') : regionId,
-                            city_id: isObject(districtId) ? get(districtId, 'value') : districtId
+                            name: get(filter, 'name'),
+                            state_id: get(filter, 'state_id.value'),
+                            city_id: get(filter, 'city_id.value')
                         }}
                         hasActionColumn
                         listKey={KEYS.organizations} url={URLS.organizations}
@@ -223,11 +256,12 @@ const OrganizationsContainer = () => {
                                        label={<div className={'flex'}><span>{t('ИНН организации')}</span><img
                                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Select classNames={'col-span-6'}
-                                    name={'parent'}
-                                    defaultValue={get(orgData, 'parent')}
-                                    label={t('Родительская организация')}
-                                    options={get(orgSelectList, 'data', [])}/>
+                            <AsyncSelect isDisabledSearch url={URLS.organizationsListForSelect} keyId={KEYS.organizationsListForSelect}
+                                         classNames={'col-span-6'}
+                                         name={'parent'}
+                                         defaultValue={get(orgData, 'parent')}
+                                         label={t('Родительская организация')}
+                            />
                             <Select defaultValue={get(orgData, 'level')} classNames={'col-span-6'} name={'level'}
                                     label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
@@ -247,10 +281,12 @@ const OrganizationsContainer = () => {
                                     label={t('Виды оказания услуг')}
                                     isMulti
                                     options={get(organizationTypeServiceList, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'affiliation')} classNames={'col-span-6'}
-                                    name={'affiliation'}
-                                    label={t('Орган государственного управления')}
-                                    options={get(organizationManagementFormList, 'data', [])}/>
+                            <AsyncSelect defaultValue={get(orgData, 'affiliation')} classNames={'col-span-6'}
+                                         keyId={KEYS.organizationManagementForm}
+                                         url={URLS.organizationManagementForm}
+                                         name={'affiliation'}
+                                         label={t('Орган государственного управления')}
+                            />
 
                             <div className={'col-span-12 '}>
                                 <div className="flex justify-end">
@@ -279,18 +315,7 @@ const OrganizationsContainer = () => {
                                         className={clsx('py-2 px-4 border border-[#EAEFF8] rounded-lg mr-2.5', {'!bg-[#E5F0F3] !border-[#E5F0F3]': lang == 'en'})}>English
                                 </button>
                             </div>
-                            <Input defaultValue={0} classNames={'col-span-5'} name={`names[0].id`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Input defaultValue={'uz'} classNames={'col-span-5'} name={`names[0].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
+
                             <Input defaultValue={get(orgData, `names[0].value_short`)} classNames={'col-span-5'}
                                    name={`names[0].value_short`}
                                    placeholder={t('Введите краткое наименование')}
@@ -305,18 +330,7 @@ const OrganizationsContainer = () => {
                                    label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input defaultValue={1} classNames={'col-span-5'} name={`names[1].id`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Input defaultValue={'ru'} classNames={'col-span-5'} name={`names[1].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
+
                             <Input defaultValue={get(orgData, `names[1].value_short`)} classNames={'col-span-5'}
                                    name={'names[1].value_short'}
                                    property={{type: lang == 'ru' ? 'text' : 'hidden'}}
@@ -331,18 +345,7 @@ const OrganizationsContainer = () => {
                                    label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input defaultValue={2} classNames={'col-span-5'} name={`names[2].id`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Input defaultValue={'en'} classNames={'col-span-5'} name={`names[2].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
+
                             <Input defaultValue={get(orgData, `names[2].value_short`)} classNames={'col-span-5'}
                                    name={'names[2].value_short'}
                                    property={{type: lang == 'en' ? 'text' : 'hidden'}}
@@ -355,6 +358,24 @@ const OrganizationsContainer = () => {
                                    property={{type: lang == 'en' ? 'text' : 'hidden'}}
                                    placeholder={t('Введите полное наименование')}
                                    label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                            />
+                            <Input defaultValue={'en'} classNames={'col-span-5'} name={`names[2].locale`}
+                                   placeholder={t('Введите краткое наименование')}
+                                   property={{type: 'hidden'}}
+                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                            />
+                            <Input defaultValue={'uz'} classNames={'col-span-5'} name={`names[0].locale`}
+                                   placeholder={t('Введите краткое наименование')}
+                                   property={{type: 'hidden'}}
+                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                            />
+                            <Input defaultValue={'ru'} classNames={'col-span-5'} name={`names[1].locale`}
+                                   placeholder={t('Введите краткое наименование')}
+                                   property={{type: 'hidden'}}
+                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
                             <div className={'col-span-12 '}>
@@ -373,7 +394,7 @@ const OrganizationsContainer = () => {
                     </Tab>
                     <Tab tab={'address'} label={t('Адрес')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'region')}>
-                            <Select defaultValue={get(orgData, 'locations[0].address.country')}
+                            <Select isDisabled  defaultValue={{id:244,display:"O'ZBEKISTON",code:"UZB"}}
                                     classNames={'col-span-4'} name={'locations[0].address.country'}
                                     label={<div className={'flex'}><span>{t('Страна')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -386,16 +407,16 @@ const OrganizationsContainer = () => {
                                     params={{required: true}}
                                     property={{onChange: (val) => setRegionId(get(val, 'id'))}}
                                     options={get(organizationRegions, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'locations[0].address.city')} classNames={'col-span-4'}
-                                    name={'locations[0].address.city'}
+                            <Select defaultValue={get(orgData, 'locations[0].address.district')} classNames={'col-span-4'}
+                                    name={'locations[0].address.district'}
                                     label={<div className={'flex'}><span>{t('Район')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
                                     property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
                                     options={get(organizationDistricts, 'data', [])}
                             />
-                            <Select defaultValue={get(orgData, 'locations[0].address.use')} classNames={'col-span-4'}
-                                    name={'locations[0].address.use'}
+                            <Select defaultValue={get(orgData, 'locations[0].address.city')} classNames={'col-span-4'}
+                                    name={'locations[0].address.city'}
                                     label={<div className={'flex'}><span>{t('Махалля')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
@@ -410,7 +431,7 @@ const OrganizationsContainer = () => {
                             />
                             <Input defaultValue={get(orgData, 'locations[0].address.block')} classNames={'col-span-2'}
                                    name={'locations[0].address.block'}
-                                   params={{required: true}}
+                                   params={{required: true,valueAsNumber:true}}
                                    placeholder={t('Дом')}
                                    label={<div className={'flex'}><span>{t('Дом')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -493,13 +514,13 @@ const OrganizationsContainer = () => {
                                    placeholder={t('URL адрес')}
                                    label={t('URL адрес')}
                             />
-                            <Input defaultValue={1} classNames={'col-span-4'} name={`contacts[0].telecoms[0].system.id`}
+                            <Input params={{valueAsNumber:true}} defaultValue={1} classNames={'col-span-4'} name={`contacts[0].telecoms[0].system.id`}
                                    property={{type: 'hidden'}}
                             />
-                            <Input defaultValue={2} classNames={'col-span-4'} name={`contacts[0].telecoms[1].system.id`}
+                            <Input params={{valueAsNumber:true}} defaultValue={2} classNames={'col-span-4'} name={`contacts[0].telecoms[1].system.id`}
                                    property={{type: 'hidden'}}
                             />
-                            <Input defaultValue={3} classNames={'col-span-4'} name={`contacts[0].telecoms[2].system.id`}
+                            <Input params={{valueAsNumber:true}} defaultValue={3} classNames={'col-span-4'} name={`contacts[0].telecoms[2].system.id`}
                                    property={{type: 'hidden'}}
                             />
                             <div className={'col-span-12'}>
@@ -523,13 +544,13 @@ const OrganizationsContainer = () => {
                                 <hr className={'my-4'}/>
                             </div>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
-                            <Input defaultValue={get(orgData, 'locations[0].latitude')} classNames={'col-span-4'}
-                                   name={`locations[0].latitude`}
+                            <Input params={{valueAsNumber:true}} defaultValue={get(orgData, 'latitude')} classNames={'col-span-4'}
+                                   name={`latitude`}
                                    placeholder={t('Широта')}
                                    label={t('Широта')}
                             />
-                            <Input defaultValue={get(orgData, 'locations[0].longitude')} classNames={'col-span-4'}
-                                   name={`locations[0].longitude`}
+                            <Input params={{valueAsNumber:true}} defaultValue={get(orgData, 'longitude')} classNames={'col-span-4'}
+                                   name={`longitude`}
                                    placeholder={t('Долгота')}
                                    label={t('Долгота')}
                             />

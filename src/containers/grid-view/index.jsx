@@ -14,7 +14,6 @@ import {Edit2, Trash2} from "react-feather";
 import usePutQuery from "../../hooks/api/usePutQuery";
 import Swal from "sweetalert2";
 import {useTranslation} from "react-i18next";
-import Checkbox from "../../components/checkbox";
 
 const GridView = ({
                       url = '/',
@@ -49,27 +48,27 @@ const GridView = ({
         })
 
         const {data: defaultValues = {}, isLoading: isLoadingOne} = useGetOneQuery({
-            id: rowId, key: [listKey, rowId], url:viewUrl ?? url, enabled: !!(rowId)
+            id: rowId, key: [listKey, rowId], url: viewUrl ?? url, enabled: !!(rowId)
         })
         const {mutate: createRequest, isLoading: isLoadingPost} = usePostQuery({listKeyId: listKey})
         const {mutate: updateRequest, isLoading: isLoadingPut} = usePutQuery({listKeyId: listKey})
         const {mutate: deleteRequest, isLoading: deleteLoading} = useDeleteQuery({listKeyId: listKey})
         const onSubmit = ({data: attrs, setError, reset}) => {
             if (!openCreateModal && rowId) {
-                    updateRequest({
-                        url: `${viewUrl ?? url}/${get(attrs, rowKey)}`,
-                        attributes: omit(attrs, rowKey)
-                    }, {
-                        onSuccess: () => {
-                            setRowId(null);
-                            reset()
-                        },
-                        onError: (error) => {
-                            forEach(get(error, 'response.data.errors', {}), (value, field) => {
-                                setError(field, {type: 'validation', message: head(value)})
-                            })
-                        }
-                    })
+                updateRequest({
+                    url: `${viewUrl ?? url}/${get(attrs, rowKey)}`,
+                    attributes: omit(attrs, rowKey)
+                }, {
+                    onSuccess: () => {
+                        setRowId(null);
+                        reset()
+                    },
+                    onError: (error) => {
+                        forEach(get(error, 'response.data.errors', {}), (value, field) => {
+                            setError(field, {type: 'validation', message: head(value)})
+                        })
+                    }
+                })
 
 
             } else {
@@ -116,12 +115,10 @@ const GridView = ({
         return (<div className={'bg-white rounded-lg'}>
             {filters}
             <div className="overflow-x-auto max-h-[75vh] overflow-y-auto border border-[#E6E6E6] rounded-lg">
+
                 <table className="table">
                     <thead className={'thead'}>
                     <tr className={'tr'}>
-                        {/*<th className={'th !pr-0'}>*/}
-                        {/*    <Checkbox />*/}
-                        {/*</th>*/}
                         {columns && columns.map(th => <th
                             className={clsx(`th`, get(th, "classnames", ""))}
                             key={get(th, 'title')}>
@@ -140,9 +137,6 @@ const GridView = ({
                                 className={"tr"}
                                 key={get(tr, get(columns, '[0].key', index))}
                             >
-                                {/*<td className={'td'}>*/}
-                                {/*    <Checkbox />*/}
-                                {/*</td>*/}
                                 {columns.map((th, j) => <td key={get(th, 'key', j)}
                                                             className={clsx(`td`, get(th, "classnames", ""), {'!px-0': doubleRow})}>
                                     {get(th, 'render') ? get(th, 'render')({
@@ -159,7 +153,7 @@ const GridView = ({
                             </tr>
                         </>);
                     }) : <tr>
-                        <td colSpan={columns?.length+1 || 12}>
+                        <td colSpan={hasActionColumn ? columns?.length + 1 : columns?.length || 12}>
                             <Nodata/>
                         </td>
                     </tr>}
@@ -168,7 +162,7 @@ const GridView = ({
             </div>
             {get(data, 'data.meta.total') > 0 && <div className="flex justify-between items-center p-3">
                 <div className="flex items-center ">
-                    <Select sm value={pageSize} setValue={setPageSize} options={PER_PAGES}/>
+                    <Select isClearable={false} sm value={pageSize} setValue={setPageSize} options={PER_PAGES}/>
                     <span
                         className={'ml-3 text-secondary-300 text-sm font-semibold'}>{t("Show")} 1-{get(pageSize, 'value', 0)} {t("from")} {get(data, 'data.meta.total', 0)}</span>
                 </div>

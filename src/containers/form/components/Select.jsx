@@ -3,8 +3,9 @@ import RSelect, {components} from 'react-select';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
 import {Controller} from "react-hook-form";
-import {get, hasIn, isEmpty, isNil, includes} from "lodash";
+import {get, hasIn} from "lodash";
 import {isFunction} from "lodash/lang";
+import {useTranslation} from "react-i18next";
 
 const DropdownIndicator = props => {
     return (
@@ -57,8 +58,10 @@ const Select = ({
                     classNames = '',
                     defaultValue=null,
                     getValues=()=>{},
-                    watch=()=>{}
+                    watch=()=>{},
+                    isDisabled = false
                 }) => {
+    const {t} = useTranslation()
     useEffect(() => {
         if(isFunction(get(property,'onChange'))){
             get(property,'onChange')(getValues(name), name);
@@ -86,11 +89,12 @@ const Select = ({
                     placeholder={placeholder}
                     isMulti={isMulti}
                     defaultValue={defaultValue}
+                    isDisabled={isDisabled}
                 />}
             />
-            {errors[name]?.type == 'required' &&
-                <span className={'form-error'}>This field is required</span>}
-            {errors[name]?.type == 'validation' &&
+            {get(errors,`${name}.type`) == 'required' &&
+                <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
+            {get(errors,`${name}.type`) == 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
         </div>
     );

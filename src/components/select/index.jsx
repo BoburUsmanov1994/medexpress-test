@@ -23,7 +23,7 @@ const customStyles = (sm = false) => ({
         display: "flex",
         overflow: 'hidden',
         padding: '2px 8px',
-        width: '200px',
+        width: sm ?'100px':'200px',
         height: '40px',
         fontSize: '16px',
         fontWeight: '600',
@@ -48,7 +48,8 @@ const Select = ({
                     label = '',
                     options = [],
                     setValue = () => {
-                    }
+                    },
+                    isClearable=true
                 }) => {
 
     return (
@@ -56,7 +57,7 @@ const Select = ({
             {label && <label className={clsx('mr-2 text-secondary-300 font-bold flex items-center')}
                              htmlFor={label}>{label}</label>}
             <RSelect
-                isClearable
+                isClearable={isClearable}
                 name={name}
                 clearIndicator={true}
                 styles={customStyles(sm)}
