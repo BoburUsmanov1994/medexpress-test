@@ -228,6 +228,7 @@ const OrganizationsContainer = () => {
                 </div>
                 <div className="col-span-12 mt-6">
                     <GridView
+                        onRowClick={({id})=>navigate(`/hrm/organization/${id}`)}
                         params={{
                             name: get(filter, 'name'),
                             state_id: get(filter, 'state_id.value'),
