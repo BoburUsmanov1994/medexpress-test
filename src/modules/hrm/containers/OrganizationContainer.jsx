@@ -107,6 +107,17 @@ const OrganizationContainer = ({id = null}) => {
                         <Tab tab={'employees'} label={t('Сотрудники')}>
                             <Content sm>Сотрудники</Content>
                         </Tab>
+                        <Tab tab={'departments'} label={t('Орг. структура')}>
+                            <div className="grid grid-cols-12 gap-x-6">
+                                <div className="col-span-3">
+                                    <Content sm classNames={'!p-4'}>Орг. структура</Content>
+                                </div>
+                                <div className="col-span-9">
+                                    <Content sm>Орг. структура</Content>
+                                </div>
+                            </div>
+
+                        </Tab>
                     </Tabs>
                 </div>
             </div>
