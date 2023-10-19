@@ -489,10 +489,10 @@ const OrganizationsContainer = () => {
                                          property={{mask: '99-999-99-99'}}
                                          params={{
                                              required: true,
-                                             // pattern: {
-                                             //     value: /^(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
-                                             //     message: 'Invalid format'
-                                             // }
+                                             pattern: {
+                                                 value: /^998(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
+                                                 message: 'Invalid format'
+                                             }
                                          }}
                                          placeholder={t('Телефон')}
                                          label={<div className={'flex'}><span>{t('Телефон')}</span><img
