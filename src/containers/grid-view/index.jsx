@@ -14,6 +14,7 @@ import {Edit2, Trash2} from "react-feather";
 import usePutQuery from "../../hooks/api/usePutQuery";
 import Swal from "sweetalert2";
 import {useTranslation} from "react-i18next";
+import {useNavigate} from "react-router-dom";
 
 const GridView = ({
                       url = '/',
@@ -34,11 +35,12 @@ const GridView = ({
                       dataKey = 'data.data',
                       rowKey = 'id'
                   }) => {
+        const navigate = useNavigate();
         const [page, setPage] = useState(1);
         const [rowId, setRowId] = useState(null);
         const [pageSize, setPageSize] = useState({value: 15, label: '15'});
         const {t} = useTranslation()
-        const {data, isLoading, isError} = useGetAllQuery({
+        const {data, isLoading, isError, error} = useGetAllQuery({
             key: listKey, url, params: {
                 params: {
                     ...params, page,
@@ -46,6 +48,7 @@ const GridView = ({
                 }
             }
         })
+        console.log('error', get(error, 'response.data'))
 
         const {data: defaultValues = {}, isLoading: isLoadingOne} = useGetOneQuery({
             id: rowId, key: [listKey, rowId], url: viewUrl ?? url, enabled: !!(rowId)
@@ -109,6 +112,13 @@ const GridView = ({
                 }
             });
         }
+
+        if (isError) {
+            navigate('/error', {
+                state: {data: get(error, 'response.data'), isError: isError}
+            });
+        }
+
         if (isLoading) {
             return <OverlayLoader/>
         }

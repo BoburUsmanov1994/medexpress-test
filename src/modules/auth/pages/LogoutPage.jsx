@@ -5,9 +5,7 @@ import {useSettingsStore} from "../../../store";
 import {get} from "lodash";
 import {useTranslation} from "react-i18next";
 
-const LogoutPage = ({
-                        ...rest
-                    }) => {
+const LogoutPage = () => {
 
     const {t} = useTranslation()
 
