@@ -16,7 +16,7 @@ const PhoneInput = ({
                         defaultValue = '',
                         label,
                         classNames = '',
-                        format = "998(##) ### ## ##"
+                        format = "998(##)#######"
                     }) => {
     const {t} = useTranslation()
     return (

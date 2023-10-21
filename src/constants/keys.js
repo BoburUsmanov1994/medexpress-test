@@ -14,4 +14,6 @@ export const KEYS = {
     organizationManagementForm: 'organizationManagementForm',
     organizationCountry: 'organizationCountry',
     organizationTerritory: 'organizationTerritory',
+    organizationDepartments: 'organizationDepartments',
+    organizationPositions: 'organizationPositions',
 }
