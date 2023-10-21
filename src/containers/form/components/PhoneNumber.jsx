@@ -27,7 +27,7 @@ const PhoneInput = ({
     useEffect(() => {
         if (selectedValue) {
             if (regex?.test(String(selectedValue))) {
-                setValue(name, selectedValue)
+                setValue(name, String(selectedValue))
             }
         }
     }, [watch(name)]);
