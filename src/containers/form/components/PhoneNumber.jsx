@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PatternFormat} from 'react-number-format';
 import {Controller} from "react-hook-form";
-import {get} from "lodash";
+import {get, hasIn} from "lodash";
 import clsx from "clsx";
 import {useTranslation} from "react-i18next";
 
@@ -21,13 +21,16 @@ const PhoneInput = ({
                         },
                         setValue = () => {
                         },
+                        trigger = () => {
+                        },
                     }) => {
-    const [selectedValue, setSelectedValue] = useState(null)
+    const [selectedValue, setSelectedValue] = useState('')
     const {t} = useTranslation()
     useEffect(() => {
         if (selectedValue) {
             if (regex?.test(String(selectedValue))) {
-                setValue(name, String(selectedValue))
+                setValue(name, `${selectedValue}`)
+                trigger()
             }
         }
     }, [watch(name)]);
@@ -49,7 +52,7 @@ const PhoneInput = ({
                                    }}
                                    value={selectedValue}
                                    format={format}
-                                   className={clsx('form-input  w-full', {'border-red-600': !regex?.test(String(selectedValue))})}
+                                   className={clsx('form-input  w-full', {'border-red-600': hasIn(errors, name)})}
                                    mask={"_"}
                                    allowEmptyFormatting
                     />)
@@ -59,8 +62,9 @@ const PhoneInput = ({
             <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
             {get(errors, `${name}.type`) === 'validation' &&
             <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
-            {!regex?.test(String(selectedValue)) &&
-            <span className={'form-error'}>Invalid format</span>}
+
+            {get(errors,`${name}.type`) == 'pattern' &&
+            <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
 
 
         </div>

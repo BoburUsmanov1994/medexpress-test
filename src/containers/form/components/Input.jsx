@@ -13,12 +13,12 @@ const Input = ({register=()=>{}, name='name', errors, property, params, label = 
                         className={clsx('form-input', {'border-red-600': hasIn(errors, name)})}
                         type={get(property, 'type', "text")} disabled={get(property, 'disabled', false)}
                         step={get(property, "step", "any")}/>
-                {get(errors,`${name}.type`) == 'required' &&
+                {get(property, 'type') !== "hidden" && <>{get(errors,`${name}.type`) == 'required' &&
                 <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
                 {get(errors,`${name}.type`) == 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
                 {get(errors,`${name}.type`) == 'pattern' &&
-                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
+                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>} </> }
             </div>
         </>
     );

@@ -3,11 +3,11 @@ import {useForm} from "react-hook-form";
 
 const Form = ({defaultValues, children, onSubmit, classNames = ''}) => {
     const methods = useForm({defaultValues});
-    const {handleSubmit, formState: {errors}, setError, clearErrors, reset,    getValues, setValue,watch} = methods;
+    const {handleSubmit, formState: {errors,isDirty,isLoading}, setError, clearErrors, reset,getValues,watch,trigger} = methods;
     const onSubmitRequest = (data) => {
         onSubmit({data, setError, clearErrors, reset})
     }
-
+    console.log('errors',errors)
     return (
         <form className={classNames} onSubmit={handleSubmit(onSubmitRequest)}>
             {React?.Children?.map(children, child => {
@@ -21,7 +21,10 @@ const Form = ({defaultValues, children, onSubmit, classNames = ''}) => {
                             watch: watch,
                             register: methods?.register,
                             key: child?.props?.name,
-                            errors: errors
+                            errors: errors,
+                            isDirtyForm:isDirty,
+                            isLoadingForm:isLoading,
+                            trigger:trigger
                         }
                     })
                     : child;
