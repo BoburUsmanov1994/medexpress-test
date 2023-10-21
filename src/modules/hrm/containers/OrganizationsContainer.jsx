@@ -34,44 +34,48 @@ const OrganizationsContainer = () => {
     const [filter, setFilter] = useState({name: '', state_id: null, city_id: null})
     const {t} = useTranslation();
 
-    const {data: organizationTypeLevelList} = useGetAllQuery({
+    const {data: organizationTypeLevelList, isLoading: isLoadingTypeLevelList} = useGetAllQuery({
         key: KEYS.organizationTypeLevel,
         url: URLS.organizationTypeLevel,
         params: {
             params: {
                 limit: 100
             }
-        }
+        },
+        enabled: open
     })
 
-    const {data: organizationTypeMedicalList} = useGetAllQuery({
+    const {data: organizationTypeMedicalList, isLoading: isLoadingTypeMedicalList} = useGetAllQuery({
         key: KEYS.organizationTypeMedical,
         url: URLS.organizationTypeMedical,
         params: {
             params: {
                 limit: 100
             }
-        }
+        },
+        enabled: open
     })
 
-    const {data: organizationLegalFormList} = useGetAllQuery({
+    const {data: organizationLegalFormList, isLoading: isLoadingLegalFormList} = useGetAllQuery({
         key: KEYS.organizationLegalForm,
         url: URLS.organizationLegalForm,
         params: {
             params: {
                 limit: 100
             }
-        }
+        },
+        enabled: open
     })
 
-    const {data: organizationTypeServiceList} = useGetAllQuery({
+    const {data: organizationTypeServiceList, isLoading: isLoadingTypeServiceList} = useGetAllQuery({
         key: KEYS.organizationTypeService,
         url: URLS.organizationTypeService,
         params: {
             params: {
                 limit: 100
             }
-        }
+        },
+        enabled: open
     })
 
 
@@ -82,10 +86,11 @@ const OrganizationsContainer = () => {
             params: {
                 limit: 1000
             }
-        }
+        },
+        enabled: open
     })
 
-    const {data: organizationRegions} = useGetAllQuery({
+    const {data: organizationRegions, isLoading: isLoadingRegions} = useGetAllQuery({
         key: KEYS.organizationTerritory,
         url: URLS.organizationTerritory,
         params: {
@@ -97,7 +102,7 @@ const OrganizationsContainer = () => {
     })
 
     const {data: organizationDistricts} = useGetAllQuery({
-        key: KEYS.organizationTerritory,
+        key: [KEYS.organizationTerritory, regionId],
         url: URLS.organizationTerritory,
         params: {
             params: {
@@ -108,8 +113,8 @@ const OrganizationsContainer = () => {
         },
         enabled: !!(regionId)
     })
-    const {data: districts} = useGetAllQuery({
-        key: KEYS.organizationTerritory,
+    const {data: districts, isLoading: isLoadingDistricts} = useGetAllQuery({
+        key: [KEYS.organizationTerritory, get(filter, 'state_id.value')],
         url: URLS.organizationTerritory,
         params: {
             params: {
@@ -121,7 +126,7 @@ const OrganizationsContainer = () => {
         enabled: !!(get(filter, 'state_id.value'))
     })
     const {data: organizationNeighbors} = useGetAllQuery({
-        key: KEYS.organizationTerritory,
+        key: [KEYS.organizationTerritory, districtId],
         url: URLS.organizationTerritory,
         params: {
             params: {
@@ -165,10 +170,18 @@ const OrganizationsContainer = () => {
     }
 
     const add = () => {
-        const {longitude,latitude,...rest} = orgData;
+        const {longitude, latitude, ...rest} = orgData;
         addRequest({
             url: URLS.organizations,
-            attributes: {...orgData,display:get(orgData,'names[0].value'),locations:[{address:get(orgData,'locations[0].address'),longitude:parseFloat(longitude),latitude:parseFloat(latitude)}]}
+            attributes: {
+                ...orgData,
+                display: get(orgData, 'names[0].value'),
+                locations: [{
+                    address: get(orgData, 'locations[0].address'),
+                    longitude: parseFloat(longitude),
+                    latitude: parseFloat(latitude)
+                }]
+            }
         }, {
             onSuccess: () => {
                 closeModal();
@@ -182,7 +195,7 @@ const OrganizationsContainer = () => {
         setSearchParams(``)
     }
 
-    console.log('orgData',orgData)
+    console.log('orgData', orgData)
 
     return (
         <div>
@@ -208,6 +221,7 @@ const OrganizationsContainer = () => {
                 </div>
                 <div className="col-span-8 mt-5 flex justify-end">
                     <div className="mr-6"><SelectComponent
+                        isLoading={isLoadingRegions}
                         value={get(filter, 'state_id')}
                         setValue={(val) => setFilter(prev => ({...prev, state_id: val}))}
                         label={t('Регион')} options={get(organizationRegions, 'data', []).map(_option => ({
@@ -228,7 +242,7 @@ const OrganizationsContainer = () => {
                 </div>
                 <div className="col-span-12 mt-6">
                     <GridView
-                        onRowClick={({id})=>navigate(`/hrm/organization/${id}`)}
+                        onRowClick={({id}) => navigate(`/hrm/organization/${id}`)}
                         params={{
                             name: get(filter, 'name'),
                             state_id: get(filter, 'state_id.value'),
@@ -257,27 +271,32 @@ const OrganizationsContainer = () => {
                                        label={<div className={'flex'}><span>{t('ИНН организации')}</span><img
                                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <AsyncSelect isDisabledSearch url={URLS.organizationsListForSelect} keyId={KEYS.organizationsListForSelect}
+                            <AsyncSelect isDisabledSearch url={URLS.organizationsListForSelect}
+                                         keyId={KEYS.organizationsListForSelect}
                                          classNames={'col-span-6'}
                                          name={'parent'}
                                          defaultValue={get(orgData, 'parent')}
                                          label={t('Родительская организация')}
                             />
-                            <Select defaultValue={get(orgData, 'level')} classNames={'col-span-6'} name={'level'}
+                            <Select isLoading={isLoadingTypeLevelList} defaultValue={get(orgData, 'level')}
+                                    classNames={'col-span-6'} name={'level'}
                                     label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
                                     options={get(organizationTypeLevelList, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'medical_type')} classNames={'col-span-6'}
+                            <Select isLoading={isLoadingTypeMedicalList} defaultValue={get(orgData, 'medical_type')}
+                                    classNames={'col-span-6'}
                                     name={'medical_type'}
                                     label={<div className={'flex'}><span>{t('Тип организации')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                     params={{required: true}}
                                     options={get(organizationTypeMedicalList, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'legal_form')} classNames={'col-span-6'}
+                            <Select isLoading={isLoadingLegalFormList} defaultValue={get(orgData, 'legal_form')}
+                                    classNames={'col-span-6'}
                                     name={'legal_form'}
                                     label={t('Организационно-правовая форма')}
                                     options={get(organizationLegalFormList, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'service_types')} classNames={'col-span-6'}
+                            <Select isLoading={isLoadingTypeServiceList} defaultValue={get(orgData, 'service_types')}
+                                    classNames={'col-span-6'}
                                     name={'service_types'}
                                     label={t('Виды оказания услуг')}
                                     isMulti
@@ -395,7 +414,7 @@ const OrganizationsContainer = () => {
                     </Tab>
                     <Tab tab={'address'} label={t('Адрес')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'region')}>
-                            <Select isDisabled  defaultValue={{id:244,display:"O'ZBEKISTON",code:"UZB"}}
+                            <Select isDisabled defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
                                     classNames={'col-span-4'} name={'locations[0].address.country'}
                                     label={<div className={'flex'}><span>{t('Страна')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -408,7 +427,8 @@ const OrganizationsContainer = () => {
                                     params={{required: true}}
                                     property={{onChange: (val) => setRegionId(get(val, 'id'))}}
                                     options={get(organizationRegions, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'locations[0].address.district')} classNames={'col-span-4'}
+                            <Select defaultValue={get(orgData, 'locations[0].address.district')}
+                                    classNames={'col-span-4'}
                                     name={'locations[0].address.district'}
                                     label={<div className={'flex'}><span>{t('Район')}</span><img
                                         className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -432,7 +452,7 @@ const OrganizationsContainer = () => {
                             />
                             <Input defaultValue={get(orgData, 'locations[0].address.block')} classNames={'col-span-2'}
                                    name={'locations[0].address.block'}
-                                   params={{required: true,valueAsNumber:true}}
+                                   params={{required: true, valueAsNumber: true}}
                                    placeholder={t('Дом')}
                                    label={<div className={'flex'}><span>{t('Дом')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -486,11 +506,10 @@ const OrganizationsContainer = () => {
 
                             <PhoneNumber defaultValue={get(orgData, 'contacts[0].telecoms[0].value')}
                                          classNames={'col-span-4'} name={`contacts[0].telecoms[0].value`}
-                                         property={{mask: '99-999-99-99'}}
                                          params={{
                                              required: true,
                                              pattern: {
-                                                 value: /^998(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
+                                                 value: /^\+998\s(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\s\d{3}\s\d{2}\s\d{2}$/,
                                                  message: 'Invalid format'
                                              }
                                          }}
@@ -503,25 +522,36 @@ const OrganizationsContainer = () => {
                             <Input defaultValue={get(orgData, 'contacts[0].telecoms[1].value')}
                                    classNames={'col-span-4'} name={`contacts[0].telecoms[1].value`}
                                    placeholder={t('E-mail')}
-                                // params={{
-                                //     pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                                // }}
+                                   params={{
+                                       pattern: {
+                                           value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                                           message: 'Invalid format'
+                                       }
+                                   }}
                                    label={t('E-mail')}
                             />
 
 
-                            <Input defaultValue={get(orgData, 'contacts[0].telecoms[2].value')}
+                            <Input params={{
+                                pattern: {
+                                    value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
+                                    message: "Invalid format"
+                                }
+                            }} defaultValue={get(orgData, 'contacts[0].telecoms[2].value')}
                                    classNames={'col-span-4'} name={`contacts[0].telecoms[2].value`}
                                    placeholder={t('URL адрес')}
                                    label={t('URL адрес')}
                             />
-                            <Input params={{valueAsNumber:true}} defaultValue={1} classNames={'col-span-4'} name={`contacts[0].telecoms[0].system.id`}
+                            <Input params={{valueAsNumber: true}} defaultValue={1} classNames={'col-span-4'}
+                                   name={`contacts[0].telecoms[0].system.id`}
                                    property={{type: 'hidden'}}
                             />
-                            <Input params={{valueAsNumber:true}} defaultValue={2} classNames={'col-span-4'} name={`contacts[0].telecoms[1].system.id`}
+                            <Input params={{valueAsNumber: true}} defaultValue={2} classNames={'col-span-4'}
+                                   name={`contacts[0].telecoms[1].system.id`}
                                    property={{type: 'hidden'}}
                             />
-                            <Input params={{valueAsNumber:true}} defaultValue={3} classNames={'col-span-4'} name={`contacts[0].telecoms[2].system.id`}
+                            <Input params={{valueAsNumber: true}} defaultValue={3} classNames={'col-span-4'}
+                                   name={`contacts[0].telecoms[2].system.id`}
                                    property={{type: 'hidden'}}
                             />
                             <div className={'col-span-12'}>
@@ -545,12 +575,24 @@ const OrganizationsContainer = () => {
                                 <hr className={'my-4'}/>
                             </div>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
-                            <Input params={{valueAsNumber:true}} defaultValue={get(orgData, 'latitude')} classNames={'col-span-4'}
+                            <Input params={{
+                                valueAsNumber: true, pattern: {
+                                    value: /^[+-]?\d+(\.\d+)?$/,
+                                    message: 'Invalid format'
+                                }
+                            }} defaultValue={get(orgData, 'latitude')}
+                                   classNames={'col-span-4'}
                                    name={`latitude`}
                                    placeholder={t('Широта')}
                                    label={t('Широта')}
                             />
-                            <Input params={{valueAsNumber:true}} defaultValue={get(orgData, 'longitude')} classNames={'col-span-4'}
+                            <Input params={{
+                                valueAsNumber: true, pattern: {
+                                    value: /^[+-]?\d+(\.\d+)?$/,
+                                    message: 'Invalid format'
+                                }
+                            }} defaultValue={get(orgData, 'longitude')}
+                                   classNames={'col-span-4'}
                                    name={`longitude`}
                                    placeholder={t('Долгота')}
                                    label={t('Долгота')}

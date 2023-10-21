@@ -49,7 +49,8 @@ const Select = ({
                     options = [],
                     setValue = () => {
                     },
-                    isClearable=true
+                    isClearable=true,
+                    isLoading=false
                 }) => {
 
     return (
@@ -57,6 +58,7 @@ const Select = ({
             {label && <label className={clsx('mr-2 text-secondary-300 font-bold flex items-center')}
                              htmlFor={label}>{label}</label>}
             <RSelect
+                isLoading={isLoading}
                 isClearable={isClearable}
                 name={name}
                 clearIndicator={true}

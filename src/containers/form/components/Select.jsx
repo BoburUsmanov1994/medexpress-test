@@ -59,7 +59,8 @@ const Select = ({
                     defaultValue=null,
                     getValues=()=>{},
                     watch=()=>{},
-                    isDisabled = false
+                    isDisabled = false,
+                    isLoading=false
                 }) => {
     const {t} = useTranslation()
     useEffect(() => {
@@ -90,6 +91,7 @@ const Select = ({
                     isMulti={isMulti}
                     defaultValue={defaultValue}
                     isDisabled={isDisabled}
+                    isLoading={isLoading}
                 />}
             />
             {get(errors,`${name}.type`) == 'required' &&
