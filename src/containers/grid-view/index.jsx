@@ -113,11 +113,11 @@ const GridView = ({
             });
         }
 
-        // if (isError) {
-        //     navigate('/error', {
-        //         state: {data: get(error, 'response.data'), isError: isError}
-        //     });
-        // }
+        if (isError) {
+            navigate('/error', {
+                state: {data: get(error, 'response.data'), isError: isError}
+            });
+        }
 
         if (isLoading) {
             return <OverlayLoader/>

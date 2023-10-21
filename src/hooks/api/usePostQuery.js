@@ -30,7 +30,7 @@ const usePostQuery = ({
             {
                 onSuccess: (data) => {
                     if (!hideSuccessToast) {
-                        toast.success(t(data?.data?.message) || t('SUCCESS'))
+                        toast.success(t(data?.data?.detail) || t('SUCCESS'))
                     }
 
                     if (listKeyId) {
@@ -44,12 +44,12 @@ const usePostQuery = ({
                     }
                 },
                 onError: (data) => {
-                    if (isArray(get(data, 'response.data.errors'))) {
-                        forEach(get(data, 'response.data.errors', []), (val) => {
+                    if (isArray(get(data, 'response.data.detail'))) {
+                        forEach(get(data, 'response.data.detail', []), (val) => {
                             toast.error(val ?? 'ERROR')
                         })
                     } else {
-                        toast.error(t(data?.response?.data?.message) || t('ERROR'))
+                        toast.error(t(data?.response?.data?.detail) || t('ERROR'))
                     }
                 }
             }
