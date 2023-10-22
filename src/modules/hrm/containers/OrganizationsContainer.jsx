@@ -3,14 +3,13 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get, isObject} from "lodash"
+import {get, isObject, range} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
 import Modal from "../../../components/modal";
 import {Tab, Tabs} from "../../../components/tab";
 import Form from "../../../containers/form";
-import {InputMask, Select, PhoneNumber, Input, AsyncSelect} from "../../../containers/form/components";
 import orgIcon from "../../../assets/icons/org.svg"
 import {Minus, Plus} from "react-feather";
 import {useGetAllQuery, usePostQuery} from "../../../hooks/api";
@@ -20,12 +19,14 @@ import SelectComponent from "../../../components/select";
 import InputMaskComponent from "../../../components/input-mask";
 import fileUploadImg from "../../../assets/images/fileUpload.png"
 import {ContentLoader} from "../../../components/loader";
-import MaskedInput from "../../../containers/form/components/Masked-Input";
+import Field from "../../../containers/form/field";
+import Dropzone from "../../../containers/form/components/Dropzone";
 
 
 const OrganizationsContainer = () => {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [_, setSearchParams] = useSearchParams();
+    const [names, setNames] = useState({uz: null, ru: null, en: null, cyrl: null});
     const [open, setOpen] = useState(false);
     let [lang, setLang] = useState('uz');
     let [orgData, setOrgData] = useState({});
@@ -259,72 +260,91 @@ const OrganizationsContainer = () => {
                 {isLoadingPost && <ContentLoader/>}
                 <Tabs isLabelDisabled>
                     <Tab tab={'info'} label={t('Информация')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'name')}>
-                            <InputMask params={{required: true}}
-                                       classNames={'col-span-6'}
-                                       name={'tin'}
-                                       defaultValue={get(orgData, 'tin')}
-                                       property={{
-                                           placeholder: t('Введите ИНН организации'),
-                                           mask: '999999999',
-                                           maskChar: '_'
-                                       }}
-                                       label={<div className={'flex'}><span>{t('ИНН организации')}</span><img
-                                           className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'name')}
+                              footer={<div className={'col-span-12 '}>
+                                  <div className="flex justify-end">
+                                      <button onClose={closeModal} type={'button'}
+                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                          {t('Назад')}
+                                      </button>
+                                      <button type={'submit'}
+                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                          {t('Следующий шаг')}
+                                      </button>
+                                  </div>
+                              </div>}>
+                            <Field type={'input-mask'}
+                                   params={{required: true, pattern: {value: /^[0-9]{9}$/, message: 'Invalid value'}}}
+                                   classNames={'col-span-6'}
+                                   name={'tin'}
+                                   defaultValue={get(orgData, 'tin')}
+                                   property={{
+                                       placeholder: t('Введите ИНН организации'),
+                                       mask: '999999999',
+                                       maskChar: '_'
+                                   }}
+                                   label={<div className={'flex'}><span>{t('ИНН организации')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <AsyncSelect isDisabledSearch url={URLS.organizationsListForSelect}
-                                         keyId={KEYS.organizationsListForSelect}
-                                         classNames={'col-span-6'}
-                                         name={'parent'}
-                                         defaultValue={get(orgData, 'parent')}
-                                         label={t('Родительская организация')}
+                            <Field type={'async-select'} isDisabledSearch url={URLS.organizationsListForSelect}
+                                   keyId={KEYS.organizationsListForSelect}
+                                   classNames={'col-span-6'}
+                                   name={'parent'}
+                                   defaultValue={get(orgData, 'parent')}
+                                   label={t('Родительская организация')}
                             />
-                            <Select isLoading={isLoadingTypeLevelList} defaultValue={get(orgData, 'level')}
-                                    classNames={'col-span-6'} name={'level'}
-                                    label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
-                                    options={get(organizationTypeLevelList, 'data', [])}/>
-                            <Select isLoading={isLoadingTypeMedicalList} defaultValue={get(orgData, 'medical_type')}
-                                    classNames={'col-span-6'}
-                                    name={'medical_type'}
-                                    label={<div className={'flex'}><span>{t('Тип организации')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    params={{required: true}}
-                                    options={get(organizationTypeMedicalList, 'data', [])}/>
-                            <Select isLoading={isLoadingLegalFormList} defaultValue={get(orgData, 'legal_form')}
-                                    classNames={'col-span-6'}
-                                    name={'legal_form'}
-                                    label={t('Организационно-правовая форма')}
-                                    options={get(organizationLegalFormList, 'data', [])}/>
-                            <Select isLoading={isLoadingTypeServiceList} defaultValue={get(orgData, 'service_types')}
-                                    classNames={'col-span-6'}
-                                    name={'service_types'}
-                                    label={t('Виды оказания услуг')}
-                                    isMulti
-                                    options={get(organizationTypeServiceList, 'data', [])}/>
-                            <AsyncSelect defaultValue={get(orgData, 'affiliation')} classNames={'col-span-6'}
-                                         keyId={KEYS.organizationManagementForm}
-                                         url={URLS.organizationManagementForm}
-                                         name={'affiliation'}
-                                         label={t('Орган государственного управления')}
+                            <Field type={'select'} isLoading={isLoadingTypeLevelList}
+                                   defaultValue={get(orgData, 'level')}
+                                   classNames={'col-span-6'} name={'level'}
+                                   label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
+                                   options={get(organizationTypeLevelList, 'data', [])}/>
+                            <Field type={'select'} isLoading={isLoadingTypeMedicalList}
+                                   defaultValue={get(orgData, 'medical_type')}
+                                   classNames={'col-span-6'}
+                                   name={'medical_type'}
+                                   label={<div className={'flex'}><span>{t('Тип организации')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                   params={{required: true}}
+                                   options={get(organizationTypeMedicalList, 'data', [])}/>
+                            <Field type={'select'} isLoading={isLoadingLegalFormList}
+                                   defaultValue={get(orgData, 'legal_form')}
+                                   classNames={'col-span-6'}
+                                   name={'legal_form'}
+                                   label={t('Организационно-правовая форма')}
+                                   options={get(organizationLegalFormList, 'data', [])}/>
+                            <Field type={'select'} isLoading={isLoadingTypeServiceList}
+                                   defaultValue={get(orgData, 'service_types')}
+                                   classNames={'col-span-6'}
+                                   name={'service_types'}
+                                   label={t('Виды оказания услуг')}
+                                   isMulti
+                                   options={get(organizationTypeServiceList, 'data', [])}/>
+                            <Field type={'async-select'} defaultValue={get(orgData, 'affiliation')}
+                                   classNames={'col-span-6'}
+                                   keyId={KEYS.organizationManagementForm}
+                                   url={URLS.organizationManagementForm}
+                                   name={'affiliation'}
+                                   label={t('Орган государственного управления')}
                             />
 
-                            <div className={'col-span-12 '}>
-                                <div className="flex justify-end">
-                                    <button onClose={closeModal} type={'button'}
-                                            className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                        {t('Назад')}
-                                    </button>
-                                    <button type={'submit'}
-                                            className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                        {t('Следующий шаг')}
-                                    </button>
-                                </div>
-                            </div>
+
                         </Form>
                     </Tab>
                     <Tab tab={'name'} label={t('Наименование')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'address')}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'address')}
+                              footer={<div className={'col-span-12 '}>
+                                  <div className="flex justify-end">
+                                      <button onClick={() => setSearchParams(`tab=info`)} type={'button'}
+                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                          {t('Назад')}
+                                      </button>
+                                      <button type={'submit'}
+                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                          {t('Следующий шаг')}
+                                      </button>
+                                  </div>
+                              </div>}>
                             <div className={'flex col-span-12 mb-4'}>
                                 <button type={'button'} onClick={() => setLang('uz')}
                                         className={clsx('py-2 px-4 border border-[#EAEFF8] rounded-lg mr-2.5 ', {'!bg-[#E5F0F3] !border-[#E5F0F3]': lang == 'uz'})}>O’zbekcha
@@ -340,245 +360,311 @@ const OrganizationsContainer = () => {
                                 </button>
                             </div>
 
-                            <Input params={{required:true,pattern:{value:/^[a-zA-Z0-9\s\'`,.]+$/,message:'Invalid value'}}} defaultValue={get(orgData, `names[0].value_short`)} classNames={'col-span-5'}
-                                   name={`names[0].value_short`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: lang == 'uz' ? 'text' : 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                            {lang == 'uz' && <><Field type={'input'} params={{
+                                required: true,
+                                pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}
+                            }} defaultValue={get(orgData, `names[0].value_short`)} classNames={'col-span-5'}
+                                                      name={`names[0].value_short`}
+                                                      placeholder={t('Введите краткое наименование')}
+                                                      property={{type: 'text'}}
+                                                      label={<div className={'flex'}>
+                                                          <span>{t('Краткое наименование')}</span><img
+                                                          className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input params={{required:true,pattern:{value:/^[a-zA-Z0-9\s\'`,.]+$/,message:'Invalid value'}}} defaultValue={get(orgData, `names[0].value`)} classNames={'col-span-7'}
-                                   name={'names[0].value'}
-                                   placeholder={t('Введите полное наименование')}
-                                   property={{type: lang == 'uz' ? 'text' : 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                <Field type={'input'} params={{
+                                    required: true,
+                                    pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}
+                                }} defaultValue={get(orgData, `names[0].value`)} classNames={'col-span-7'}
+                                       name={'names[0].value'}
+                                       placeholder={t('Введите полное наименование')}
+                                       property={{type: 'text'}}
+                                       label={<div className={'flex'}><span>{t('Полное наименование')}</span><img
+                                           className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                />
+                                <Field type={'input'} defaultValue={'uz'} classNames={'col-span-5'}
+                                       name={`names[0].locale`}
+                                       placeholder={t('Введите краткое наименование')}
+                                       property={{type: 'hidden'}}
+                                       label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
+                                />
+                            </>}
+                            {lang == 'uz-Cyrl' && <><Field type={'input'} params={{
+                                pattern: {
+                                    value: /^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,
+                                    message: 'Invalid value'
+                                }
+                            }} defaultValue={get(orgData, `names[1].value_short`)} classNames={'col-span-5'}
+                                                           name={`names[1].value_short`}
+                                                           placeholder={t('Введите краткое наименование')}
+                                                           property={{type: 'text'}}
+                                                           label={<div className={'flex'}>
+                                                               <span>{t('Краткое наименование')}</span></div>}
                             />
-                            <Input params={{pattern:{value:/^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,message:'Invalid value'}}} defaultValue={get(orgData, `names[1].value_short`)} classNames={'col-span-5'}
-                                   name={`names[1].value_short`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: lang == 'uz-Cyrl' ? 'text' : 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
+                                <Field type={'input'} params={{
+                                    pattern: {
+                                        value: /^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,
+                                        message: 'Invalid value'
+                                    }
+                                }} defaultValue={get(orgData, `names[1].value`)} classNames={'col-span-7'}
+                                       name={'names[1].value'}
+                                       placeholder={t('Введите полное наименование')}
+                                       property={{type: 'text'}}
+                                       label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
+                                />
+                                <Field type={'input'} defaultValue={'uz-Cyrl'} classNames={'col-span-5'}
+                                       name={`names[1].locale`}
+                                       placeholder={t('Введите краткое наименование')}
+                                       property={{type: 'hidden'}}
+                                       label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
+                                           className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                />
+                            </>}
+                            {lang == 'ru' && <><Field type={'input'} params={{
+                                pattern: {
+                                    value: /^[А-Яа-я\s_-]+$/u,
+                                    message: 'Invalid value'
+                                }
+                            }}
+                                                      defaultValue={get(orgData, `names[2].value_short`)}
+                                                      classNames={'col-span-5'}
+                                                      name={'names[2].value_short'}
+                                                      property={{type: 'text'}}
+                                                      placeholder={t('Введите краткое наименование')}
+                                                      label={<div className={'flex'}>
+                                                          <span>{t('Краткое наименование')}</span></div>}
                             />
-                            <Input params={{pattern:{value:/^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,message:'Invalid value'}}} defaultValue={get(orgData, `names[1].value`)} classNames={'col-span-7'}
-                                   name={'names[1].value'}
-                                   placeholder={t('Введите полное наименование')}
-                                   property={{type: lang == 'uz-Cyrl' ? 'text' : 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
-                            />
-                            <Input params={{pattern:{value:/^[А-Яа-я\s_-]+$/u, message:'Invalid value'}}} defaultValue={get(orgData, `names[2].value_short`)} classNames={'col-span-5'}
-                                   name={'names[2].value_short'}
-                                   property={{type: lang == 'ru' ? 'text' : 'hidden'}}
-                                   placeholder={t('Введите краткое наименование')}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
-                            />
-                            <Input params={{pattern:{value:/^[А-Яа-я0-9\s_-]+$/u,message:'Invalid value'}}} defaultValue={get(orgData, `names[2].value`)} classNames={'col-span-7'}
-                                   name={'names[2].value'}
-                                   property={{type: lang == 'ru' ? 'text' : 'hidden'}}
-                                   placeholder={t('Введите полное наименование')}
-                                   label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
-                            />
+                                <Field type={'input'}
+                                       params={{pattern: {value: /^[А-Яа-я0-9\s_-]+$/u, message: 'Invalid value'}}}
+                                       defaultValue={get(orgData, `names[2].value`)} classNames={'col-span-7'}
+                                       name={'names[2].value'}
+                                       property={{type: 'text'}}
+                                       placeholder={t('Введите полное наименование')}
+                                       label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
+                                />
+                                <Field type={'input'} defaultValue={'ru'} classNames={'col-span-5'}
+                                       name={`names[2].locale`}
+                                       placeholder={t('Введите краткое наименование')}
+                                       property={{type: 'hidden'}}
+                                       label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
+                                />
+                            </>}
 
-                            <Input params={{pattern:{value:/^[a-zA-Z0-9\s\'`,.]+$/,message:'Invalid value'}}} defaultValue={get(orgData, `names[3].value_short`)} classNames={'col-span-5'}
-                                   name={'names[3].value_short'}
-                                   property={{type: lang == 'en' ? 'text' : 'hidden'}}
-                                   placeholder={t('Введите краткое наименование')}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
+                            {lang == 'en' && <><Field type={'input'} params={{
+                                pattern: {
+                                    value: /^[a-zA-Z0-9\s\'`,.]+$/,
+                                    message: 'Invalid value'
+                                }
+                            }}
+                                                      defaultValue={get(orgData, `names[3].value_short`)}
+                                                      classNames={'col-span-5'}
+                                                      name={'names[3].value_short'}
+                                                      property={{type: lang == 'en' ? 'text' : 'hidden'}}
+                                                      placeholder={t('Введите краткое наименование')}
+                                                      label={<div className={'flex'}>
+                                                          <span>{t('Краткое наименование')}</span></div>}
                             />
-                            <Input params={{pattern:{value:/^[a-zA-Z0-9\s\'`,.]+$/,message:'Invalid value'}}} defaultValue={get(orgData, `names[3].value`)} classNames={'col-span-7'}
-                                   name={'names[3].value'}
-                                   property={{type: lang == 'en' ? 'text' : 'hidden'}}
-                                   placeholder={t('Введите полное наименование')}
-                                   label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
-                            />
-                            <Input defaultValue={'en'} classNames={'col-span-5'} name={`names[3].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
-                            />
-                            <Input defaultValue={'uz'} classNames={'col-span-5'} name={`names[0].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
-                            />
-                            <Input defaultValue={'uz-Cyrl'} classNames={'col-span-5'} name={`names[1].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Input defaultValue={'ru'} classNames={'col-span-5'} name={`names[2].locale`}
-                                   placeholder={t('Введите краткое наименование')}
-                                   property={{type: 'hidden'}}
-                                   label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
-                            />
-                            <div className={'col-span-12 '}>
-                                <div className="flex justify-end">
-                                    <button onClick={() => setSearchParams(`tab=info`)} type={'button'}
-                                            className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                        {t('Назад')}
-                                    </button>
-                                    <button type={'submit'}
-                                            className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                        {t('Следующий шаг')}
-                                    </button>
-                                </div>
-                            </div>
+                                <Field type={'input'}
+                                       params={{pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}}}
+                                       defaultValue={get(orgData, `names[3].value`)} classNames={'col-span-7'}
+                                       name={'names[3].value'}
+                                       property={{type: lang == 'en' ? 'text' : 'hidden'}}
+                                       placeholder={t('Введите полное наименование')}
+                                       label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
+                                />
+                                <Field type={'input'} defaultValue={'en'} classNames={'col-span-5'}
+                                       name={`names[3].locale`}
+                                       placeholder={t('Введите краткое наименование')}
+                                       property={{type: 'hidden'}}
+                                       label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
+                                /></>}
+
+
                         </Form>
                     </Tab>
                     <Tab tab={'address'} label={t('Адрес')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'region')}>
-                            <Select isDisabled defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
-                                    classNames={'col-span-4'} name={'locations[0].address.country'}
-                                    label={<div className={'flex'}><span>{t('Страна')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    params={{required: true}}
-                                    options={get(organizationCountryList, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'locations[0].address.state')} classNames={'col-span-4'}
-                                    name={'locations[0].address.state'}
-                                    label={<div className={'flex'}><span>{t('Регион')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    params={{required: true}}
-                                    property={{onChange: (val) => setRegionId(get(val, 'id'))}}
-                                    options={get(organizationRegions, 'data', [])}/>
-                            <Select defaultValue={get(orgData, 'locations[0].address.district')}
-                                    classNames={'col-span-4'}
-                                    name={'locations[0].address.district'}
-                                    label={<div className={'flex'}><span>{t('Район')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    params={{required: true}}
-                                    property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
-                                    options={get(organizationDistricts, 'data', [])}
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'region')}
+                              footer={<div className={'col-span-12 '}>
+                                  <div className="flex justify-end">
+                                      <button onClick={() => setSearchParams(`tab=name`)} type={'button'}
+                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                          {t('Назад')}
+                                      </button>
+                                      <button type={'submit'}
+                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                          {t('Следующий шаг')}
+                                      </button>
+                                  </div>
+                              </div>}>
+                            <Field type={'select'} isDisabled
+                                   defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
+                                   classNames={'col-span-4'} name={'locations[0].address.country'}
+                                   label={<div className={'flex'}><span>{t('Страна')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                   params={{required: true}}
+                                   options={get(organizationCountryList, 'data', [])}/>
+                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.state')}
+                                   classNames={'col-span-4'}
+                                   name={'locations[0].address.state'}
+                                   label={<div className={'flex'}><span>{t('Регион')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                   params={{required: true}}
+                                   property={{onChange: (val) => setRegionId(get(val, 'id'))}}
+                                   options={get(organizationRegions, 'data', [])}/>
+                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.district')}
+                                   classNames={'col-span-4'}
+                                   name={'locations[0].address.district'}
+                                   label={<div className={'flex'}><span>{t('Район')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                   params={{required: true}}
+                                   property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
+                                   options={get(organizationDistricts, 'data', [])}
                             />
-                            <Select defaultValue={get(orgData, 'locations[0].address.city')} classNames={'col-span-4'}
-                                    name={'locations[0].address.city'}
-                                    label={<div className={'flex'}><span>{t('Махалля')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    params={{required: true}}
-                                    options={get(organizationNeighbors, 'data', [])}
+                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.city')}
+                                   classNames={'col-span-4'}
+                                   name={'locations[0].address.city'}
+                                   label={<div className={'flex'}><span>{t('Махалля')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                   params={{required: true}}
+                                   options={get(organizationNeighbors, 'data', [])}
                             />
-                            <Input defaultValue={get(orgData, 'locations[0].address.line')} classNames={'col-span-4'}
+                            <Field type={'input'} defaultValue={get(orgData, 'locations[0].address.line')}
+                                   classNames={'col-span-4'}
                                    name={'locations[0].address.line'}
                                    params={{required: true}}
                                    placeholder={t('Улица')}
                                    label={<div className={'flex'}><span>{t('Улица')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <Input defaultValue={get(orgData, 'locations[0].address.block')} classNames={'col-span-2'}
+                            <Field type={'input'} defaultValue={get(orgData, 'locations[0].address.block')}
+                                   classNames={'col-span-2'}
                                    name={'locations[0].address.block'}
                                    params={{required: true, valueAsNumber: true}}
                                    placeholder={t('Дом')}
                                    label={<div className={'flex'}><span>{t('Дом')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            <InputMask property={{mask:'999999'}} defaultValue={get(orgData, 'locations[0].address.postal_code')}
+                            <Field params={{pattern: {value: /^[0-9]{6}$/, message: 'Invalid value'}}}
+                                   type={'input-mask'} property={{mask: '999999'}}
+                                   defaultValue={get(orgData, 'locations[0].address.postal_code')}
                                    classNames={'col-span-2'} name={'locations[0].address.postal_code'}
                                    placeholder={t('Почтовый индекс')}
                                    label={t('Почтовый индекс')}
                             />
-                            <div className={'col-span-12 '}>
-                                <div className="flex justify-end">
-                                    <button onClick={() => setSearchParams(`tab=name`)} type={'button'}
-                                            className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                        {t('Назад')}
-                                    </button>
-                                    <button type={'submit'}
-                                            className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                        {t('Следующий шаг')}
-                                    </button>
-                                </div>
-                            </div>
+
                         </Form>
                     </Tab>
                     <Tab tab={'region'} label={t('Регион обслуживания')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'contact')}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'contact')}
+                              footer={<div className={'col-span-12 '}>
+                                  <div className="flex justify-end">
+                                      <button onClick={() => setSearchParams(`tab=address`)} type={'button'}
+                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                          {t('Назад')}
+                                      </button>
+                                      <button type={'submit'}
+                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                          {t('Следующий шаг')}
+                                      </button>
+                                  </div>
+                              </div>}>
 
-                            <Select defaultValue={get(orgData, 'service_area[0].state')} classNames={'col-span-6'}
-                                    name={'service_area[0].state'}
-                                    label={<div className={'flex'}><span>{t('Регион')}</span><img
-                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    params={{required: true}}
-                                    options={get(organizationRegions, 'data', [])}/>
+                            <Field type={'select'} defaultValue={get(orgData, 'service_area[0].state')}
+                                   classNames={'col-span-6'}
+                                   name={'service_area[0].state'}
+                                   label={<div className={'flex'}><span>{t('Регион')}</span><img
+                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                   params={{required: true}}
+                                   options={get(organizationRegions, 'data', [])}/>
 
-                            <div className={'col-span-12 '}>
-                                <div className="flex justify-end">
-                                    <button onClick={() => setSearchParams(`tab=address`)} type={'button'}
-                                            className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                        {t('Назад')}
-                                    </button>
-                                    <button type={'submit'}
-                                            className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                        {t('Следующий шаг')}
-                                    </button>
-                                </div>
-                            </div>
                         </Form>
                     </Tab>
                     <Tab tab={'contact'} label={t('Контакты')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} onSubmit={(data) => onSubmit(data, 'photo')}>
+                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'photo')}
+                              footer={<div className={'col-span-12 '}>
+                                  <div className="flex justify-end">
+                                      <button onClick={() => setSearchParams(`tab=region`)} type={'button'}
+                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                          {t('Назад')}
+                                      </button>
+                                      <button type={'submit'}
+                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                          {t('Следующий шаг')}
+                                      </button>
+                                  </div>
+                              </div>}>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Контактная информация</h3>
 
-                            <PhoneNumber defaultValue={get(orgData, 'contacts[0].telecoms[0].value')}
-                                         classNames={'col-span-4'} name={`contacts[0].telecoms[0].value`}
-                                         params={{
-                                             valueAsString:true,
-                                             required: true,
-                                             pattern: {
-                                                 value: /^(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
-                                                 message: 'Invalid format'
-                                             }
-                                         }}
-                                         placeholder={t('Телефон')}
-                                         label={<div className={'flex'}><span>{t('Телефон')}</span><img
-                                             className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
+                            {
+                                range(0, increment + 1).map(inc => <>
+                                    <Field type={'phone-number'}
+                                           defaultValue={get(orgData, `contacts[${inc}].telecoms[0].value`)}
+                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[0].value`}
+                                           params={{
+                                               valueAsString: true,
+                                               required: true,
+                                               pattern: {
+                                                   value: /^(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
+                                                   message: 'Invalid format'
+                                               }
+                                           }}
+                                           placeholder={t('Телефон')}
+                                           label={<div className={'flex'}><span>{t('Телефон')}</span><img
+                                               className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                    />
 
 
-                            <Input defaultValue={get(orgData, 'contacts[0].telecoms[1].value')}
-                                   classNames={'col-span-4'} name={`contacts[0].telecoms[1].value`}
-                                   placeholder={t('E-mail')}
-                                   params={{
-                                       pattern: {
-                                           value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                                           message: 'Invalid format'
-                                       }
-                                   }}
-                                   label={t('E-mail')}
-                            />
+                                    <Field type={'input'}
+                                           defaultValue={get(orgData, `contacts[${inc}].telecoms[1].value`)}
+                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[1].value`}
+                                           placeholder={t('E-mail')}
+                                           params={{
+                                               pattern: {
+                                                   value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                                                   message: 'Invalid format'
+                                               }
+                                           }}
+                                           label={t('E-mail')}
+                                    />
 
 
-                            <Input params={{
-                                pattern: {
-                                    value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
-                                    message: "Invalid format"
-                                }
-                            }} defaultValue={get(orgData, 'contacts[0].telecoms[2].value')}
-                                   classNames={'col-span-4'} name={`contacts[0].telecoms[2].value`}
-                                   placeholder={t('URL адрес')}
-                                   label={t('URL адрес')}
-                            />
-                            <Input params={{valueAsNumber: true}} defaultValue={1} classNames={'col-span-4'}
-                                   name={`contacts[0].telecoms[0].system.id`}
-                                   property={{type: 'hidden'}}
-                            />
-                            <Input params={{valueAsNumber: true}} defaultValue={2} classNames={'col-span-4'}
-                                   name={`contacts[0].telecoms[1].system.id`}
-                                   property={{type: 'hidden'}}
-                            />
-                            <Input params={{valueAsNumber: true}} defaultValue={3} classNames={'col-span-4'}
-                                   name={`contacts[0].telecoms[2].system.id`}
-                                   property={{type: 'hidden'}}
-                            />
+                                    <Field type={'input'} params={{
+                                        pattern: {
+                                            value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
+                                            message: "Invalid format"
+                                        }
+                                    }} defaultValue={get(orgData, `contacts[${inc}].telecoms[2].value`)}
+                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[2].value`}
+                                           placeholder={t('URL адрес')}
+                                           label={t('URL адрес')}
+                                    />
+                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={1}
+                                           classNames={'col-span-4'}
+                                           name={`contacts[${inc}].telecoms[0].system.id`}
+                                           property={{type: 'hidden'}}
+                                    />
+                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={2}
+                                           classNames={'col-span-4'}
+                                           name={`contacts[${inc}].telecoms[1].system.id`}
+                                           property={{type: 'hidden'}}
+                                    />
+                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={3}
+                                           classNames={'col-span-4'}
+                                           name={`contacts[${inc}].telecoms[2].system.id`}
+                                           property={{type: 'hidden'}}
+                                    />
+                                </>)
+                            }
                             <div className={'col-span-12'}>
                                 <button
                                     type={"button"}
-                                    // onClick={() => setIncrement(prev => ++prev)}
+                                    onClick={() => setIncrement(prev => ++prev)}
                                     className={'mr-6 p-2.5 !pr-6 text-[#006D85] rounded-lg inline-flex  border border-[#006D85] font-bold text-center  mt-3  items-center '}>
                                     <Plus className={'mr-1'}/> <span>Добавить
                                     поле</span>
                                 </button>
                                 {
                                     increment > 0 && <button
+                                        type={'button'}
                                         onClick={() => setIncrement(prev => --prev)}
                                         className={' p-2.5 !pr-6 text-[#EB5757] rounded-lg inline-flex  border border-[#EB5757] font-bold text-center  mt-6  items-center '}>
                                         <Minus className={'mr-1'}/> <span>Удалить
@@ -590,44 +676,33 @@ const OrganizationsContainer = () => {
                                 <hr className={'my-4'}/>
                             </div>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
-                            <Input params={{
+                            <Field type={'input'} params={{
                                 pattern: {
                                     value: /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/,
                                     message: 'Invalid format'
                                 }
-                            }} defaultValue={get(orgData, 'latitude',null)}
+                            }} defaultValue={get(orgData, 'latitude', null)}
                                    classNames={'col-span-4'}
                                    name={`latitude`}
                                    placeholder={t('Широта')}
                                    label={t('Широта')}
                             />
-                            <Input params={{
+                            <Field type={'input'} params={{
                                 pattern: {
                                     value: /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/,
                                     message: 'Invalid format'
                                 }
-                            }} defaultValue={get(orgData, 'longitude',null)}
+                            }} defaultValue={get(orgData, 'longitude', null)}
                                    classNames={'col-span-4'}
                                    name={`longitude`}
                                    placeholder={t('Долгота')}
                                    label={t('Долгота')}
                             />
-                            <div className={'col-span-12 '}>
-                                <div className="flex justify-end">
-                                    <button onClick={() => setSearchParams(`tab=region`)} type={'button'}
-                                            className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                        {t('Назад')}
-                                    </button>
-                                    <button type={'submit'}
-                                            className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                        {t('Следующий шаг')}
-                                    </button>
-                                </div>
-                            </div>
+
                         </Form>
                     </Tab>
                     <Tab tab={'photo'} label={t('Изображение')}>
-                        <img src={fileUploadImg}/>
+                        <Dropzone />
                         <div className={'col-span-12 '}>
                             <div className="flex justify-end">
                                 <button onClick={() => setSearchParams(`tab=contact`)} type={'button'}

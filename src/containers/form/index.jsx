@@ -1,34 +1,59 @@
-import React from 'react';
-import {useForm} from "react-hook-form";
+import React from "react";
+import {Controller, useForm} from "react-hook-form";
+import FormProvider from "../../context/form/FormProvider";
 
-const Form = ({defaultValues, children, onSubmit, classNames = ''}) => {
-    const methods = useForm({defaultValues});
-    const {handleSubmit, formState: {errors,isDirty,isLoading}, setError, clearErrors, reset,getValues,watch,trigger} = methods;
-    const onSubmitRequest = (data) => {
-        onSubmit({data, setError, clearErrors, reset})
-    }
-    console.log('errors',errors)
+const Form = ({
+                  children,
+                  formRequest,
+                  isFetched,
+                  footer = '',
+                  getValueFromField = () => {
+                  },
+                  classNames = '',
+                  defaultValues = {},
+                  ...rest
+              }) => {
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: {errors,isLoading,isDirty},
+        getValues,
+        setValue,
+        watch,
+        control,
+        trigger
+    } = useForm({defaultValues});
+
+    const onSubmit = (data) => {
+        formRequest({ data, setError });
+    };
+    const attrs = {
+        Controller,
+        register,
+        errors,
+        control,
+        getValues,
+        watch,
+        setError,
+        setValue,
+        trigger,
+        isLoadingForm:isLoading,
+        isDirty,
+        ...rest,
+    };
+
+
     return (
-        <form className={classNames} onSubmit={handleSubmit(onSubmitRequest)}>
-            {React?.Children?.map(children, child => {
-                return child?.props?.name
-                    ? React.createElement(child?.type, {
-                        ...{
-                            ...child?.props,
-                            control: methods?.control,
-                            setValue: methods?.setValue,
-                            getValues:getValues,
-                            watch: watch,
-                            register: methods?.register,
-                            key: child?.props?.name,
-                            errors: errors,
-                            isDirtyForm:isDirty,
-                            isLoadingForm:isLoading,
-                            trigger:trigger
-                        }
-                    })
-                    : child;
-            })}
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            {...rest}
+            className={classNames}
+        >
+            <FormProvider value={{attrs, getValueFromField}}>
+                {children}
+            </FormProvider>
+            {footer}
         </form>
     );
 };

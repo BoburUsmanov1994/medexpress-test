@@ -3,13 +3,13 @@ import clsx from "clsx";
 import {get, hasIn} from "lodash";
 import {useTranslation} from "react-i18next";
 
-const Input = ({register=()=>{}, name='name', errors, property, params, label = '', classNames = '', ...rest}) => {
+const Input = ({register=()=>{}, name='name', errors, property, params, label = '', classNames = '',defaultValue='', ...rest}) => {
     const {t} = useTranslation()
     return (
         <>
             <div className={clsx("form-group", classNames,{'!mb-0':get(property, 'type') == 'hidden'})}>
                 {get(property, 'type', "text") != 'hidden' && <label className={'form-label'} htmlFor="#">{label}</label> }
-                <input  {...register(name, {...params})} {...rest}
+                <input defaultValue={defaultValue}  {...register(name, {...params})} {...rest}
                         className={clsx('form-input', {'border-red-600': hasIn(errors, name)})}
                         type={get(property, 'type', "text")} disabled={get(property, 'disabled', false)}
                         step={get(property, "step", "any")}/>

@@ -23,8 +23,9 @@ const PhoneInput = ({
                         },
                         trigger = () => {
                         },
+
                     }) => {
-    const [selectedValue, setSelectedValue] = useState('')
+    const [selectedValue, setSelectedValue] = useState(defaultValue)
     const {t} = useTranslation()
     useEffect(() => {
         if (selectedValue) {
@@ -42,7 +43,6 @@ const PhoneInput = ({
                 control={control}
                 name={name}
                 rules={params}
-                defaultValue={defaultValue}
                 render={({field}) => (
                     <PatternFormat name={name}
                                    {...field}
@@ -63,7 +63,7 @@ const PhoneInput = ({
             {get(errors, `${name}.type`) === 'validation' &&
             <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
 
-            {get(errors,`${name}.type`) == 'pattern' &&
+            {get(errors, `${name}.type`) == 'pattern' &&
             <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
 
 
