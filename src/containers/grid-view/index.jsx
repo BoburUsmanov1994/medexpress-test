@@ -33,7 +33,11 @@ const GridView = ({
                       setOpenCreateModal = () => {
                       },
                       dataKey = 'data.data',
-                      rowKey = 'id'
+                      rowKey = 'id',
+                      deleteModalTitle = 'Удаление организации',
+                      deleteModalText = 'Вы действительно хотите удалить организацию?',
+                      getRowId = () => {
+                      },
                   }) => {
         const navigate = useNavigate();
         const [page, setPage] = useState(1);
@@ -94,18 +98,14 @@ const GridView = ({
             Swal.fire({
                 position: 'center',
                 icon: 'error',
-                backdrop: 'rgba(0,0,0,0.9)',
-                background: 'none',
-                title: t('Are you sure?'),
+                title: deleteModalTitle,
+                text: deleteModalText,
                 showConfirmButton: true,
                 showCancelButton: true,
-                confirmButtonColor: '#F25886',
+                confirmButtonColor: '#EB5757',
                 cancelButtonColor: '#006D85',
-                confirmButtonText: t('Delete'),
-                cancelButtonText: t('Cancel'),
-                customClass: {
-                    title: 'title-color',
-                },
+                confirmButtonText: t('Удалить'),
+                cancelButtonText: t('Отмена'),
             }).then((result) => {
                 if (result.isConfirmed) {
                     deleteRequest({url: `${viewUrl ?? url}/${id}`})
@@ -157,8 +157,14 @@ const GridView = ({
                                 </td>)}
                                 {hasActionColumn && <td className={'td  !max-w-full pr-10 '}>
                                     <Edit2 className={'mx-3.5 inline'} color={'#2F68FC'} size={22}
-                                           onClick={() => console.log()}/>
-                                    <Trash2 className={'inline'} onClick={() => console.log()} color={'#F25886'} size={22}/>
+                                           onClick={(e) => {
+                                               e.stopPropagation()
+                                               getRowId(get(tr, 'id'))
+                                           }}/>
+                                    <Trash2 className={'inline'} onClick={(e) => {
+                                        e.stopPropagation()
+                                        remove(get(tr, 'id'))
+                                    }} color={'#F25886'} size={22}/>
                                 </td>}
                             </tr>
                         </>);

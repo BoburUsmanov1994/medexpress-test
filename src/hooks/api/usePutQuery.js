@@ -18,7 +18,7 @@ const usePutQuery = ({hideSuccessToast = false, listKeyId = null}) => {
             {
                 onSuccess: (data) => {
                     if (!hideSuccessToast) {
-                        toast.success(t(data?.data?.message) || t('SUCCESS'))
+                        toast.success(t(data?.data?.detail) || t('SUCCESS'))
                     }
 
                     if (listKeyId) {
@@ -26,7 +26,7 @@ const usePutQuery = ({hideSuccessToast = false, listKeyId = null}) => {
                     }
                 },
                 onError: (data) => {
-                    toast.error(t(data?.response?.data?.message) || t('ERROR'))
+                    toast.error(t(data?.response?.data?.detail) || t('ERROR'))
                 }
             }
         );

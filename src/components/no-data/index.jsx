@@ -5,7 +5,7 @@ const Nodata = () => {
     const {t} = useTranslation()
     return (
         <div className={'w-100 p-5 pt-7 text-center font-semibold'}>
-            {t("No data")}
+            {t("Нет данных")}
         </div>
     );
 };
