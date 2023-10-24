@@ -1,20 +1,59 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Title from "../../../components/title";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
-import {ChevronLeft, Edit2} from "react-feather";
-import {useGetOneQuery} from "../../../hooks/api";
+import {ChevronLeft, Edit2, Plus} from "react-feather";
+import {useGetAllQuery, useGetOneQuery, usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
+import {KEYS} from "../../../constants/keys";
 import {OverlayLoader} from "../../../components/loader";
-import {get, head} from "lodash";
+import {get, head, find} from "lodash";
 import {Tab, Tabs} from "../../../components/tab";
 import Content from "../../../components/content";
 import photoImg from "../../../assets/images/photo.png";
 import mapImg from "../../../assets/images/map.png";
+import {PatternFormat} from "react-number-format";
+import Modal from "../../../components/modal";
+import Form from "../../../containers/form";
+import Field from "../../../containers/form/field";
+import orgIcon from "../../../assets/icons/org.svg";
+import Names from "../../../components/names"
 
 const OrganizationContainer = ({id = null}) => {
+    const [openDepartmentModal, setDepartmentModal] = useState(false)
     const {t} = useTranslation();
     const {data, isLoading} = useGetOneQuery({id: id, url: URLS.organizations})
+    const {
+        data: departments,
+        isLoading: isLoadingDepartments
+    } = useGetAllQuery({key:KEYS.organizationDepartments,url: `${URLS.organizations}/${id}${URLS.organizationDepartments}`})
+
+    const {data: organizationTypeMedicalList, isLoading: isLoadingTypeMedicalList} = useGetAllQuery({
+        key: KEYS.organizationTypeMedical,
+        url: URLS.organizationTypeMedical,
+        params: {
+            params: {
+                limit: 100
+            }
+        },
+        enabled: openDepartmentModal
+    })
+
+    const {
+        mutate: addDepartmentRequest, isLoading: isLoadingPost
+    } = usePostQuery({listKeyId: KEYS.organizationDepartments})
+
+    const addDepartment = ({data:requestData}) => {
+        const {parent,...rest} = requestData;
+        addDepartmentRequest({
+            url: `${URLS.organizations}/${id}${URLS.organizationDepartments}`,
+            attributes:{...rest,display: get(rest, 'names[0].value')},
+        },{
+            onSuccess: () => {
+                setDepartmentModal(false);
+            }
+        })
+    }
     if (isLoading) {
         return <OverlayLoader/>
     }
@@ -90,11 +129,14 @@ const OrganizationContainer = ({id = null}) => {
                                         </div>
                                         <div className={'flex py-5 border-b items-center'}>
                                             <span className={'w-1/3'}>Телефон:</span>
-                                            <strong className={'w-2/3'}>+998 67 123 12 12</strong>
+                                            <strong className={'w-2/3'}><PatternFormat displayType={'text'}
+                                                                                       format={"+998 ## ### ## ##"}
+                                                                                       value={get(find(get(head(get(data, 'data.contacts', [])), 'telecoms', []), _item => get(_item, 'system.id') == 1), 'value')}/></strong>
                                         </div>
                                         <div className={'flex py-5 border-b items-center'}>
                                             <span className={'w-1/3'}>Электронная почта:</span>
-                                            <strong className={'text-primary w-2/3'}>boyovut.ttb@ssv.uz</strong>
+                                            <strong
+                                                className={'text-primary w-2/3'}>{get(find(get(head(get(data, 'data.contacts', [])), 'telecoms', []), _item => get(_item, 'system.id') == 2), 'value')}</strong>
                                         </div>
                                     </div>
                                     <div className="col-span-3">
@@ -105,12 +147,18 @@ const OrganizationContainer = ({id = null}) => {
                             </Content>
                         </Tab>
                         <Tab tab={'employees'} label={t('Сотрудники')}>
-                            <Content sm>Сотрудники</Content>
+                            <Content sm>
+
+                            </Content>
                         </Tab>
                         <Tab tab={'departments'} label={t('Орг. структура')}>
                             <div className="grid grid-cols-12 gap-x-6">
                                 <div className="col-span-3">
-                                    <Content sm classNames={'!p-4'}>Орг. структура</Content>
+                                    <Content sm classNames={'!p-4'}>
+                                        <button onClick={() => setDepartmentModal(true)}
+                                                className={'text-primary font-bold flex items-center justify-center w-full text-center p-4 border-t border-1 border-t-[rgba(0,0,0,0.1)]'}>Добавить
+                                            отделение <Plus className={'ml-2'} size={24}/></button>
+                                    </Content>
                                 </div>
                                 <div className="col-span-9">
                                     <Content sm>Орг. структура</Content>
@@ -121,6 +169,39 @@ const OrganizationContainer = ({id = null}) => {
                     </Tabs>
                 </div>
             </div>
+            <Modal open={openDepartmentModal} onClose={() => setDepartmentModal(false)} classNames={'!w-[552px]'}
+                   title={t('Добавить отделение')}>
+                <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
+                      footer={<div className={'col-span-12 '}>
+                          <div className="flex justify-end">
+                              <button onClose={() => setDepartmentModal(false)} type={'button'}
+                                      className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                  {t('Отмена')}
+                              </button>
+                              <button type={'submit'}
+                                      className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                  {t('Сохранить')}
+                              </button>
+                          </div>
+                      </div>}>
+                    <Field type={'async-select'} isDisabledSearch
+                           url={`${URLS.organizations}/${id}${URLS.organizationDepartments}`}
+                           keyId={KEYS.organizationsListForSelect}
+                           classNames={'col-span-12'}
+                           name={'parent'}
+                           label={t('Родительская организация')}
+                    />
+                    <Field type={'select'} isLoading={isLoadingTypeMedicalList}
+                           classNames={'col-span-12'}
+                           name={'medical_type'}
+                           label={<div className={'flex'}><span>{t('Тип организации')}</span><img
+                               className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                           params={{required: true}}
+                           options={get(organizationTypeMedicalList, 'data', [])}/>
+                    <hr className={'mt-2 mb-6 col-span-12'}/>
+                    <Names fullWidth/>
+                </Form>
+            </Modal>
         </div>
     );
 }
