@@ -10,6 +10,7 @@ export const URLS = {
     organizationsListForSelect: '/organizations/list-for-select',
     organizationTypeLevel: '/reference-books/organization-type-level',
     organizationTypeMedical: '/reference-books/organization-type-medical',
+    organizationType: '/reference-books/organization-type',
     organizationLegalForm: '/reference-books/legal-form',
     organizationTypeService: '/reference-books/organization-type-service',
     organizationManagementForm: '/reference-books/management-form',
@@ -17,4 +18,5 @@ export const URLS = {
     organizationTerritory: '/reference-books/administrative-territory',
     organizationDepartments: '/departments',
     organizationPositions: '/positions',
+    practitionerRole: '/reference-books/practitioner-role',
 }
