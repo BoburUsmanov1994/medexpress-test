@@ -88,6 +88,7 @@ const OrganizationContainer = ({id = null}) => {
     if (isLoading) {
         return <OverlayLoader/>
     }
+    console.log('departments',departments)
     return (<div>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 mb-5">
@@ -186,6 +187,9 @@ const OrganizationContainer = ({id = null}) => {
                             <div className="grid grid-cols-12 gap-x-6">
                                 <div className="col-span-3">
                                     <Content sm classNames={'!p-4'}>
+                                        <ul className={'mb-6'}>
+                                            {get(departments,'data.data',[]).map(department=><li className={'cursor-pointer text-[#222222] font-bold py-1.5 mb-2'} key={get(department,'id')}>{get(department,'display')}</li>)}
+                                        </ul>
                                         <button onClick={() => setDepartmentModal(true)}
                                                 className={'text-primary font-bold flex items-center justify-center w-full text-center p-4 border-t border-1 border-t-[rgba(0,0,0,0.1)]'}>Добавить
                                             отделение <Plus className={'ml-2'} size={24}/></button>
