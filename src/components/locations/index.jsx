@@ -100,7 +100,7 @@ const Index = ({data}) => {
             <Field type={'input'} defaultValue={get(data, 'locations[0].address.block',null)}
                    classNames={'col-span-2'}
                    name={'locations[0].address.block'}
-                   params={{required: true}}
+                   params={{required: true,valueAsNumber:true}}
                    placeholder={t('Дом')}
                    label={<div className={'flex'}><span>{t('Дом')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}

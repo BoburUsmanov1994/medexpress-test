@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Title from "../../../components/title";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
-import {ChevronLeft, Edit2, Loader, Plus} from "react-feather";
+import {ChevronLeft, Edit2,  Plus} from "react-feather";
 import {useGetAllQuery, useGetOneQuery, usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
 import {KEYS} from "../../../constants/keys";
@@ -330,7 +330,7 @@ const OrganizationContainer = ({id = null}) => {
                             <Names/></>
                         }
                         {
-                            !isEqual(defaultDept, 'dept') && <>
+                            defaultDept && !isEqual(defaultDept, 'dept') && <>
 
                                 <Field type={'select'} isLoading={isLoadingTypeLevelList}
                                        classNames={'col-span-6'} name={'level'}
@@ -397,7 +397,7 @@ const OrganizationContainer = ({id = null}) => {
                            name={'rate'}
                            label={<div className={'flex'}><span>{t('Общая ставка')}</span><img
                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                           params={{required: true, valueAsNumber: true}}
+                           params={{required: true}}
                     />
                 </Form>
             </Modal>
