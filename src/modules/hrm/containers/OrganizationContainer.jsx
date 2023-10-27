@@ -113,19 +113,50 @@ const OrganizationContainer = ({id = null}) => {
         })
     }
     const addPosition = ({data: requestData}) => {
-        const {rate,...rest} = requestData;
-        addPositionRequest({
-            url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
-            attributes: {
-                ...rest,
-                rate:parseFloat(rate),
-                display: get(rest, '[0].value'),
-            }
-        }, {
-            onSuccess: () => {
-                setOpen(false);
-            }
-        })
+        const {rate, organization_id, ...rest} = requestData;
+        if (isEqual(organization_id, 'type.code') === 'dept') {
+            addPositionRequest({
+                url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
+                attributes: {
+                    ...rest,
+                    rate: parseFloat(rate),
+                    department_id: organization_id,
+                    display: get(rest, '[0].value'),
+                }
+            }, {
+                onSuccess: () => {
+                    setOpen(false);
+                }
+            })
+        } else if (get(organization_id, 'id')) {
+            addPositionRequest({
+                url: `${URLS.organizations}/${get(organization_id, 'id')}${URLS.organizationPositions}`,
+                attributes: {
+                    ...rest,
+                    rate: parseFloat(rate),
+                    department_id: get(organization_id, 'id'),
+                    display: get(rest, '[0].value'),
+                }
+            }, {
+                onSuccess: () => {
+                    setOpen(false);
+                }
+            })
+        } else {
+            addPositionRequest({
+                url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
+                attributes: {
+                    ...rest,
+                    rate: parseFloat(rate),
+                    display: get(rest, '[0].value'),
+                }
+            }, {
+                onSuccess: () => {
+                    setOpen(false);
+                }
+            })
+        }
+
     }
     if (isLoading) {
         return <OverlayLoader/>
@@ -344,7 +375,7 @@ const OrganizationContainer = ({id = null}) => {
                            url={`${URLS.organizations}/${id}${URLS.organizationDepartments}`}
                            keyId={KEYS.organizationsListForSelect}
                            classNames={'col-span-12'}
-                           name={'parent'}
+                           name={'organization_id'}
                            label={t('Отделение')}
                     />
                     <Field type={'async-select'}
@@ -357,7 +388,6 @@ const OrganizationContainer = ({id = null}) => {
                            params={{required: true}}
                     />
 
-
                     <hr className={'mt-2 mb-6 col-span-12'}/>
                     <Names fullWidth hideValueShort/>
                     <hr className={'mt-2 mb-6 col-span-12'}/>
@@ -367,7 +397,7 @@ const OrganizationContainer = ({id = null}) => {
                            name={'rate'}
                            label={<div className={'flex'}><span>{t('Общая ставка')}</span><img
                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                           params={{required: true,valueAsNumber:true}}
+                           params={{required: true, valueAsNumber: true}}
                     />
                 </Form>
             </Modal>
