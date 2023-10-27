@@ -6,7 +6,7 @@ import orgIcon from "../../assets/icons/org.svg";
 import {useTranslation} from "react-i18next";
 
 
-const Index = ({data,fullWidth=false}) => {
+const Index = ({data,fullWidth=false,hideValueShort=false}) => {
     let [lang, setLang] = useState('uz');
     const {t} = useTranslation()
     return (
@@ -26,7 +26,8 @@ const Index = ({data,fullWidth=false}) => {
                 </button>
             </div>
 
-            {lang == 'uz' && <><Field type={'input'} params={{
+            {lang == 'uz' && <>
+                {!hideValueShort && <Field type={'input'} params={{
                 required: true,
                 pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}
             }} defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'uz')),'value_short')} classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
@@ -36,7 +37,7 @@ const Index = ({data,fullWidth=false}) => {
                                       label={<div className={'flex'}>
                                           <span>{t('Краткое наименование')}</span><img
                                           className={'ml-1'} src={orgIcon} alt="org"/></div>}
-            />
+            />}
                 <Field type={'input'} params={{
                     required: true,
                     pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}
@@ -54,7 +55,8 @@ const Index = ({data,fullWidth=false}) => {
                        label={<div className={'flex'}><span>{t('Краткое наименование')}</span></div>}
                 />
             </>}
-            {lang == 'uz-Cyrl' && <><Field type={'input'} params={{
+            {lang == 'uz-Cyrl' && <>
+                {!hideValueShort && <Field type={'input'} params={{
                 pattern: {
                     value: /^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,
                     message: 'Invalid value'
@@ -65,7 +67,7 @@ const Index = ({data,fullWidth=false}) => {
                                            property={{type: 'text'}}
                                            label={<div className={'flex'}>
                                                <span>{t('Краткое наименование')}</span></div>}
-            />
+            />}
                 <Field type={'input'} params={{
                     pattern: {
                         value: /^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,
@@ -115,7 +117,8 @@ const Index = ({data,fullWidth=false}) => {
                 />
             </>}
 
-            {lang == 'en' && <><Field type={'input'} params={{
+            {lang == 'en' && <>
+                {!hideValueShort && <Field type={'input'} params={{
                 pattern: {
                     value: /^[a-zA-Z0-9\s\'`,.]+$/,
                     message: 'Invalid value'
@@ -128,7 +131,7 @@ const Index = ({data,fullWidth=false}) => {
                                       placeholder={t('Введите краткое наименование')}
                                       label={<div className={'flex'}>
                                           <span>{t('Краткое наименование')}</span></div>}
-            />
+            />}
                 <Field type={'input'}
                        params={{pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}}}
                        defaultValue={get(data, `names[3].value`)} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}

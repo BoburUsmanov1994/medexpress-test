@@ -113,11 +113,12 @@ const OrganizationContainer = ({id = null}) => {
         })
     }
     const addPosition = ({data: requestData}) => {
-        const {...rest} = requestData;
+        const {rate,...rest} = requestData;
         addPositionRequest({
             url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
             attributes: {
                 ...rest,
+                rate:parseFloat(rate),
                 display: get(rest, '[0].value'),
             }
         }, {
@@ -324,7 +325,7 @@ const OrganizationContainer = ({id = null}) => {
 
             <Modal open={open} onClose={() => setOpen(false)} classNames={'!w-[552px]'}
                    title={t('Добавить должность')}>
-                {isLoadingPositionPost && <ContentLoader />}
+                {isLoadingPositionPost && <ContentLoader/>}
 
                 <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addPosition(data)}
                       footer={<div className={'col-span-12 '}>
@@ -358,7 +359,7 @@ const OrganizationContainer = ({id = null}) => {
 
 
                     <hr className={'mt-2 mb-6 col-span-12'}/>
-                    <Names fullWidth/>
+                    <Names fullWidth hideValueShort/>
                     <hr className={'mt-2 mb-6 col-span-12'}/>
                     <Field type={'input'}
                            placeholder={'Введите количество'}
@@ -366,7 +367,7 @@ const OrganizationContainer = ({id = null}) => {
                            name={'rate'}
                            label={<div className={'flex'}><span>{t('Общая ставка')}</span><img
                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                           params={{required: true}}
+                           params={{required: true,valueAsNumber:true}}
                     />
                 </Form>
             </Modal>
