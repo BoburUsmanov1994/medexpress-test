@@ -428,18 +428,6 @@ const OrganizationContainer = ({id = null}) => {
                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
                            params={{required: true}}
                     />
-                    <Field params={{valueAsNumber:true}} type={'input'}
-                           placeholder={'Введите количество'}
-                           classNames={'col-span-12'}
-                           name={'filled_rate_count'}
-                           label={t('Заполненность')}
-                    />
-                    <Field params={{valueAsNumber:true}} type={'input'}
-                           placeholder={'Введите количество'}
-                           classNames={'col-span-12'}
-                           name={'practitioner_role_count'}
-                           label={t('Кол-во Сотрудников')}
-                    />
                 </Form>
             </Modal>
         </div>
