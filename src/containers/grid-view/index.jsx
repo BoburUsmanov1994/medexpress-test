@@ -38,6 +38,7 @@ const GridView = ({
                       deleteModalText = 'Вы действительно хотите удалить организацию?',
                       getRowId = () => {
                       },
+                      noBorder = false
                   }) => {
         const navigate = useNavigate();
         const [page, setPage] = useState(1);
@@ -124,7 +125,7 @@ const GridView = ({
         }
         return (<div className={'bg-white rounded-lg'}>
             {filters}
-            <div className="overflow-x-auto max-h-[75vh] overflow-y-auto border border-[#E6E6E6] rounded-lg">
+            <div className={clsx("overflow-x-auto max-h-[75vh] overflow-y-auto border border-[#E6E6E6] rounded-lg",{'!border-transparent':noBorder})}>
 
                 <table className="table">
                     <thead className={'thead'}>
@@ -144,7 +145,7 @@ const GridView = ({
                         return (<>
                             <tr
                                 onClick={() => onRowClick(tr)}
-                                className={"tr"}
+                                className={clsx("tr",{'no-border':noBorder})}
                                 key={get(tr, get(columns, '[0].key', index))}
                             >
                                 {columns.map((th, j) => <td key={get(th, 'key', j)}
@@ -176,7 +177,7 @@ const GridView = ({
                     </tbody>
                 </table>
             </div>
-            {get(data, 'data.meta.total') > 0 && <div className="flex justify-between items-center p-3">
+            {!noBorder && get(data, 'data.meta.total') > 0 && <div className="flex justify-between items-center p-3">
                 <div className="flex items-center ">
                     <Select isClearable={false} sm value={pageSize} setValue={setPageSize} options={PER_PAGES}/>
                     <span

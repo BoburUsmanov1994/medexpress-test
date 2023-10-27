@@ -147,6 +147,9 @@ input.checked::before {
     .tbody .tr {
         @apply bg-white  hover:bg-[#E6F1F3] transition cursor-pointer   border-b border-b-['#EDEDED'] align-middle
     }
+    .tbody .tr.no-border{
+        @apply border-b-transparent
+    }
 
     .pagination {
         @apply flex justify-end;

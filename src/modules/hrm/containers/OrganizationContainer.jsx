@@ -20,6 +20,7 @@ import orgIcon from "../../../assets/icons/org.svg";
 import Names from "../../../components/names"
 import Contacts from "../../../components/contacts";
 import Locations from "../../../components/locations";
+import GridView from "../../../containers/grid-view";
 
 const OrganizationContainer = ({id = null}) => {
     const [openDepartmentModal, setDepartmentModal] = useState(false)
@@ -34,6 +35,8 @@ const OrganizationContainer = ({id = null}) => {
         key: KEYS.organizationDepartments,
         url: `${URLS.organizations}/${id}${URLS.organizationDepartments}`
     })
+
+
 
     const {data: organizationTypeMedicalList, isLoading: isLoadingTypeMedicalList} = useGetAllQuery({
         key: KEYS.organizationTypeMedical,
@@ -114,13 +117,13 @@ const OrganizationContainer = ({id = null}) => {
     }
     const addPosition = ({data: requestData}) => {
         const {rate, organization_id, ...rest} = requestData;
-        if (isEqual(organization_id, 'type.code') === 'dept') {
+        if (get(organization_id, 'type.code')=='dept') {
             addPositionRequest({
                 url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
                 attributes: {
                     ...rest,
                     rate: parseFloat(rate),
-                    department_id: organization_id,
+                    department_id: get(organization_id,'id'),
                     display: get(rest, '[0].value'),
                 }
             }, {
@@ -128,13 +131,12 @@ const OrganizationContainer = ({id = null}) => {
                     setOpen(false);
                 }
             })
-        } else if (get(organization_id, 'id')) {
+        } else if(get(organization_id, 'id')) {
             addPositionRequest({
                 url: `${URLS.organizations}/${get(organization_id, 'id')}${URLS.organizationPositions}`,
                 attributes: {
                     ...rest,
                     rate: parseFloat(rate),
-                    department_id: get(organization_id, 'id'),
                     display: get(rest, '[0].value'),
                 }
             }, {
@@ -158,6 +160,22 @@ const OrganizationContainer = ({id = null}) => {
         }
 
     }
+    const columns = [
+        {
+            title: t('ДОЛЖНОСТЬ'),
+            key: 'names',
+            render:({value=[]})=>get(find(value,_val=>get(_val,'locale') == 'uz'),'value','-')
+        },
+        {
+            title:t('ПО КЛАССИФИКАТОРУ'),
+            key:'role',
+            render:({value})=>get(value,'display','-')
+        },
+        {
+            title:t('ОБЩАЯ СТАВКА'),
+            key:'rate'
+        }
+    ]
     if (isLoading) {
         return <OverlayLoader/>
     }
@@ -282,6 +300,9 @@ const OrganizationContainer = ({id = null}) => {
                                                     <Plus className={'mr-1.5'}/>
                                                     {t('Добавить должность')}
                                                 </button>
+                                            </div>
+                                            <div className="col-span-12">
+                                                <GridView noBorder columns={columns} url={`${URLS.organizations}/${id}${URLS.organizationPositions}`} listKey={KEYS.organizationPositions} />
                                             </div>
                                         </div>
                                     </Content>
