@@ -21,6 +21,8 @@ import Field from "../../../containers/form/field";
 import Dropzone from "../../../containers/form/components/Dropzone";
 import Badge from "../../../components/badge"
 import Names from "../../../components/names"
+import Contacts from "../../../components/contacts";
+import Locations from "../../../components/locations";
 
 
 const OrganizationsContainer = () => {
@@ -29,9 +31,6 @@ const OrganizationsContainer = () => {
     const [rowId, setRowId] = useState(null);
     const [open, setOpen] = useState(false);
     let [orgData, setOrgData] = useState({});
-    let [regionId, setRegionId] = useState(null);
-    let [districtId, setDistrictId] = useState(null);
-    let [increment, setIncrement] = useState(0);
     const [filter, setFilter] = useState({name: '', state_id: null, city_id: null})
     const {t} = useTranslation();
 
@@ -80,16 +79,6 @@ const OrganizationsContainer = () => {
     })
 
 
-    const {data: organizationCountryList} = useGetAllQuery({
-        key: KEYS.organizationCountry,
-        url: URLS.organizationCountry,
-        params: {
-            params: {
-                limit: 1000
-            }
-        },
-        enabled: !!(open || !isNil(rowId))
-    })
 
     const {data: organizationRegions, isLoading: isLoadingRegions} = useGetAllQuery({
         key: KEYS.organizationTerritory,
@@ -102,18 +91,7 @@ const OrganizationsContainer = () => {
         }
     })
 
-    const {data: organizationDistricts} = useGetAllQuery({
-        key: [KEYS.organizationTerritory, regionId],
-        url: URLS.organizationTerritory,
-        params: {
-            params: {
-                limit: 100,
-                level: 2,
-                parent_id: isObject(regionId) ? get(regionId, 'value') : regionId
-            },
-        },
-        enabled: !!(regionId)
-    })
+
     const {data: districts} = useGetAllQuery({
         key: [KEYS.organizationTerritory, get(filter, 'state_id.value')],
         url: URLS.organizationTerritory,
@@ -126,18 +104,7 @@ const OrganizationsContainer = () => {
         },
         enabled: !!(get(filter, 'state_id.value'))
     })
-    const {data: organizationNeighbors} = useGetAllQuery({
-        key: [KEYS.organizationTerritory, districtId],
-        url: URLS.organizationTerritory,
-        params: {
-            params: {
-                limit: 1000,
-                level: 3,
-                parent_id: isObject(districtId) ? get(districtId, 'value') : districtId
-            },
-        },
-        enabled: !!(districtId)
-    })
+
 
     const {data, isLoading: isLoadingOne} = useGetOneQuery({
         key: [KEYS.organizations, rowId],
@@ -384,7 +351,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <Names data={orgData} />
+                            <Names data={orgData}/>
 
                         </Form>
                     </Tab>
@@ -402,61 +369,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <Field type={'select'} isDisabled
-                                   defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
-                                   classNames={'col-span-4'} name={'locations[0].address.country'}
-                                   label={<div className={'flex'}><span>{t('Страна')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   options={get(organizationCountryList, 'data', [])}/>
-                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.state')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.state'}
-                                   label={<div className={'flex'}><span>{t('Регион')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   property={{onChange: (val) => setRegionId(get(val, 'id'))}}
-                                   options={get(organizationRegions, 'data', [])}/>
-                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.district')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.district'}
-                                   label={<div className={'flex'}><span>{t('Район')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
-                                   options={get(organizationDistricts, 'data', [])}
-                            />
-                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.city')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.city'}
-                                   label={<div className={'flex'}><span>{t('Махалля')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   options={get(organizationNeighbors, 'data', [])}
-                            />
-                            <Field type={'input'} defaultValue={get(orgData, 'locations[0].address.line')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.line'}
-                                   params={{required: true}}
-                                   placeholder={t('Улица')}
-                                   label={<div className={'flex'}><span>{t('Улица')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Field type={'input'} defaultValue={get(orgData, 'locations[0].address.block')}
-                                   classNames={'col-span-2'}
-                                   name={'locations[0].address.block'}
-                                   params={{required: true, valueAsNumber: true}}
-                                   placeholder={t('Дом')}
-                                   label={<div className={'flex'}><span>{t('Дом')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Field params={{pattern: {value: /^[0-9]{6}$/, message: 'Invalid value'}}}
-                                   type={'input-mask'} property={{mask: '999999'}}
-                                   defaultValue={get(orgData, 'locations[0].address.postal_code')}
-                                   classNames={'col-span-2'} name={'locations[0].address.postal_code'}
-                                   placeholder={t('Почтовый индекс')}
-                                   label={t('Почтовый индекс')}
-                            />
+                            <Locations data={orgData} />
 
                         </Form>
                     </Tab>
@@ -499,89 +412,9 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <h3 className={'mb-6 col-span-12 font-semibold'}>Контактная информация</h3>
 
-                            {
-                                range(0, increment + 1).map(inc => <>
-                                    <Field type={'phone-number'}
-                                           defaultValue={get(orgData, `contacts[${inc}].telecoms[0].value`)}
-                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[0].value`}
-                                           params={{
-                                               valueAsString: true,
-                                               required: true,
-                                               pattern: {
-                                                   value: /^(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
-                                                   message: 'Invalid format'
-                                               }
-                                           }}
-                                           placeholder={t('Телефон')}
-                                           label={<div className={'flex'}><span>{t('Телефон')}</span><img
-                                               className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    />
+                            <Contacts data={orgData}/>
 
-
-                                    <Field type={'input'}
-                                           defaultValue={get(orgData, `contacts[${inc}].telecoms[1].value`)}
-                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[1].value`}
-                                           placeholder={t('E-mail')}
-                                           params={{
-                                               pattern: {
-                                                   value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                                                   message: 'Invalid format'
-                                               }
-                                           }}
-                                           label={t('E-mail')}
-                                    />
-
-
-                                    <Field type={'input'} params={{
-                                        pattern: {
-                                            value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
-                                            message: "Invalid format"
-                                        }
-                                    }} defaultValue={get(orgData, `contacts[${inc}].telecoms[2].value`)}
-                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[2].value`}
-                                           placeholder={t('URL адрес')}
-                                           label={t('URL адрес')}
-                                    />
-                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={1}
-                                           classNames={'col-span-4'}
-                                           name={`contacts[${inc}].telecoms[0].system.id`}
-                                           property={{type: 'hidden'}}
-                                    />
-                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={2}
-                                           classNames={'col-span-4'}
-                                           name={`contacts[${inc}].telecoms[1].system.id`}
-                                           property={{type: 'hidden'}}
-                                    />
-                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={3}
-                                           classNames={'col-span-4'}
-                                           name={`contacts[${inc}].telecoms[2].system.id`}
-                                           property={{type: 'hidden'}}
-                                    />
-                                </>)
-                            }
-                            <div className={'col-span-12'}>
-                                <button
-                                    type={"button"}
-                                    onClick={() => setIncrement(prev => ++prev)}
-                                    className={'mr-6 p-2.5 !pr-6 text-[#006D85] rounded-lg inline-flex  border border-[#006D85] font-bold text-center  mt-3  items-center '}>
-                                    <Plus className={'mr-1'}/> <span>Добавить
-                                    поле</span>
-                                </button>
-                                {
-                                    increment > 0 && <button
-                                        type={'button'}
-                                        onClick={() => setIncrement(prev => --prev)}
-                                        className={' p-2.5 !pr-6 text-[#EB5757] rounded-lg inline-flex  border border-[#EB5757] font-bold text-center  mt-6  items-center '}>
-                                        <Minus className={'mr-1'}/> <span>Удалить
-                                    поле</span>
-                                    </button>
-                                }
-                            </div>
-                            <div className={'col-span-12'}>
-                                <hr className={'my-4'}/>
-                            </div>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
                             <Field type={'input'} params={{
                                 pattern: {
@@ -736,61 +569,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <Field type={'select'} isDisabled
-                                   defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
-                                   classNames={'col-span-4'} name={'locations[0].address.country'}
-                                   label={<div className={'flex'}><span>{t('Страна')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   options={get(organizationCountryList, 'data', [])}/>
-                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.state')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.state'}
-                                   label={<div className={'flex'}><span>{t('Регион')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   property={{onChange: (val) => setRegionId(get(val, 'id'))}}
-                                   options={get(organizationRegions, 'data', [])}/>
-                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.city')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.district'}
-                                   label={<div className={'flex'}><span>{t('Район')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
-                                   options={get(organizationDistricts, 'data', [])}
-                            />
-                            <Field type={'select'} defaultValue={get(orgData, 'locations[0].address.city')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.city'}
-                                   label={<div className={'flex'}><span>{t('Махалля')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                   params={{required: true}}
-                                   options={get(organizationNeighbors, 'data', [])}
-                            />
-                            <Field type={'input'} defaultValue={get(orgData, 'locations[0].address.line')}
-                                   classNames={'col-span-4'}
-                                   name={'locations[0].address.line'}
-                                   params={{required: true}}
-                                   placeholder={t('Улица')}
-                                   label={<div className={'flex'}><span>{t('Улица')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Field type={'input'} defaultValue={get(orgData, 'locations[0].address.block')}
-                                   classNames={'col-span-2'}
-                                   name={'locations[0].address.block'}
-                                   params={{required: true, valueAsNumber: true}}
-                                   placeholder={t('Дом')}
-                                   label={<div className={'flex'}><span>{t('Дом')}</span><img
-                                       className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                            />
-                            <Field params={{pattern: {value: /^[0-9]{6}$/, message: 'Invalid value'}}}
-                                   type={'input-mask'} property={{mask: '999999'}}
-                                   defaultValue={get(orgData, 'locations[0].address.postal_code')}
-                                   classNames={'col-span-2'} name={'locations[0].address.postal_code'}
-                                   placeholder={t('Почтовый индекс')}
-                                   label={t('Почтовый индекс')}
-                            />
+                            <Locations data={orgData} />
 
                         </Form>
                     </Tab>
@@ -833,89 +612,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <h3 className={'mb-6 col-span-12 font-semibold'}>Контактная информация</h3>
 
-                            {
-                                range(0, increment + 1).map(inc => <>
-                                    <Field type={'phone-number'}
-                                           defaultValue={get(orgData, `contacts[${inc}].telecoms[0].value`)}
-                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[0].value`}
-                                           params={{
-                                               valueAsString: true,
-                                               required: true,
-                                               pattern: {
-                                                   value: /^(33|36|55|61|62|65|66|67|69|70|71|72|73|74|75|76|77|78|79|88|90|91|93|94|95|97|98|99)\d{7}$/,
-                                                   message: 'Invalid format'
-                                               }
-                                           }}
-                                           placeholder={t('Телефон')}
-                                           label={<div className={'flex'}><span>{t('Телефон')}</span><img
-                                               className={'ml-1'} src={orgIcon} alt="org"/></div>}
-                                    />
-
-
-                                    <Field type={'input'}
-                                           defaultValue={get(orgData, `contacts[${inc}].telecoms[1].value`)}
-                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[1].value`}
-                                           placeholder={t('E-mail')}
-                                           params={{
-                                               pattern: {
-                                                   value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                                                   message: 'Invalid format'
-                                               }
-                                           }}
-                                           label={t('E-mail')}
-                                    />
-
-
-                                    <Field type={'input'} params={{
-                                        pattern: {
-                                            value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
-                                            message: "Invalid format"
-                                        }
-                                    }} defaultValue={get(orgData, `contacts[${inc}].telecoms[2].value`)}
-                                           classNames={'col-span-4'} name={`contacts[${inc}].telecoms[2].value`}
-                                           placeholder={t('URL адрес')}
-                                           label={t('URL адрес')}
-                                    />
-                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={1}
-                                           classNames={'col-span-4'}
-                                           name={`contacts[${inc}].telecoms[0].system.id`}
-                                           property={{type: 'hidden'}}
-                                    />
-                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={2}
-                                           classNames={'col-span-4'}
-                                           name={`contacts[${inc}].telecoms[1].system.id`}
-                                           property={{type: 'hidden'}}
-                                    />
-                                    <Field type={'input'} params={{valueAsNumber: true}} defaultValue={3}
-                                           classNames={'col-span-4'}
-                                           name={`contacts[${inc}].telecoms[2].system.id`}
-                                           property={{type: 'hidden'}}
-                                    />
-                                </>)
-                            }
-                            <div className={'col-span-12'}>
-                                <button
-                                    type={"button"}
-                                    onClick={() => setIncrement(prev => ++prev)}
-                                    className={'mr-6 p-2.5 !pr-6 text-[#006D85] rounded-lg inline-flex  border border-[#006D85] font-bold text-center  mt-3  items-center '}>
-                                    <Plus className={'mr-1'}/> <span>Добавить
-                                    поле</span>
-                                </button>
-                                {
-                                    increment > 0 && <button
-                                        type={'button'}
-                                        onClick={() => setIncrement(prev => --prev)}
-                                        className={' p-2.5 !pr-6 text-[#EB5757] rounded-lg inline-flex  border border-[#EB5757] font-bold text-center  mt-6  items-center '}>
-                                        <Minus className={'mr-1'}/> <span>Удалить
-                                    поле</span>
-                                    </button>
-                                }
-                            </div>
-                            <div className={'col-span-12'}>
-                                <hr className={'my-4'}/>
-                            </div>
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
                             <Field type={'input'} params={{
                                 pattern: {

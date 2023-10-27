@@ -7,7 +7,7 @@ import {useGetAllQuery, useGetOneQuery, usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
 import {KEYS} from "../../../constants/keys";
 import {ContentLoader, OverlayLoader} from "../../../components/loader";
-import {get, head, find, isEqual} from "lodash";
+import {get, head, find, isEqual, isNil} from "lodash";
 import {Tab, Tabs} from "../../../components/tab";
 import Content from "../../../components/content";
 import photoImg from "../../../assets/images/photo.png";
@@ -18,6 +18,8 @@ import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import orgIcon from "../../../assets/icons/org.svg";
 import Names from "../../../components/names"
+import Contacts from "../../../components/contacts";
+import Locations from "../../../components/locations";
 
 const OrganizationContainer = ({id = null}) => {
     const [openDepartmentModal, setDepartmentModal] = useState(false)
@@ -54,30 +56,55 @@ const OrganizationContainer = ({id = null}) => {
         enabled: openDepartmentModal
     })
 
-    const {data: roles,isLoading:isLoadingRoles} = useGetAllQuery({
-        key: KEYS.practitionerRole,
-        url: URLS.practitionerRole,
+    const {data: organizationTypeLevelList, isLoading: isLoadingTypeLevelList} = useGetAllQuery({
+        key: KEYS.organizationTypeLevel,
+        url: URLS.organizationTypeLevel,
         params: {
             params: {
                 limit: 100
             }
         },
-        enabled: open
+        enabled: openDepartmentModal
     })
+
+    const {data: organizationTypeServiceList, isLoading: isLoadingTypeServiceList} = useGetAllQuery({
+        key: KEYS.organizationTypeService,
+        url: URLS.organizationTypeService,
+        params: {
+            params: {
+                limit: 100
+            }
+        },
+        enabled: openDepartmentModal
+    })
+
 
     const {
         mutate: addDepartmentRequest, isLoading: isLoadingPost
     } = usePostQuery({listKeyId: KEYS.organizationDepartments})
+    const {
+        mutate: addPositionRequest, isLoading: isLoadingPositionPost
+    } = usePostQuery({listKeyId: KEYS.organizationPositions})
 
     const addDepartment = ({data: requestData}) => {
-        const {parent, ...rest} = requestData;
+        const {parent, names, service_types, contacts, level, locations, ...rest} = requestData;
         addDepartmentRequest({
             url: `${URLS.organizations}/${id}${URLS.organizationDepartments}`,
-            attributes: {
+            attributes: isEqual(defaultDept, 'dept') ? {
                 ...rest,
+                names,
                 parent: parent ?? undefined,
-                display: get(rest, 'names[0].value'),
-                type: find(get(organizationTypeList, 'data', []), item => isEqual(get(item, 'code'), defaultDept == 'dept' ? 'dept' : 'prov'))
+                display: get(names, '[0].value'),
+                type: find(get(organizationTypeList, 'data', []), item => isEqual(get(item, 'code'), 'dept'))
+            } : {
+                ...rest,
+                locations,
+                service_types,
+                contacts,
+                level,
+                display: get(names, '[0].value'),
+                names,
+                type: find(get(organizationTypeList, 'data', []), item => isEqual(get(item, 'code'), 'prov'))
             },
         }, {
             onSuccess: () => {
@@ -85,10 +112,23 @@ const OrganizationContainer = ({id = null}) => {
             }
         })
     }
+    const addPosition = ({data: requestData}) => {
+        const {...rest} = requestData;
+        addPositionRequest({
+            url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
+            attributes: {
+                ...rest,
+                display: get(rest, '[0].value'),
+            }
+        }, {
+            onSuccess: () => {
+                setOpen(false);
+            }
+        })
+    }
     if (isLoading) {
         return <OverlayLoader/>
     }
-    console.log('departments',departments)
     return (<div>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 mb-5">
@@ -188,7 +228,9 @@ const OrganizationContainer = ({id = null}) => {
                                 <div className="col-span-3">
                                     <Content sm classNames={'!p-4'}>
                                         <ul className={'mb-6'}>
-                                            {get(departments,'data.data',[]).map(department=><li className={'cursor-pointer text-[#222222] font-bold py-1.5 mb-2'} key={get(department,'id')}>{get(department,'display')}</li>)}
+                                            {get(departments, 'data.data', []).map(department => <li
+                                                className={'cursor-pointer text-[#222222] font-bold py-1.5 mb-2'}
+                                                key={get(department, 'id')}>{get(department, 'display')}</li>)}
                                         </ul>
                                         <button onClick={() => setDepartmentModal(true)}
                                                 className={'text-primary font-bold flex items-center justify-center w-full text-center p-4 border-t border-1 border-t-[rgba(0,0,0,0.1)]'}>Добавить
@@ -202,12 +244,12 @@ const OrganizationContainer = ({id = null}) => {
                                                 <Title sm>Штатные единицы</Title>
                                             </div>
                                             <div className="col-span-6 text-right">
-                                                  <button
-                                                onClick={() => setOpen(true)}
-                                                className={'inline-flex py-2.5 pl-2.5 pr-5 rounded-lg text-primary items-center font-bold border-2 border-primary text-center '}>
-                                                <Plus className={'mr-1.5'}/>
-                                                {t('Добавить должность')}
-                                            </button>
+                                                <button
+                                                    onClick={() => setOpen(true)}
+                                                    className={'inline-flex py-2.5 pl-2.5 pr-5 rounded-lg text-primary items-center font-bold border-2 border-primary text-center '}>
+                                                    <Plus className={'mr-1.5'}/>
+                                                    {t('Добавить должность')}
+                                                </button>
                                             </div>
                                         </div>
                                     </Content>
@@ -218,8 +260,9 @@ const OrganizationContainer = ({id = null}) => {
                     </Tabs>
                 </div>
             </div>
-            <Modal open={openDepartmentModal} onClose={() => setDepartmentModal(false)} classNames={'!w-[552px]'}
+            <Modal open={openDepartmentModal} onClose={() => setDepartmentModal(false)} classNames={'!w-[1000px]'}
                    title={t('Добавить отделение')}>
+                {isLoadingPost && <ContentLoader/>}
                 {isLoadingTypeMedicalList ? <ContentLoader/> :
                     <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
                           footer={<div className={'col-span-12 '}>
@@ -234,61 +277,98 @@ const OrganizationContainer = ({id = null}) => {
                                   </button>
                               </div>
                           </div>}>
-                        <Field isDisabled type={'select'} isLoading={isLoadingTypeMedicalList}
+                        <Field type={'select'} isLoading={isLoadingTypeMedicalList}
                                defaultValue={find(get(organizationTypeMedicalList, 'data', []), _item => isEqual(get(_item, 'code'), defaultDept))}
-                               property={{onChange: (val) => get(val, 'code')}}
+                               property={{onChange: (val) => setDefaultDept(get(val, 'code'))}}
                                classNames={'col-span-12'}
                                name={'medical_type'}
                                label={<div className={'flex'}><span>{t('Тип организации')}</span><img
                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                params={{required: true}}
                                options={get(organizationTypeMedicalList, 'data', [])}/>
-                        <Field type={'async-select'} isDisabledSearch
-                               url={`${URLS.organizations}/${id}${URLS.organizationDepartments}`}
-                               keyId={KEYS.organizationsListForSelect}
-                               classNames={'col-span-12'}
-                               name={'parent'}
-                               label={t('Родительская организация')}
+                        {isEqual(defaultDept, 'dept') && <> <Field type={'async-select'} isDisabledSearch
+                                                                   url={`${URLS.organizations}/${id}${URLS.organizationDepartments}`}
+                                                                   keyId={KEYS.organizationsListForSelect}
+                                                                   classNames={'col-span-12'}
+                                                                   name={'parent'}
+                                                                   label={t('Родительская организация')}
                         />
 
-                        <hr className={'mt-2 mb-6 col-span-12'}/>
-                        <Names fullWidth/>
+                            <hr className={'mt-2 mb-6 col-span-12'}/>
+                            <Names/></>
+                        }
+                        {
+                            !isEqual(defaultDept, 'dept') && <>
+
+                                <Field type={'select'} isLoading={isLoadingTypeLevelList}
+                                       classNames={'col-span-6'} name={'level'}
+                                       label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
+                                           className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
+                                       options={get(organizationTypeLevelList, 'data', [])}/>
+                                <Field params={{required: true}} type={'select'} isLoading={isLoadingTypeServiceList}
+                                       classNames={'col-span-6'}
+                                       name={'service_types'}
+                                       isMulti
+                                       label={<div className={'flex'}><span>{t('Виды оказания услуг')}</span><img
+                                           className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                       options={get(organizationTypeServiceList, 'data', [])}/>
+                                <hr className={'mb-3 w-full block col-span-12'}/>
+                                <Locations/>
+                                <hr className={'mb-3 w-full block col-span-12'}/>
+                                <Contacts/>
+                                <Names/>
+                            </>
+                        }
                     </Form>}
             </Modal>
 
             <Modal open={open} onClose={() => setOpen(false)} classNames={'!w-[552px]'}
-                   title={t('Добавить отделение')}>
+                   title={t('Добавить должность')}>
+                {isLoadingPositionPost && <ContentLoader />}
 
-                    <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
-                          footer={<div className={'col-span-12 '}>
-                              <div className="flex justify-end">
-                                  <button onClick={() => setOpen(false)} type={'button'}
-                                          className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                      {t('Отмена')}
-                                  </button>
-                                  <button type={'submit'}
-                                          className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                      {t('Сохранить')}
-                                  </button>
-                              </div>
-                          </div>}>
-                        <Field type={'async-select'} isDisabledSearch
-                               url={`${URLS.organizations}/${id}${URLS.organizationDepartments}`}
-                               keyId={KEYS.organizationsListForSelect}
-                               classNames={'col-span-12'}
-                               name={'parent'}
-                               label={t('Отделение')}
-                        />
-                        <Field type={'async-select'}
-                               classNames={'col-span-12'}
-                               name={'role'}
-                               label={t('По классификатору')}
-                               params={{required: true}}
-                        />
+                <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addPosition(data)}
+                      footer={<div className={'col-span-12 '}>
+                          <div className="flex justify-end">
+                              <button onClick={() => setOpen(false)} type={'button'}
+                                      className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                  {t('Отмена')}
+                              </button>
+                              <button type={'submit'}
+                                      className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                  {t('Сохранить')}
+                              </button>
+                          </div>
+                      </div>}>
+                    <Field type={'async-select'} isDisabledSearch
+                           url={`${URLS.organizations}/${id}${URLS.organizationDepartments}`}
+                           keyId={KEYS.organizationsListForSelect}
+                           classNames={'col-span-12'}
+                           name={'parent'}
+                           label={t('Отделение')}
+                    />
+                    <Field type={'async-select'}
+                           url={URLS.practitionerRole}
+                           keyId={KEYS.practitionerRole}
+                           classNames={'col-span-12'}
+                           name={'role'}
+                           label={<div className={'flex'}><span>{t('По классификатору')}</span><img
+                               className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                           params={{required: true}}
+                    />
 
-                        <hr className={'mt-2 mb-6 col-span-12'}/>
-                        <Names fullWidth/>
-                    </Form>
+
+                    <hr className={'mt-2 mb-6 col-span-12'}/>
+                    <Names fullWidth/>
+                    <hr className={'mt-2 mb-6 col-span-12'}/>
+                    <Field type={'input'}
+                           placeholder={'Введите количество'}
+                           classNames={'col-span-12'}
+                           name={'rate'}
+                           label={<div className={'flex'}><span>{t('Общая ставка')}</span><img
+                               className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                           params={{required: true}}
+                    />
+                </Form>
             </Modal>
         </div>
     );

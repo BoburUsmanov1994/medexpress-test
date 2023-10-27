@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import clsx from "clsx";
 import Field from "../../containers/form/field";
-import {get} from "lodash";
+import {find, get, isEqual} from "lodash";
 import orgIcon from "../../assets/icons/org.svg";
 import {useTranslation} from "react-i18next";
 
@@ -29,7 +29,7 @@ const Index = ({data,fullWidth=false}) => {
             {lang == 'uz' && <><Field type={'input'} params={{
                 required: true,
                 pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}
-            }} defaultValue={get(data, `names[0].value_short`)} classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
+            }} defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'uz')),'value_short')} classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
                                       name={`names[0].value_short`}
                                       placeholder={t('Введите краткое наименование')}
                                       property={{type: 'text'}}
@@ -40,7 +40,7 @@ const Index = ({data,fullWidth=false}) => {
                 <Field type={'input'} params={{
                     required: true,
                     pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}
-                }} defaultValue={get(data, `names[0].value`)} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
+                }} defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'uz')),'value')} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
                        name={'names[0].value'}
                        placeholder={t('Введите полное наименование')}
                        property={{type: 'text'}}
@@ -59,7 +59,7 @@ const Index = ({data,fullWidth=false}) => {
                     value: /^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,
                     message: 'Invalid value'
                 }
-            }} defaultValue={get(data, `names[1].value_short`)} classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
+            }} defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'uz-Cyrl')),'value_short')} classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
                                            name={`names[1].value_short`}
                                            placeholder={t('Введите краткое наименование')}
                                            property={{type: 'text'}}
@@ -71,7 +71,7 @@ const Index = ({data,fullWidth=false}) => {
                         value: /^[ўЎҳҲғҒқҚаАбБвВгГдДеЕёЁжЖзЗиИйЙкКлЛмМнНоОпПрРсСтТуУфФхХцЦчЧшШщЩъЪыЫьЬэЭюЮяЯ0-9_ -]+$/u,
                         message: 'Invalid value'
                     }
-                }} defaultValue={get(data, `names[1].value`)} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
+                }} defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'uz-Cyrl')),'value')} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
                        name={'names[1].value'}
                        placeholder={t('Введите полное наименование')}
                        property={{type: 'text'}}
@@ -91,7 +91,7 @@ const Index = ({data,fullWidth=false}) => {
                     message: 'Invalid value'
                 }
             }}
-                                      defaultValue={get(data, `names[2].value_short`)}
+                                      defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'ru')),'value_short')}
                                       classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
                                       name={'names[2].value_short'}
                                       property={{type: 'text'}}
@@ -101,7 +101,7 @@ const Index = ({data,fullWidth=false}) => {
             />
                 <Field type={'input'}
                        params={{pattern: {value: /^[А-Яа-я0-9\s_-]+$/u, message: 'Invalid value'}}}
-                       defaultValue={get(data, `names[2].value`)} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
+                       defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'ru')),'value')} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
                        name={'names[2].value'}
                        property={{type: 'text'}}
                        placeholder={t('Введите полное наименование')}

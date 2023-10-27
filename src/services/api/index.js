@@ -61,7 +61,7 @@ request.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     // if (error?.response?.status == 401) {
-    //     if (!includes(window.location.pathname, 'auth') && window.location.pathname != '/') {
+    //     if (!includes(window.locations.pathname, 'auth') && window.locations.pathname != '/') {
     //         Swal.fire({
     //             title: i18n.t('Your token expired'),
     //             icon: 'error',
@@ -79,7 +79,7 @@ request.interceptors.response.use((response) => {
     //             },
     //         }).then((result) => {
     //             window.localStorage.clear();
-    //             window.location.href = '/auth';
+    //             window.locations.href = '/auth';
     //         })
     //     } else {
     //         window.localStorage.clear();
