@@ -388,9 +388,9 @@ const OrganizationsContainer = () => {
                                   </div>
                               </div>}>
 
-                            <Field type={'select'} defaultValue={get(orgData, 'service_area[0].state')}
+                            <Field type={'select'} defaultValue={get(orgData, 'service_areas[0].state')}
                                    classNames={'col-span-6'}
-                                   name={'service_area[0].state'}
+                                   name={'service_areas[0].state'}
                                    label={<div className={'flex'}><span>{t('Регион')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                    params={{required: true}}
@@ -588,9 +588,9 @@ const OrganizationsContainer = () => {
                                   </div>
                               </div>}>
 
-                            <Field type={'select'} defaultValue={get(orgData, 'service_area[0].state')}
+                            <Field type={'select'} defaultValue={get(orgData, 'service_areas[0].state')}
                                    classNames={'col-span-6'}
-                                   name={'service_area[0].state'}
+                                   name={'service_areas[0].state'}
                                    label={<div className={'flex'}><span>{t('Регион')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                    params={{required: true}}
@@ -612,6 +612,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
+                            <Contacts data={orgData} />
 
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
                             <Field type={'input'} params={{

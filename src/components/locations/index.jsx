@@ -72,18 +72,18 @@ const Index = ({data}) => {
                    params={{required: true}}
                    property={{onChange: (val) => setRegionId(get(val, 'id'))}}
                    options={get(organizationRegions, 'data', [])}/>
-            <Field type={'select'} defaultValue={get(data, 'locations[0].address.district')}
+            <Field type={'select'} defaultValue={get(data, 'locations[0].address.city')}
                    classNames={'col-span-4'}
-                   name={'locations[0].address.district'}
+                   name={'locations[0].address.city'}
                    label={<div className={'flex'}><span>{t('Район')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                    params={{required: true}}
                    property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
                    options={get(organizationDistricts, 'data', [])}
             />
-            <Field type={'select'} defaultValue={get(data, 'locations[0].address.city')}
+            <Field type={'select'} defaultValue={get(data, 'locations[0].address.district')}
                    classNames={'col-span-4'}
-                   name={'locations[0].address.city'}
+                   name={'locations[0].address.district'}
                    label={<div className={'flex'}><span>{t('Махалля')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                    params={{required: true}}

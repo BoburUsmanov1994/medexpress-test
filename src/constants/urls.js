@@ -7,7 +7,7 @@ export const URLS = {
     translations: '/site/translations',
     translationsKey: '/site/translations/key',
     organizations: '/organizations',
-    organizationsListForSelect: '/organizations/list-for-select',
+    organizationsListForSelect: '/organizations/list',
     organizationTypeLevel: '/reference-books/organization-type-level',
     organizationTypeMedical: '/reference-books/organization-type-medical',
     organizationType: '/reference-books/organization-type',

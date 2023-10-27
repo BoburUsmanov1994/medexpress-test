@@ -174,6 +174,14 @@ const OrganizationContainer = ({id = null}) => {
         {
             title:t('ОБЩАЯ СТАВКА'),
             key:'rate'
+        },
+        {
+            title:t('ЗАПОЛНЕННОСТЬ'),
+            key:'filled_rate'
+        },
+        {
+            title:t('КОЛ-ВО СОТРУДНИКОВ'),
+            key:'practitioner_role_count'
         }
     ]
     if (isLoading) {
@@ -419,6 +427,18 @@ const OrganizationContainer = ({id = null}) => {
                            label={<div className={'flex'}><span>{t('Общая ставка')}</span><img
                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
                            params={{required: true}}
+                    />
+                    <Field params={{valueAsNumber:true}} type={'input'}
+                           placeholder={'Введите количество'}
+                           classNames={'col-span-12'}
+                           name={'filled_rate_count'}
+                           label={t('Заполненность')}
+                    />
+                    <Field params={{valueAsNumber:true}} type={'input'}
+                           placeholder={'Введите количество'}
+                           classNames={'col-span-12'}
+                           name={'practitioner_role_count'}
+                           label={t('Кол-во Сотрудников')}
                     />
                 </Form>
             </Modal>

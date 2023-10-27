@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {get, range} from "lodash";
+import {get, range,isEqual,find} from "lodash";
 import Field from "../../containers/form/field";
 import orgIcon from "../../assets/icons/org.svg";
 import {Minus, Plus} from "react-feather";
@@ -10,7 +10,7 @@ const Index = ({data}) => {
     let [increment, setIncrement] = useState(0);
     useEffect(() => {
         if (get(data, 'contacts', []).length) {
-            setIncrement(get(data, 'contacts', []).length);
+            setIncrement(get(data, 'contacts', []).length-1);
         }
     }, [data]);
     return (
@@ -19,7 +19,7 @@ const Index = ({data}) => {
             {
                 range(0, increment + 1).map(inc => <>
                     <Field type={'phone-number'}
-                           defaultValue={get(data, `contacts[${inc}].telecoms[0].value`)}
+                           defaultValue={get(find(get(data, `contacts[${inc}].telecoms`,[]),item=>isEqual(get(item,'system.id'),1)),'value')}
                            classNames={'col-span-4'} name={`contacts[${inc}].telecoms[0].value`}
                            params={{
                                valueAsString: true,
@@ -36,7 +36,7 @@ const Index = ({data}) => {
 
 
                     <Field type={'input'}
-                           defaultValue={get(data, `contacts[${inc}].telecoms[1].value`)}
+                           defaultValue={get(find(get(data, `contacts[${inc}].telecoms`,[]),item=>isEqual(get(item,'system.id'),2)),'value')}
                            classNames={'col-span-4'} name={`contacts[${inc}].telecoms[1].value`}
                            placeholder={t('E-mail')}
                            params={{
@@ -54,7 +54,7 @@ const Index = ({data}) => {
                             value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
                             message: "Invalid format"
                         }
-                    }} defaultValue={get(data, `contacts[${inc}].telecoms[2].value`)}
+                    }} defaultValue={get(find(get(data, `contacts[${inc}].telecoms`,[]),item=>isEqual(get(item,'system.id'),3)),'value')}
                            classNames={'col-span-4'} name={`contacts[${inc}].telecoms[2].value`}
                            placeholder={t('URL адрес')}
                            label={t('URL адрес')}
