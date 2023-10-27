@@ -373,11 +373,12 @@ const OrganizationContainer = ({id = null}) => {
                                        label={<div className={'flex'}><span>{t('Виды оказания услуг')}</span><img
                                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                        options={get(organizationTypeServiceList, 'data', [])}/>
+                                <Names/>
                                 <hr className={'mb-3 w-full block col-span-12'}/>
                                 <Locations/>
                                 <hr className={'mb-3 w-full block col-span-12'}/>
                                 <Contacts/>
-                                <Names/>
+
                             </>
                         }
                     </Form>}
