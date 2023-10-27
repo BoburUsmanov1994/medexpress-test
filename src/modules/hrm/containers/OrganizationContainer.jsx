@@ -361,6 +361,7 @@ const OrganizationContainer = ({id = null}) => {
                         {
                             defaultDept && !isEqual(defaultDept, 'dept') && <>
 
+
                                 <Field type={'select'} isLoading={isLoadingTypeLevelList}
                                        classNames={'col-span-6'} name={'level'}
                                        label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
@@ -373,7 +374,9 @@ const OrganizationContainer = ({id = null}) => {
                                        label={<div className={'flex'}><span>{t('Виды оказания услуг')}</span><img
                                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                        options={get(organizationTypeServiceList, 'data', [])}/>
+                                <hr className={'mb-3 w-full block col-span-12'}/>
                                 <Names/>
+
                                 <hr className={'mb-3 w-full block col-span-12'}/>
                                 <Locations/>
                                 <hr className={'mb-3 w-full block col-span-12'}/>
