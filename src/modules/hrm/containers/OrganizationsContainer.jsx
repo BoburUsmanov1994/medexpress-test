@@ -3,7 +3,7 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get, isObject, range, isNil, isEmpty} from "lodash"
+import {get, isObject, range, isNil, isEmpty, forEach, keys} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
@@ -146,6 +146,11 @@ const OrganizationsContainer = () => {
     ]
 
     const onSubmit = ({data}, tab) => {
+        forEach(keys(data),(_key)=>{
+            if(data[_key] === null){
+                delete data[_key];
+            }
+        })
         setOrgData(prev => ({...prev, ...data}))
         setSearchParams(`tab=${tab}`)
     }
@@ -202,7 +207,7 @@ const OrganizationsContainer = () => {
         }
     }, [data, rowId])
 
-
+    console.log('orgData',orgData)
     return (
         <div>
             <div className="grid grid-cols-12 items-center">
@@ -495,17 +500,17 @@ const OrganizationsContainer = () => {
                                    keyId={KEYS.organizationsListForSelect}
                                    classNames={'col-span-6'}
                                    name={'parent'}
-                                   defaultValue={get(orgData, 'parent')}
+                                   defaultValue={get(orgData, 'parent',undefined)}
                                    label={t('Родительская организация')}
                             />
                             <Field type={'select'} isLoading={isLoadingTypeLevelList}
-                                   defaultValue={get(orgData, 'level')}
+                                   defaultValue={get(orgData, 'level',undefined)}
                                    classNames={'col-span-6'} name={'level'}
                                    label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
                                    options={get(organizationTypeLevelList, 'data', [])}/>
                             <Field type={'select'} isLoading={isLoadingTypeMedicalList}
-                                   defaultValue={get(orgData, 'medical_type')}
+                                   defaultValue={get(orgData, 'medical_type',undefined)}
                                    classNames={'col-span-6'}
                                    name={'medical_type'}
                                    label={<div className={'flex'}><span>{t('Тип организации')}</span><img
@@ -513,19 +518,19 @@ const OrganizationsContainer = () => {
                                    params={{required: true}}
                                    options={get(organizationTypeMedicalList, 'data', [])}/>
                             <Field type={'select'} isLoading={isLoadingLegalFormList}
-                                   defaultValue={get(orgData, 'legal_form')}
+                                   defaultValue={get(orgData, 'legal_form',undefined)}
                                    classNames={'col-span-6'}
                                    name={'legal_form'}
                                    label={t('Организационно-правовая форма')}
                                    options={get(organizationLegalFormList, 'data', [])}/>
                             <Field type={'select'} isLoading={isLoadingTypeServiceList}
-                                   defaultValue={get(orgData, 'service_types')}
+                                   defaultValue={get(orgData, 'service_types',undefined)}
                                    classNames={'col-span-6'}
                                    name={'service_types'}
                                    label={t('Виды оказания услуг')}
                                    isMulti
                                    options={get(organizationTypeServiceList, 'data', [])}/>
-                            <Field type={'async-select'} defaultValue={get(orgData, 'affiliation')}
+                            <Field type={'async-select'} defaultValue={get(orgData, 'affiliation',undefined)}
                                    classNames={'col-span-6'}
                                    keyId={KEYS.organizationManagementForm}
                                    url={URLS.organizationManagementForm}

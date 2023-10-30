@@ -13,9 +13,9 @@ const Dropzone = ({upload = () => {}}) => {
                             <input {...getInputProps()} />
                             {
                                 isNil(file) ? <div>
-                                    <img src={photoIcon} className={'mx-auto mb-3'} alt=""/>
+                                    <img  src={photoIcon} className={'mx-auto mb-3'} alt=""/>
                                     <p className={'text-center'}>Перетащите изображение, <br/> или <span className={'text-[#006D85]'}>выберите с компьютера</span></p>
-                                </div>: <img className={'object-cover top-0 left-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 absolute'} src={URL.createObjectURL(file[0] || null)} alt="" />
+                                </div>: <img className={'w-full h-full object-cover top-0 left-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 absolute'} src={URL.createObjectURL(file[0] || null)} alt="" />
                             }
                         </div>
                     </section>

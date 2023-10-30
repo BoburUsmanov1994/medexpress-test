@@ -87,7 +87,8 @@ const Index = ({data,fullWidth=false,hideValueShort=false}) => {
                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                 />
             </>}
-            {lang == 'ru' && <><Field type={'input'} params={{
+            {lang == 'ru' && <>
+                {!hideValueShort &&<Field type={'input'} params={{
                 pattern: {
                     value: /^[А-Яа-я\s_-]+$/u,
                     message: 'Invalid value'
@@ -100,7 +101,7 @@ const Index = ({data,fullWidth=false,hideValueShort=false}) => {
                                       placeholder={t('Введите краткое наименование')}
                                       label={<div className={'flex'}>
                                           <span>{t('Краткое наименование')}</span></div>}
-            />
+            />}
                 <Field type={'input'}
                        params={{pattern: {value: /^[А-Яа-я0-9\s_-]+$/u, message: 'Invalid value'}}}
                        defaultValue={get(find(get(data, `names`,[]),(item)=>isEqual(get(item,'locale'),'ru')),'value')} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
@@ -127,7 +128,7 @@ const Index = ({data,fullWidth=false,hideValueShort=false}) => {
                                       defaultValue={get(data, `names[3].value_short`)}
                                       classNames={clsx('col-span-5',{'!col-span-12':fullWidth})}
                                       name={'names[3].value_short'}
-                                      property={{type: lang == 'en' ? 'text' : 'hidden'}}
+                                      property={{type: 'text' }}
                                       placeholder={t('Введите краткое наименование')}
                                       label={<div className={'flex'}>
                                           <span>{t('Краткое наименование')}</span></div>}
@@ -136,7 +137,7 @@ const Index = ({data,fullWidth=false,hideValueShort=false}) => {
                        params={{pattern: {value: /^[a-zA-Z0-9\s\'`,.]+$/, message: 'Invalid value'}}}
                        defaultValue={get(data, `names[3].value`)} classNames={clsx('col-span-7',{'!col-span-12':fullWidth})}
                        name={'names[3].value'}
-                       property={{type: lang == 'en' ? 'text' : 'hidden'}}
+                       property={{type: 'text'}}
                        placeholder={t('Введите полное наименование')}
                        label={<div className={'flex'}><span>{t('Полное наименование')}</span></div>}
                 />

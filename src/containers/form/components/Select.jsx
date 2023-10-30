@@ -56,7 +56,7 @@ const Select = ({
                     label = '',
                     options = [],
                     classNames = '',
-                    defaultValue=null,
+                    defaultValue=undefined,
                     getValues=()=>{},
                     watch=()=>{},
                     isDisabled = false,
@@ -69,6 +69,7 @@ const Select = ({
         }
 
     }, [watch(name)]);
+    console.log(`defaultValue ${name}`,defaultValue)
     return (
         <div className={clsx(`form-group ${classNames}`)}>
             {label && <label className={clsx('form-label')}

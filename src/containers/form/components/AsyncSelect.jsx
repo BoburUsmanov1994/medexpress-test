@@ -57,7 +57,7 @@ const AsyncSelect = ({
                          params,
                          label = '',
                          classNames = '',
-                         defaultValue = null,
+                         defaultValue = undefined,
                          getValues = () => {
                          },
                          watch = () => {
