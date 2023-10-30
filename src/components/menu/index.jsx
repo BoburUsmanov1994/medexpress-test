@@ -19,7 +19,7 @@ const Menu = () => {
                 {/*</ul>*/}
             </li>
             <li className={'menu__item group'}>
-                <NavLink className={'menu__item_link'} to={'/his'}>{t("Сотрудники")}</NavLink>
+                <NavLink className={'menu__item_link'} to={'/hrm/practitioners'}>{t("Сотрудники")}</NavLink>
             </li>
 
             <li className={'menu__item group'}>

@@ -18,4 +18,7 @@ export const KEYS = {
     organizationPositions: 'organizationPositions',
     organizationType: 'organizationType',
     practitionerRole: 'practitionerRole',
+    practitioners: 'practitioners',
+    roles: 'roles',
+    persons: 'persons',
 }

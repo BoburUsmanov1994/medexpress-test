@@ -23,7 +23,7 @@ const MaskedInput = ({
     const {t} = useTranslation()
     useEffect(() => {
         if(isFunction(get(property,'onChange'))){
-            console.log(getValues(name), name)
+            get(property,'onChange')(getValues(name), name)
         }
     }, [watch(name)]);
     return (
@@ -38,7 +38,7 @@ const MaskedInput = ({
                 render={({field}) => (<InputMask
                     value={field.value}
                     onChange={field.onChange}
-                    className={clsx('form-input  w-full', {'border-red-600': hasIn(errors, name)})}
+                    className={clsx('form-input  w-full',get(property,'className'), {'border-red-600': hasIn(errors, name)})}
                     placeholder={get(property, "placeholder")}
                     mask={get(property, "mask", "aa")}
                     maskChar={get(property, "maskChar", "_")}

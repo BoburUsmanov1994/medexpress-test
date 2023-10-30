@@ -11,6 +11,7 @@ import LogoutPage from "../modules/auth/pages/LogoutPage";
 import ForbiddenPage from "../modules/auth/pages/ForbiddenPage";
 import NotFoundPage from "../modules/auth/pages/NotFoundPage";
 import SSOCallbackPage from "../modules/auth/pages/SSOCallbackPage";
+import PractitionersPage from "../modules/hrm/pages/PractitionersPage";
 
 const LoginPage = lazy(() => import("../modules/auth/pages/LoginPage"));
 const OrganizationsPage = lazy(() => import("../modules/hrm/pages/OrganizationsPage"));
@@ -29,6 +30,7 @@ const Router = ({...rest}) => {
                             <Route path={"hrm"}>
                                 <Route path={'organizations'} element={<OrganizationsPage/>}/>
                                 <Route path={'organization/:id'} element={<OrganizationPage/>}/>
+                                <Route path={'practitioners'} element={<PractitionersPage/>}/>
                             </Route>
                             <Route path={'settings'}>
                                 <Route path={'translations'} element={<TranslationsPage />} />

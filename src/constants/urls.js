@@ -19,4 +19,7 @@ export const URLS = {
     organizationDepartments: '/departments',
     organizationPositions: '/positions',
     practitionerRole: '/reference-books/practitioner-role',
+    practitioners: '/practitioners',
+    persons: '/persons',
+    roles: '/roles',
 }
