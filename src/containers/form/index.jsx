@@ -1,5 +1,5 @@
 import React from "react";
-import {Controller, useForm} from "react-hook-form";
+import {Controller, useFieldArray, useForm} from "react-hook-form";
 import FormProvider from "../../context/form/FormProvider";
 
 const Form = ({
@@ -11,13 +11,14 @@ const Form = ({
                   },
                   classNames = '',
                   defaultValues = {},
+                  fieldArrayName = 'contacts',
                   ...rest
               }) => {
     const {
         register,
         handleSubmit,
         setError,
-        formState: {errors,isLoading,isDirty},
+        formState: {errors, isLoading, isDirty},
         getValues,
         setValue,
         watch,
@@ -25,8 +26,12 @@ const Form = ({
         trigger
     } = useForm({defaultValues});
 
+    const {fields, append, prepend, remove, swap, move, insert} = useFieldArray({control, name: fieldArrayName,
+        defaultValue: [{ email: "" }]
+    })
+
     const onSubmit = (data) => {
-        formRequest({ data, setError });
+        formRequest({data, setError});
     };
     const attrs = {
         Controller,
@@ -38,8 +43,18 @@ const Form = ({
         setError,
         setValue,
         trigger,
-        isLoadingForm:isLoading,
+        isLoadingForm: isLoading,
         isDirty,
+        fieldArrayAttrs: {
+            fieldArrayName,
+            fields,
+            append,
+            prepend,
+            remove,
+            swap,
+            move,
+            insert
+        },
         ...rest,
     };
 
