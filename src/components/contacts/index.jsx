@@ -1,23 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {get, range,isEqual,find} from "lodash";
 import Field from "../../containers/form/field";
 import orgIcon from "../../assets/icons/org.svg";
 import {Minus, Plus} from "react-feather";
 import {useTranslation} from "react-i18next";
 import FormConsumer from "../../context/form/FormConsumer";
-import Input from "../../containers/form/components/Input";
 
 const Index = ({data}) => {
     const {t} = useTranslation();
-    let [increment, setIncrement] = useState(0);
-    useEffect(() => {
-        if (get(data, 'contacts', []).length) {
-            setIncrement(get(data, 'contacts', []).length-1);
-        }
-    }, [data]);
     return (
         <>
-            <FormConsumer>{({attrs, getValueFromField}) =><>
+            <FormConsumer>{({attrs}) =><>
                 <h3 className={'mb-6 col-span-12 font-semibold'}>Контактная информация</h3>
                 {
                     get(attrs,'fieldArrayAttrs.fields',[]).map((item,index) => <>
@@ -58,23 +51,16 @@ const Index = ({data}) => {
                                 message: "Invalid format"
                             }
                         }} defaultValue={get(find(get(data, `contacts[${index}].telecoms`,[]),item=>isEqual(get(item,'system.id'),3)),'value')}
-                               classNames={'col-span-4'} name={`contacts[${index}].telecoms[2].value`}
+                               classNames={'col-span-3'} name={`contacts[${index}].telecoms[2].value`}
                                placeholder={t('URL адрес')}
                                label={t('URL адрес')}
                         />
-                        <Field type={'input'} params={{valueAsNumber: true}} defaultValue={1}
-                               classNames={'col-span-4'}
+                        <div className="col-span-1 pt-8 text-center">
+                            <Minus onClick={()=>get(attrs,'fieldArrayAttrs.remove',()=>{})(index)} className={'cursor-pointer text-red-500'} size={32} />
+                        </div>
+                        <Field type={'input'} params={{valueAsNumber: true}} defaultValue={index+1}
+                               classNames={'col-span-12'}
                                name={`contacts[${index}].telecoms[0].system.id`}
-                               property={{type: 'hidden'}}
-                        />
-                        <Field type={'input'} params={{valueAsNumber: true}} defaultValue={2}
-                               classNames={'col-span-4'}
-                               name={`contacts[${index}].telecoms[1].system.id`}
-                               property={{type: 'hidden'}}
-                        />
-                        <Field type={'input'} params={{valueAsNumber: true}} defaultValue={3}
-                               classNames={'col-span-4'}
-                               name={`contacts[${index}].telecoms[2].system.id`}
                                property={{type: 'hidden'}}
                         />
 
@@ -83,7 +69,7 @@ const Index = ({data}) => {
                 <div className={'col-span-12'}>
                     <button
                         type={"button"}
-                        onClick={() => get(attrs,'fieldArrayAttrs.append',()=>{})({ 'telecoms[0].value': "", 'telecoms[1].value': "" })}
+                        onClick={() => get(attrs,'fieldArrayAttrs.append',()=>{})({ 'telecoms[0].value': "", 'telecoms[1].value': "",'telecoms[2].value':'' })}
                         className={'mr-6 p-2.5 !pr-6 text-[#006D85] rounded-lg inline-flex  border border-[#006D85] font-bold text-center  mt-3  items-center '}>
                         <Plus className={'mr-1'}/> <span>Добавить
                                     поле</span>
