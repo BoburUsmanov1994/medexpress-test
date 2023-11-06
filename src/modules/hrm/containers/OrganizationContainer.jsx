@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 import Title from "../../../components/title";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
-import {ChevronLeft, Edit2,  Plus} from "react-feather";
+import {ChevronLeft, Edit2, Plus} from "react-feather";
 import {useGetAllQuery, useGetOneQuery, usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
 import {KEYS} from "../../../constants/keys";
 import {ContentLoader, OverlayLoader} from "../../../components/loader";
-import {get, head, find, isEqual, isNil} from "lodash";
+import {get, head, find, isEqual, isEmpty} from "lodash";
 import {Tab, Tabs} from "../../../components/tab";
 import Content from "../../../components/content";
 import photoImg from "../../../assets/images/photo.png";
@@ -22,10 +22,13 @@ import Contacts from "../../../components/contacts";
 import Locations from "../../../components/locations";
 import GridView from "../../../containers/grid-view";
 import {listToTree} from "../../../utils";
+import chevronRightIcon from "../../../assets/icons/chevron-right.svg"
+import clsx from "clsx";
 
 const OrganizationContainer = ({id = null}) => {
     const [openDepartmentModal, setDepartmentModal] = useState(false)
     const [open, setOpen] = useState(false)
+    const [active, setActive] = useState(null)
     const {t} = useTranslation();
     const [defaultDept, setDefaultDept] = useState('dept')
     const {data, isLoading} = useGetOneQuery({id: id, url: URLS.organizations})
@@ -36,7 +39,6 @@ const OrganizationContainer = ({id = null}) => {
         key: KEYS.organizationDepartments,
         url: `${URLS.organizations}/${id}${URLS.organizationDepartments}`
     })
-
 
 
     const {data: organizationTypeMedicalList, isLoading: isLoadingTypeMedicalList} = useGetAllQuery({
@@ -93,7 +95,7 @@ const OrganizationContainer = ({id = null}) => {
     const addDepartment = ({data: requestData}) => {
         const {parent, names, service_types, contacts, level, locations, ...rest} = requestData;
         addDepartmentRequest({
-            url: `${URLS.organizations}/${parent ? get(parent,'id') : id}${URLS.organizationDepartments}`,
+            url: `${URLS.organizations}/${parent ? get(parent, 'id') : id}${URLS.organizationDepartments}`,
             attributes: isEqual(defaultDept, 'dept') ? {
                 ...rest,
                 names,
@@ -117,14 +119,14 @@ const OrganizationContainer = ({id = null}) => {
         })
     }
     const addPosition = ({data: requestData}) => {
-        const {rate, organization_id,contacts, ...rest} = requestData;
-        if (get(organization_id, 'type.code')=='dept') {
+        const {rate, organization_id, contacts, ...rest} = requestData;
+        if (get(organization_id, 'type.code') == 'dept') {
             addPositionRequest({
                 url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
                 attributes: {
                     ...rest,
                     rate: parseFloat(rate),
-                    department_id: get(organization_id,'id'),
+                    department_id: get(organization_id, 'id'),
                     display: get(rest, '[0].value'),
                 }
             }, {
@@ -132,7 +134,7 @@ const OrganizationContainer = ({id = null}) => {
                     setOpen(false);
                 }
             })
-        } else if(get(organization_id, 'id')) {
+        } else if (get(organization_id, 'id')) {
             addPositionRequest({
                 url: `${URLS.organizations}/${get(organization_id, 'id')}${URLS.organizationPositions}`,
                 attributes: {
@@ -165,32 +167,32 @@ const OrganizationContainer = ({id = null}) => {
         {
             title: t('ДОЛЖНОСТЬ'),
             key: 'names',
-            render:({value=[]})=>get(find(value,_val=>get(_val,'locale') == 'uz'),'value','-')
+            render: ({value = []}) => get(find(value, _val => get(_val, 'locale') == 'uz'), 'value', '-')
         },
         {
-            title:t('ПО КЛАССИФИКАТОРУ'),
-            key:'role',
-            render:({value})=>get(value,'display','-')
+            title: t('ПО КЛАССИФИКАТОРУ'),
+            key: 'role',
+            render: ({value}) => get(value, 'display', '-')
         },
         {
-            title:t('ОБЩАЯ СТАВКА'),
-            key:'rate'
+            title: t('ОБЩАЯ СТАВКА'),
+            key: 'rate'
         },
         {
-            title:t('ЗАПОЛНЕННОСТЬ'),
-            key:'filled_rate'
+            title: t('ЗАПОЛНЕННОСТЬ'),
+            key: 'filled_rate'
         },
         {
-            title:t('КОЛ-ВО СОТРУДНИКОВ'),
-            key:'practitioner_role_count'
+            title: t('КОЛ-ВО СОТРУДНИКОВ'),
+            key: 'practitioner_role_count'
         }
     ]
     if (isLoading) {
         return <OverlayLoader/>
     }
 
-    console.log('departments',get(departments,'data.data'))
-    console.log('listToTree',listToTree(get(departments,'data.data')))
+    console.log('departments', get(departments, 'data.data'))
+    console.log('listToTree', listToTree(get(departments, 'data.data')))
     return (<div>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 mb-5">
@@ -259,7 +261,8 @@ const OrganizationContainer = ({id = null}) => {
                                         </div>
                                         <div className={'flex py-5 border-b items-center'}>
                                             <span className={'w-1/3'}>Регион обслуживания:</span>
-                                            <strong className={'w-2/3'}>{get(head(get(data, 'data.service_areas', [])), 'state.display')}</strong>
+                                            <strong
+                                                className={'w-2/3'}>{get(head(get(data, 'data.service_areas', [])), 'state.display')}</strong>
                                         </div>
                                         <div className={'flex py-5 border-b items-center'}>
                                             <span className={'w-1/3'}>Телефон:</span>
@@ -299,9 +302,29 @@ const OrganizationContainer = ({id = null}) => {
                                 <div className="col-span-3">
                                     <Content sm classNames={'!p-4'}>
                                         <ul className={'mb-6'}>
-                                            {get(departments, 'data.data', []).map(department => <li
+                                            {listToTree(get(departments, 'data.data', [])).map(department => <li
                                                 className={'cursor-pointer text-[#222222] font-bold py-1.5 mb-2'}
-                                                key={get(department, 'id')}>{get(department, 'display')}</li>)}
+                                                key={get(department, 'id')}>
+                                                <div className={'flex justify-between'}
+                                                     onClick={() => setActive(get(department, 'id'))}>
+                                                    <span>{get(department, 'display')}</span>
+                                                    {
+                                                        !isEmpty(get(department, 'children', [])) && <img
+                                                            className={clsx({'rotate-90': get(department, 'id') === active})}
+                                                            src={chevronRightIcon} alt="icon"/>
+                                                    }
+                                                </div>
+                                                {
+                                                    get(department, 'id') === active && !isEmpty(get(department, 'children', [])) &&
+                                                    <ul className={'p-4'}>
+                                                        {
+                                                            get(department, 'children', []).map((child, i) => <li
+                                                                key={get(child, 'id')}
+                                                                className={clsx('font-normal mb-3', {'!mb-0': i === get(department, 'children', [])?.length - 1})}>{get(child, 'display')}</li>)
+                                                        }
+                                                    </ul>
+                                                }
+                                            </li>)}
                                         </ul>
                                         <button onClick={() => setDepartmentModal(true)}
                                                 className={'text-primary font-bold flex items-center justify-center w-full text-center p-4 border-t border-1 border-t-[rgba(0,0,0,0.1)]'}>Добавить
@@ -323,7 +346,9 @@ const OrganizationContainer = ({id = null}) => {
                                                 </button>
                                             </div>
                                             <div className="col-span-12">
-                                                <GridView noBorder columns={columns} url={`${URLS.organizations}/${id}${URLS.organizationPositions}`} listKey={KEYS.organizationPositions} />
+                                                <GridView noBorder columns={columns}
+                                                          url={`${URLS.organizations}/${id}${URLS.organizationPositions}`}
+                                                          listKey={KEYS.organizationPositions}/>
                                             </div>
                                         </div>
                                     </Content>
@@ -339,7 +364,8 @@ const OrganizationContainer = ({id = null}) => {
                 {isLoadingPost && <ContentLoader/>}
                 {isLoadingTypeMedicalList ? <ContentLoader/> :
                     <Form fieldArrayName={'contacts'}
-                          defaultValues={{contacts: [{telecoms:[{value:''},{value:''},{value:''}]}]}} classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
+                          defaultValues={{contacts: [{telecoms: [{value: ''}, {value: ''}, {value: ''}]}]}}
+                          classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
                           footer={<div className={'col-span-12 '}>
                               <div className="flex justify-end">
                                   <button onClick={() => setDepartmentModal(false)} type={'button'}

@@ -1,9 +1,10 @@
-import {find,get} from "lodash"
+import {find, get} from "lodash"
+
 export const getDefaultValue = (options, id) => {
     return find(options, (option) => get(option, 'value') == id)
 }
 
-export const listToTree = (list) =>{
+export const listToTree = (list) => {
     let map = {},
         tree_node, roots = [],
         i;
@@ -15,10 +16,10 @@ export const listToTree = (list) =>{
     for (i = 0; i < list?.length; i += 1) {
         tree_node = list[i];
         tree_node.label = tree_node.name;
-        if (tree_node.parent_id !== null && (map[tree_node.parent_id] === 0 || map[tree_node.parent_id])) {
+        if (tree_node.parent?.id !== null && (map[tree_node.parent?.id] === 0 || map[tree_node.parent?.id])) {
             // if you have dangling branches check that map[node.parentId] exists
 
-            list[map[tree_node.parent_id]].children.push(tree_node);
+            list[map[tree_node.parent?.id]].children.push(tree_node);
 
         } else {
             roots.push(tree_node);
