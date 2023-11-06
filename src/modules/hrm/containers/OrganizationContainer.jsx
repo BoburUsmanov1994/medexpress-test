@@ -338,7 +338,8 @@ const OrganizationContainer = ({id = null}) => {
                    title={t('Добавить отделение')}>
                 {isLoadingPost && <ContentLoader/>}
                 {isLoadingTypeMedicalList ? <ContentLoader/> :
-                    <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
+                    <Form fieldArrayName={'contacts'}
+                          defaultValues={{contacts: [{telecoms:[{value:''},{value:''},{value:''}]}]}} classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => addDepartment(data)}
                           footer={<div className={'col-span-12 '}>
                               <div className="flex justify-end">
                                   <button onClick={() => setDepartmentModal(false)} type={'button'}
