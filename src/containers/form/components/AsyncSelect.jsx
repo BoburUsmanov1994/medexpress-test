@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect} from 'react';
 import {components} from 'react-select';
 import RAsyncSelect from 'react-select/async';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
 import {Controller} from "react-hook-form";
-import {get, hasIn, debounce} from "lodash";
-import {isFunction} from "lodash/lang";
+import {get, hasIn, debounce, isEmpty} from "lodash";
 import {useTranslation} from "react-i18next";
 import {useGetAllQuery} from "../../../hooks/api";
+import config from "../../../config";
 
 const DropdownIndicator = props => {
     return (
@@ -58,22 +58,16 @@ const AsyncSelect = ({
                          label = '',
                          classNames = '',
                          defaultValue = undefined,
-                         getValues = () => {
-                         },
-                         watch = () => {
-                         },
                          url = '',
                          limit = 100,
                          keyId = 'list',
-                         isDisabledSearch=false
+                         isDisabledSearch = false
                      }) => {
     const [options, setOptions] = useState([])
-    const [search, setSearch] = useState('')
     const {data, isLoading: loading} = useGetAllQuery({
-        key: [keyId, search], url: url, params: {
+        key: keyId, url: url, params: {
             params: {
-                limit,
-                name: isDisabledSearch ? null :search
+                limit
             }
         }
     })
@@ -81,20 +75,21 @@ const AsyncSelect = ({
 
     useEffect(() => {
         if (data) {
-            setOptions(get(data, 'data.data', get(data,'data',[])))
+            setOptions(get(data, 'data.data', get(data, 'data', [])))
         }
-    }, [data,search,name]);
-
-    const changeHandler = (val) => {
-        setSearch(val)
-    }
-
-    const debouncedChangeHandler = debounce(changeHandler, 500)
+    }, [data]);
 
 
     const loadOptions = async (inputValue) => {
-        await debouncedChangeHandler(inputValue)
-        return options;
+        const res = await fetch(`${config.API_ROOT}${url}?name=${inputValue}`);
+        const data = await res.json();
+        const results = data;
+
+        if (isEmpty(data)) {
+            return [];
+        }
+
+        return results;
     }
     return (
         <div className={clsx(`form-group ${classNames}`)}>
@@ -125,9 +120,9 @@ const AsyncSelect = ({
                 />}
             />
             {errors[name]?.type == 'required' &&
-            <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
+                <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
             {errors[name]?.type == 'validation' &&
-            <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
+                <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
         </div>
     );
 };

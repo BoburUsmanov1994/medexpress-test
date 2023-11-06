@@ -27,7 +27,6 @@ const Form = ({
     } = useForm({defaultValues});
 
     const {fields, append, prepend, remove, swap, move, insert} = useFieldArray({control, name: fieldArrayName,
-        defaultValue: [{ email: "" }]
     })
 
     const onSubmit = (data) => {

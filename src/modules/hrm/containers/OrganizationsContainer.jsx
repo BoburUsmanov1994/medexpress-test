@@ -79,7 +79,6 @@ const OrganizationsContainer = () => {
     })
 
 
-
     const {data: organizationRegions, isLoading: isLoadingRegions} = useGetAllQuery({
         key: KEYS.organizationTerritory,
         url: URLS.organizationTerritory,
@@ -146,8 +145,8 @@ const OrganizationsContainer = () => {
     ]
 
     const onSubmit = ({data}, tab) => {
-        forEach(keys(data),(_key)=>{
-            if(data[_key] === null){
+        forEach(keys(data), (_key) => {
+            if (data[_key] === null) {
                 delete data[_key];
             }
         })
@@ -207,7 +206,7 @@ const OrganizationsContainer = () => {
         }
     }, [data, rowId])
 
-    console.log('orgData',orgData)
+    console.log('orgData', orgData)
     return (
         <div>
             <div className="grid grid-cols-12 items-center">
@@ -374,7 +373,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <Locations data={orgData} />
+                            <Locations data={orgData}/>
 
                         </Form>
                     </Tab>
@@ -404,7 +403,9 @@ const OrganizationsContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'contact'} label={t('Контакты')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'photo')}
+                        <Form fieldArrayName={'contacts'}
+                              defaultValues={{contacts: [{telecoms:[{value:''},{value:''},{value:''}]}]}}
+                              classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'photo')}
                               footer={<div className={'col-span-12 '}>
                                   <div className="flex justify-end">
                                       <button onClick={() => setSearchParams(`tab=region`)} type={'button'}
@@ -500,17 +501,17 @@ const OrganizationsContainer = () => {
                                    keyId={KEYS.organizationsListForSelect}
                                    classNames={'col-span-6'}
                                    name={'parent'}
-                                   defaultValue={get(orgData, 'parent',undefined)}
+                                   defaultValue={get(orgData, 'parent', undefined)}
                                    label={t('Родительская организация')}
                             />
                             <Field type={'select'} isLoading={isLoadingTypeLevelList}
-                                   defaultValue={get(orgData, 'level',undefined)}
+                                   defaultValue={get(orgData, 'level', undefined)}
                                    classNames={'col-span-6'} name={'level'}
                                    label={<div className={'flex'}><span>{t('Уровень оказания услуг')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>} params={{required: true}}
                                    options={get(organizationTypeLevelList, 'data', [])}/>
                             <Field type={'select'} isLoading={isLoadingTypeMedicalList}
-                                   defaultValue={get(orgData, 'medical_type',undefined)}
+                                   defaultValue={get(orgData, 'medical_type', undefined)}
                                    classNames={'col-span-6'}
                                    name={'medical_type'}
                                    label={<div className={'flex'}><span>{t('Тип организации')}</span><img
@@ -518,19 +519,19 @@ const OrganizationsContainer = () => {
                                    params={{required: true}}
                                    options={get(organizationTypeMedicalList, 'data', [])}/>
                             <Field type={'select'} isLoading={isLoadingLegalFormList}
-                                   defaultValue={get(orgData, 'legal_form',undefined)}
+                                   defaultValue={get(orgData, 'legal_form', undefined)}
                                    classNames={'col-span-6'}
                                    name={'legal_form'}
                                    label={t('Организационно-правовая форма')}
                                    options={get(organizationLegalFormList, 'data', [])}/>
                             <Field type={'select'} isLoading={isLoadingTypeServiceList}
-                                   defaultValue={get(orgData, 'service_types',undefined)}
+                                   defaultValue={get(orgData, 'service_types', undefined)}
                                    classNames={'col-span-6'}
                                    name={'service_types'}
                                    label={t('Виды оказания услуг')}
                                    isMulti
                                    options={get(organizationTypeServiceList, 'data', [])}/>
-                            <Field type={'async-select'} defaultValue={get(orgData, 'affiliation',undefined)}
+                            <Field type={'async-select'} defaultValue={get(orgData, 'affiliation', undefined)}
                                    classNames={'col-span-6'}
                                    keyId={KEYS.organizationManagementForm}
                                    url={URLS.organizationManagementForm}
@@ -574,7 +575,7 @@ const OrganizationsContainer = () => {
                                       </button>
                                   </div>
                               </div>}>
-                            <Locations data={orgData} />
+                            <Locations data={orgData}/>
 
                         </Form>
                     </Tab>
@@ -604,20 +605,23 @@ const OrganizationsContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'contact'} label={t('Контакты')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'photo')}
-                              footer={<div className={'col-span-12 '}>
-                                  <div className="flex justify-end">
-                                      <button onClick={() => setSearchParams(`tab=region`)} type={'button'}
-                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                          {t('Назад')}
-                                      </button>
-                                      <button type={'submit'}
-                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                          {t('Следующий шаг')}
-                                      </button>
-                                  </div>
-                              </div>}>
-                            <Contacts data={orgData} />
+                        <Form
+                            defaultValues={{contacts: get(orgData, 'contacts', []).map(item => ({telecoms: get(item, 'telecoms', []).map(_item => ({value: get(_item, 'value')}))}))}}
+                            fieldArrayName={'contacts'} classNames={'grid grid-cols-12 gap-x-6'}
+                            formRequest={(data) => onSubmit(data, 'photo')}
+                            footer={<div className={'col-span-12 '}>
+                                <div className="flex justify-end">
+                                    <button onClick={() => setSearchParams(`tab=region`)} type={'button'}
+                                            className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                        {t('Назад')}
+                                    </button>
+                                    <button type={'submit'}
+                                            className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                        {t('Следующий шаг')}
+                                    </button>
+                                </div>
+                            </div>}>
+                            <Contacts data={orgData}/>
 
                             <h3 className={'mb-6 col-span-12 font-semibold'}>Географические координаты</h3>
                             <Field type={'input'} params={{

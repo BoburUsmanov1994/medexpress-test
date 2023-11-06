@@ -21,6 +21,7 @@ import Names from "../../../components/names"
 import Contacts from "../../../components/contacts";
 import Locations from "../../../components/locations";
 import GridView from "../../../containers/grid-view";
+import {listToTree} from "../../../utils";
 
 const OrganizationContainer = ({id = null}) => {
     const [openDepartmentModal, setDepartmentModal] = useState(false)
@@ -116,7 +117,7 @@ const OrganizationContainer = ({id = null}) => {
         })
     }
     const addPosition = ({data: requestData}) => {
-        const {rate, organization_id, ...rest} = requestData;
+        const {rate, organization_id,contacts, ...rest} = requestData;
         if (get(organization_id, 'type.code')=='dept') {
             addPositionRequest({
                 url: `${URLS.organizations}/${id}${URLS.organizationPositions}`,
@@ -187,6 +188,9 @@ const OrganizationContainer = ({id = null}) => {
     if (isLoading) {
         return <OverlayLoader/>
     }
+
+    console.log('departments',get(departments,'data.data'))
+    console.log('listToTree',listToTree(get(departments,'data.data')))
     return (<div>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 mb-5">
@@ -255,7 +259,7 @@ const OrganizationContainer = ({id = null}) => {
                                         </div>
                                         <div className={'flex py-5 border-b items-center'}>
                                             <span className={'w-1/3'}>Регион обслуживания:</span>
-                                            <strong className={'w-2/3'}>Сырдарьинская область</strong>
+                                            <strong className={'w-2/3'}>{get(head(get(data, 'data.service_areas', [])), 'state.display')}</strong>
                                         </div>
                                         <div className={'flex py-5 border-b items-center'}>
                                             <span className={'w-1/3'}>Телефон:</span>
