@@ -93,7 +93,7 @@ const OrganizationContainer = ({id = null}) => {
     const addDepartment = ({data: requestData}) => {
         const {parent, names, service_types, contacts, level, locations, ...rest} = requestData;
         addDepartmentRequest({
-            url: `${URLS.organizations}/${id}${URLS.organizationDepartments}`,
+            url: `${URLS.organizations}/${parent ? get(parent,'id') : id}${URLS.organizationDepartments}`,
             attributes: isEqual(defaultDept, 'dept') ? {
                 ...rest,
                 names,

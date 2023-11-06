@@ -8,7 +8,7 @@ import FormConsumer from "../../context/form/FormConsumer";
 
 const Index = ({data}) => {
     const {t} = useTranslation();
-    console.log('contacts data',data)
+    console.log('contacts data', data)
     return (
         <>
             <FormConsumer>{({attrs}) => <>
