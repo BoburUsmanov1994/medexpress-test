@@ -30,6 +30,7 @@ const OrganizationsContainer = () => {
     const [_, setSearchParams] = useSearchParams();
     const [rowId, setRowId] = useState(null);
     const [open, setOpen] = useState(false);
+    const [lang, setLang] = useState('uz');
     let [orgData, setOrgData] = useState({});
     const [filter, setFilter] = useState({name: '', state_id: null, city_id: null})
     const {t} = useTranslation();
@@ -150,8 +151,12 @@ const OrganizationsContainer = () => {
                 delete data[_key];
             }
         })
-        setOrgData(prev => ({...prev, ...data}))
-        setSearchParams(`tab=${tab}`)
+        if(tab === 'address'){
+
+        }else {
+            setOrgData(prev => ({...prev, ...data}))
+            setSearchParams(`tab=${tab}`)
+        }
     }
 
     const add = () => {
