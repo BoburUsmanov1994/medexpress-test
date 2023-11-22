@@ -7,7 +7,7 @@ import {get} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
-import {Plus, RefreshCcw} from "react-feather";
+import {Plus} from "react-feather";
 import Search from "../../../components/search"
 import SelectComponent from "../../../components/select";
 import Badge from "../../../components/badge"
@@ -16,7 +16,6 @@ import {Tab, Tabs} from "../../../components/tab";
 import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import orgIcon from "../../../assets/icons/org.svg";
-import Names from "../../../components/names";
 import Locations from "../../../components/locations";
 import Contacts from "../../../components/contacts";
 import Dropzone from "../../../containers/form/components/Dropzone";
@@ -70,18 +69,19 @@ const PractitionersContainer = () => {
     }
 
     const onSubmit = ({data}, tab) => {
-        if(tab === 'person') {
+        if (tab === 'person') {
+            const {contacts, ...rest} = data;
             getPersonInfo({
-                url:URLS.persons,
-                attributes:{
-                    ...data
+                url: URLS.persons,
+                attributes: {
+                    ...rest
                 }
-            },{
-                onSuccess:(response)=>{
-                   debugger
+            }, {
+                onSuccess: (response) => {
+                    setPersonData(prev => ({...prev, ...get(response, 'data.payload.person')}))
                 }
             })
-        }else{
+        } else {
             setPersonData(prev => ({...prev, ...data}))
         }
         setSearchParams(`tab=${tab}`)
@@ -100,7 +100,7 @@ const PractitionersContainer = () => {
             }
         })
     }
-
+    console.log('personData', personData)
     return (
         <div>
             <div className="grid grid-cols-12 items-center">
@@ -135,7 +135,7 @@ const PractitionersContainer = () => {
                 <div className="col-span-12 mt-6">
                     <GridView
                         params={{
-                            name: get(filter, 'name'),
+                            // name: get(filter, 'name'),
                         }}
                         hasActionColumn
                         listKey={KEYS.practitioners} url={URLS.practitioners}
@@ -173,7 +173,7 @@ const PractitionersContainer = () => {
                                        placeholder: t('Серия и номер паспорта'),
                                        mask: 'aa9999999',
                                        maskChar: '_',
-                                       className:'uppercase'
+                                       className: 'uppercase'
                                    }}
                                    label={<div className={'flex'}><span>{t('Серия и номер паспорта')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -212,7 +212,8 @@ const PractitionersContainer = () => {
                         </Form>
                     </Tab>
                     <Tab tab={'address'} label={t('Адрес')}>
-                        <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'contacts')}
+                        <Form classNames={'grid grid-cols-12 gap-x-6'}
+                              formRequest={(data) => onSubmit(data, 'contacts')}
                               footer={<div className={'col-span-12 '}>
                                   <div className="flex justify-end">
                                       <button onClick={() => setSearchParams(`tab=name`)} type={'button'}
