@@ -192,7 +192,9 @@ const PractitionersContainer = () => {
                                    label={<div className={'flex'}><span>{t('ПИНФЛ')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-                            {!isEmpty(personData) && !isNil(personData) && <ReactJson src={personData}/>}
+                            <div className="col-span-12">
+                                {!isEmpty(personData) && !isNil(personData) && <ReactJson src={personData}/>}
+                            </div>
                         </Form>
 
                     </Tab>
