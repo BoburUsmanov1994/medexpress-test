@@ -24,6 +24,7 @@
     "react-hook-form": "^7.43.9",
     "react-i18next": "^12.2.0",
     "react-input-mask": "^2.0.4",
+    "react-json-view": "^1.21.3",
     "react-number-format": "^5.1.4",
     "react-paginate": "^8.2.0",
     "react-router-dom": "^6.10.0",

@@ -3,7 +3,7 @@ import Title from "../../../components/title";
 import GridView from "../../../containers/grid-view";
 import {KEYS} from "../../../constants/keys";
 import {URLS} from "../../../constants/urls";
-import {get} from "lodash"
+import {get, isEmpty, isNil} from "lodash"
 import downloadIcon from "../../../assets/icons/download.svg"
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import {useTranslation} from "react-i18next";
@@ -21,6 +21,7 @@ import Contacts from "../../../components/contacts";
 import Dropzone from "../../../containers/form/components/Dropzone";
 import Modal from "../../../components/modal";
 import {usePostQuery} from "../../../hooks/api";
+import ReactJson from "react-json-view";
 
 
 const PractitionersContainer = () => {
@@ -191,8 +192,9 @@ const PractitionersContainer = () => {
                                    label={<div className={'flex'}><span>{t('ПИНФЛ')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                             />
-
+                            {!isEmpty(personData) && !isNil(personData) && <ReactJson src={personData}/>}
                         </Form>
+
                     </Tab>
                     <Tab tab={'info'} label={t('Основные данные')}>
                         <Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={(data) => onSubmit(data, 'address')}
