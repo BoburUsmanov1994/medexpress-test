@@ -101,6 +101,20 @@ const PractitionersContainer = () => {
             }
         })
     }
+    const addPractioner = () => {
+        const {id, ...rest} = personData;
+        addRequest({
+            url: URLS.practitioners,
+            attributes: {
+                ...rest,
+                person_id: id
+            }
+        }, {
+            onSuccess: () => {
+                closeModal();
+            }
+        })
+    }
     console.log('personData', personData)
     return (
         <div>
@@ -145,21 +159,26 @@ const PractitionersContainer = () => {
             </div>
             <Modal open={open} onClose={closeModal} classNames={'!w-[1080px] !pb-0'}
                    title={t('Добавить сотрудника')}>
-                {(false) && <ContentLoader/>}
+                {(isLoadingPost || isLoadingPersonInfo) && <ContentLoader/>}
                 <Tabs isLabelDisabled>
                     <Tab tab={'person'} label={t('Личный документ')}>
                         <Form defaultValues={{...personData}} classNames={'grid grid-cols-12 gap-x-6'}
                               formRequest={(data) => onSubmit(data, 'person')}
                               footer={<div className={'col-span-12 '}>
                                   <div className="flex justify-end">
-                                      <button onClose={closeModal} type={'button'}
-                                              className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
-                                          {t('Назад')}
-                                      </button>
-                                      <button type={'submit'}
-                                              className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                          {t('Следующий шаг')}
-                                      </button>
+                                      {!isNil(personData) ? <button onClick={addPractioner} type={'button'}
+                                                                    className={'py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                          {t('Сохранить')}
+                                      </button> : <>
+                                          <button onClose={closeModal} type={'button'}
+                                                  className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                              {t('Назад')}
+                                          </button>
+                                          <button type={'submit'}
+                                                  className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                              {t('Следующий шаг')}
+                                          </button>
+                                      </>}
                                   </div>
                               </div>}>
                             <Field type={'input-mask'}
