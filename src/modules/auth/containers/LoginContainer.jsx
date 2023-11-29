@@ -32,7 +32,7 @@ const LoginContainer = () => {
                 <h2 className={'text-2xl font-bold'}>{t("Вход в систему")}</h2>
             </div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <button onClick={() => setToken(`test token`)} type={'button'}
+                <button onClick={() => loginWithSSO()} type={'button'}
                         className={'w-full p-3.5 rounded-lg bg-primary block w-full text-white font-bold text-center h-12'}>
                     {t("Войти через SSO")}
                 </button>

@@ -46,7 +46,7 @@ request.interceptors.request.use((config) => {
     }
     const lang = get(JSON.parse(storage.get('settings')), 'state.lang', 'ru');
 
-    if(lang){
+    if (lang) {
         config.headers['Accept-Language'] = lang
     }
 
@@ -60,32 +60,33 @@ request.interceptors.response.use((response) => {
     NProgress.done(true);
     return response;
 }, (error) => {
-    // if (error?.response?.status == 401) {
-    //     if (!includes(window.locations.pathname, 'auth') && window.locations.pathname != '/') {
-    //         Swal.fire({
-    //             title: i18n.t('Your token expired'),
-    //             icon: 'error',
-    //             backdrop: 'rgba(0,0,0,0.9)',
-    //             background: 'none',
-    //             confirmButtonColor: '#f27474',
-    //             confirmButtonText: i18n.t('Logout'),
-    //             allowOutsideClick: false,
-    //             timer: 2000,
-    //             // showConfirmButton:false,
-    //             customClass: {
-    //                 title: 'title-color',
-    //                 content: 'text-color',
-    //                 icon: 'icon-color',
-    //             },
-    //         }).then((result) => {
-    //             window.localStorage.clear();
-    //             window.locations.href = '/auth';
-    //         })
-    //     } else {
-    //         window.localStorage.clear();
-    //     }
-    //
-    // }
+    if (error?.response?.status == 401) {
+        if (!includes(window.locations.pathname, 'auth')) {
+            debugger
+            Swal.fire({
+                title: i18n.t('Your token expired'),
+                icon: 'error',
+                backdrop: 'rgba(0,0,0,0.9)',
+                background: 'none',
+                confirmButtonColor: '#f27474',
+                confirmButtonText: i18n.t('Logout'),
+                allowOutsideClick: false,
+                timer: 2000,
+                // showConfirmButton:false,
+                customClass: {
+                    title: 'title-color',
+                    content: 'text-color',
+                    icon: 'icon-color',
+                },
+            }).then((result) => {
+                window.localStorage.clear();
+                window.locations.href = '/auth';
+            })
+        } else {
+            window.localStorage.clear();
+        }
+
+    }
     NProgress.done(true);
     return Promise.reject(error);
 });
