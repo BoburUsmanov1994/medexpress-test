@@ -36,7 +36,7 @@ const SSOCallbackPage = () => {
                 onSuccess: ({data: response}) => {
                     console.log('response', response)
                     setToken(get(response, 'access_token'));
-                    navigate('/dispensaries/outpatient-reports');
+                    navigate('/hrm/organizations');
                 },
                 onError: () => {
                     setVerifierCode(null);
