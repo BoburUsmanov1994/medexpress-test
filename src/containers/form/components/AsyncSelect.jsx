@@ -4,10 +4,11 @@ import RAsyncSelect from 'react-select/async';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
 import {Controller} from "react-hook-form";
-import {get, hasIn, debounce, isEmpty} from "lodash";
+import {get, hasIn, debounce, isEmpty, isArray} from "lodash";
 import {useTranslation} from "react-i18next";
 import {useGetAllQuery} from "../../../hooks/api";
 import config from "../../../config";
+import {useSettingsStore} from "../../../store";
 
 const DropdownIndicator = props => {
     return (
@@ -63,6 +64,7 @@ const AsyncSelect = ({
                          keyId = 'list',
                          isDisabledSearch = false
                      }) => {
+    const token = useSettingsStore(state => get(state, 'token', null))
     const [options, setOptions] = useState([])
     const {data, isLoading: loading} = useGetAllQuery({
         key: keyId, url: url, params: {
@@ -81,11 +83,13 @@ const AsyncSelect = ({
 
 
     const loadOptions = async (inputValue) => {
-        const res = await fetch(`${config.API_ROOT}${url}?name=${inputValue}`);
+        const res = await fetch(`${config.API_ROOT}${url}?name=${inputValue}`, {headers: {Authorization: `Bearer ${token}`}});
         const data = await res.json();
         const results = data;
-
         if (isEmpty(data)) {
+            return [];
+        }
+        if (results.status !== 200) {
             return [];
         }
 
