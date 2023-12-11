@@ -21,5 +21,6 @@ export const URLS = {
     practitionerRole: '/reference-books/practitioner-role',
     practitioners: '/practitioners',
     persons: '/persons',
+    patients: '/patients',
     roles: '/roles',
 }

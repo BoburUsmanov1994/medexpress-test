@@ -12,6 +12,7 @@ import ForbiddenPage from "../modules/auth/pages/ForbiddenPage";
 import NotFoundPage from "../modules/auth/pages/NotFoundPage";
 import SSOCallbackPage from "../modules/auth/pages/SSOCallbackPage";
 import PractitionersPage from "../modules/hrm/pages/PractitionersPage";
+import PatientsPage from "../modules/patient/pages/PractitionersPage";
 
 const LoginPage = lazy(() => import("../modules/auth/pages/LoginPage"));
 const OrganizationsPage = lazy(() => import("../modules/hrm/pages/OrganizationsPage"));
@@ -34,6 +35,9 @@ const Router = ({...rest}) => {
                             </Route>
                             <Route path={'settings'}>
                                 <Route path={'translations'} element={<TranslationsPage />} />
+                            </Route>
+                            <Route path={"patient"}>
+                                <Route index element={<PatientsPage/>}/>
                             </Route>
                             <Route path={"/error"} element={<ErrorPage/>}/>
                             <Route path={"/profile"} element={<ProfilePage/>}/>

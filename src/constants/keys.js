@@ -21,4 +21,5 @@ export const KEYS = {
     practitioners: 'practitioners',
     roles: 'roles',
     persons: 'persons',
+    patients: 'patients',
 }
