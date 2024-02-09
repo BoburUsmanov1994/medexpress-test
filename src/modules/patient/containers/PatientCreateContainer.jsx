@@ -38,36 +38,8 @@ const PatientsContainer = () => {
         mutate: addRequest, isLoading: isLoadingPost
     } = usePostQuery({listKeyId: KEYS.practitioners})
 
-    const columns = [
-        {
-            title: t('НАИМЕНОВАНИЕ'),
-            key: 'display',
-        },
-        {
-            title: t('РОДИТЕЛЬСКАЯ ОРГАНИЗАЦИЯ'),
-            key: 'parent.display',
-        },
-        {
-            title: t('ТИП ОРГАНИЗАЦИИ'),
-            key: 'medical_type.display',
-        },
-        {
-            title: t('УРОВЕНЬ'),
-            key: 'level.display',
-        },
-        {
-            title: t('СТАТУС'),
-            key: 'active',
-            render: ({value}) => <Badge
-                status={value ? 'success' : 'error'}>{value ? t('Активный') : t('Неактивный')}</Badge>
-        }
-    ]
 
-    const closeModal = () => {
-        setOpen(false)
-        setPersonData({})
-        setSearchParams(``)
-    }
+
 
     const onSubmit = ({data}, tab) => {
         if (tab === 'person') {
@@ -120,19 +92,6 @@ const PatientsContainer = () => {
             <div className="grid grid-cols-12 items-center">
                 <div className="col-span-6">
                     <Title>{t("Пациенты")}</Title>
-                </div>
-                <div className="col-span-6 flex items-center justify-end">
-                    <button
-                        onClick={() => navigate('/patient/create')}
-                        className={'inline-flex py-2.5 pl-2.5 pr-5 rounded-lg bg-primary items-center text-white font-semibold text-center'}>
-                        <Plus className={'mr-1.5'}/>
-                        {t('Добавить пациента')}
-                    </button>
-                    {/*<button*/}
-                    {/*    className={'inline-flex items-center py-2.5 pl-2.5 pr-5 text-sm font-bold text-primary border border-primary rounded-lg'}>*/}
-                    {/*    <img className={'mr-2.5'} src={downloadIcon} alt={'export'}/>*/}
-                    {/*    {t("Export")}*/}
-                    {/*</button>*/}
                 </div>
                 <div className="col-span-6 mt-5">
                     <Search handleSearch={(val) => setFilter(prev => ({...prev, name: val}))}/>
