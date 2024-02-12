@@ -4,7 +4,7 @@ import RAsyncSelect from 'react-select/async';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
 import {Controller} from "react-hook-form";
-import {get, hasIn, debounce, isEmpty, isArray} from "lodash";
+import {get, hasIn, isEmpty} from "lodash";
 import {useTranslation} from "react-i18next";
 import {useGetAllQuery} from "../../../hooks/api";
 import config from "../../../config";
@@ -123,9 +123,9 @@ const AsyncSelect = ({
                     cacheOptions
                 />}
             />
-            {errors[name]?.type == 'required' &&
+            {errors[name]?.type === 'required' &&
                 <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
-            {errors[name]?.type == 'validation' &&
+            {errors[name]?.type === 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
         </div>
     );

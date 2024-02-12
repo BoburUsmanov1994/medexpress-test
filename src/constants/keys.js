@@ -22,4 +22,7 @@ export const KEYS = {
     roles: 'roles',
     persons: 'persons',
     patients: 'patients',
+    nationality: 'nationality',
+    citizenship: 'citizenship',
+    gender: 'gender',
 }

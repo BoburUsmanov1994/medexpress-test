@@ -1,24 +1,24 @@
 import React, {useState} from 'react';
 import Title from "../../../components/title";
 import {useTranslation} from "react-i18next";
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {ChevronLeft} from "react-feather";
 import Content from "../../../components/content";
 import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import orgIcon from "../../../assets/icons/org.svg";
-import {get, head} from "lodash";
+import {find, get, head, isEqual} from "lodash";
 import {KEYS} from "../../../constants/keys";
-import {usePostQuery} from "../../../hooks/api";
+import {useGetOneQuery, usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
-import {ContentLoader} from "../../../components/loader";
+import {ContentLoader, OverlayLoader} from "../../../components/loader";
 import Locations from "../../../components/locations";
 import Contacts from "../../../components/contacts";
 
-const PatientCreateContainer = () => {
+const PatientUpdateContainer = ({id}) => {
     const {t} = useTranslation();
-    const navigate = useNavigate()
-    const [personData, setPersonData] = useState(null)
+    const [personData, setPersonData] = useState(null);
+    const {data,isLoading} = useGetOneQuery({id:id,url:URLS.patients,key:[KEYS.patients,id]})
     const {
         mutate: getPersonInfo, isLoading: isLoadingPersonInfo
     } = usePostQuery({listKeyId: KEYS.persons})
@@ -49,9 +49,12 @@ const PatientCreateContainer = () => {
             }
         }, {
             onSuccess: () => {
-                navigate('/patient')
+
             }
         })
+    }
+    if(isLoading){
+        return <OverlayLoader />
     }
     return (<>
             <div className="grid grid-cols-12">
@@ -60,7 +63,7 @@ const PatientCreateContainer = () => {
                           to={'/patient'}><ChevronLeft className={'mr-1'}/>{t("Назад к списку")}</Link>
                 </div>
                 <div className="col-span-12 mb-4">
-                    <Title>{t("Добавить пациента")}</Title>
+                    <Title>{t("Обновить информацию о пациенте")}</Title>
                 </div>
                 <div className="col-span-12">
                     {(isLoadingPersonInfo || isLoadingPatient) && <ContentLoader/>}
@@ -78,7 +81,7 @@ const PatientCreateContainer = () => {
                                    }}
                                    classNames={'col-span-4'}
                                    name={'passport'}
-                                   defaultValue={get(personData, 'passport')}
+                                   defaultValue={get(personData, 'passport',get(data,'data.payload.patient.passport'))}
                                    property={{
                                        placeholder: t('Серия и номер паспорта'),
                                        mask: 'aa9999999',
@@ -92,7 +95,7 @@ const PatientCreateContainer = () => {
                                    params={{required: true, pattern: {value: /^[0-9]{14}$/, message: 'Invalid value'}}}
                                    classNames={'col-span-4'}
                                    name={'pin'}
-                                   defaultValue={get(personData, 'pin')}
+                                   defaultValue={get(personData, 'pin',get(data,'data.payload.patient.pin'))}
                                    property={{
                                        placeholder: t('ПИНФЛ'),
                                        mask: '99999999999999',
@@ -111,7 +114,7 @@ const PatientCreateContainer = () => {
                         <div className={'col-span-12'}>
                             <hr className={'my-4'}/>
                         </div>
-                        {personData && <Form formRequest={(data)=>addPatient(data)}  fieldArrayName={'contacts'} name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'} footer={<div className={'col-span-12 '}>
+                        {(personData || get(data,'data.payload.patient'))&& <Form formRequest={(data)=>addPatient(data)}  fieldArrayName={'contacts'} name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'} footer={<div className={'col-span-12 '}>
                             <div className="flex">
                                 <button type={'submit'}
                                         className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
@@ -125,7 +128,7 @@ const PatientCreateContainer = () => {
                             <Field type={'input'} params={{
                                 required: true,
                             }}
-                                   defaultValue={get(personData, 'display_first_name')}
+                                   defaultValue={get(personData, 'display_first_name',get(data,'data.payload.patient.display_first_name'))}
                                    classNames={'col-span-4'}
                                    name={'display_first_name'}
                                    placeholder={t('Имя')}
@@ -136,7 +139,7 @@ const PatientCreateContainer = () => {
                             <Field type={'input'} params={{
                                 required: true,
                             }}
-                                   defaultValue={get(personData, 'display_last_name')}
+                                   defaultValue={get(personData, 'display_last_name',get(data,'data.payload.patient.display_last_name'))}
                                    classNames={'col-span-4'}
                                    name={'display_last_name'}
                                    placeholder={t('Фамилия')}
@@ -147,7 +150,7 @@ const PatientCreateContainer = () => {
                             <Field type={'input'} params={{
                                 required: true,
                             }}
-                                   defaultValue={get(personData, 'display_middle_name')}
+                                   defaultValue={get(personData, 'display_middle_name',get(data,'data.payload.patient.display_middle_name'))}
                                    classNames={'col-span-4'}
                                    name={'display_middle_name'}
                                    placeholder={t('Отчество')}
@@ -236,7 +239,7 @@ const PatientCreateContainer = () => {
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Контакты")}</Title>
                             </div>
-                            <Contacts hasSubtitle={false} data={{...personData}} />
+                            <Contacts hasSubtitle={false} data={{...personData,contacts:[{}]}} />
 
                         </Form>}
                     </Content>
@@ -246,4 +249,4 @@ const PatientCreateContainer = () => {
     );
 }
 
-export default PatientCreateContainer;
+export default PatientUpdateContainer;

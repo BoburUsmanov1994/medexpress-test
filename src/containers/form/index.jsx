@@ -12,6 +12,7 @@ const Form = ({
                   classNames = '',
                   defaultValues = {},
                   fieldArrayName = 'contacts',
+                  name = "form",
                   ...rest
               }) => {
     const {
@@ -26,7 +27,8 @@ const Form = ({
         trigger
     } = useForm({defaultValues});
 
-    const {fields, append, prepend, remove, swap, move, insert} = useFieldArray({control, name: fieldArrayName,
+    const {fields, append, prepend, remove, swap, move, insert} = useFieldArray({
+        control, name: fieldArrayName,
     })
 
     const onSubmit = (data) => {
@@ -60,6 +62,7 @@ const Form = ({
 
     return (
         <form
+            name={name}
             onSubmit={handleSubmit(onSubmit)}
             {...rest}
             className={classNames}

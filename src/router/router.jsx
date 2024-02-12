@@ -14,6 +14,7 @@ import SSOCallbackPage from "../modules/auth/pages/SSOCallbackPage";
 import PractitionersPage from "../modules/hrm/pages/PractitionersPage";
 import PatientsPage from "../modules/patient/pages/PatientsPage";
 import PatientCreatePage from "../modules/patient/pages/PatientCreatePage";
+import PatientUpdatePage from "../modules/patient/pages/PatientUpdatePage";
 
 const LoginPage = lazy(() => import("../modules/auth/pages/LoginPage"));
 const OrganizationsPage = lazy(() => import("../modules/hrm/pages/OrganizationsPage"));
@@ -40,6 +41,7 @@ const Router = ({...rest}) => {
                             <Route path={"patient"}>
                                 <Route index element={<PatientsPage/>}/>
                                 <Route path={"create"} element={<PatientCreatePage/>}/>
+                                <Route path={"update/:id"} element={<PatientUpdatePage/>}/>
                             </Route>
                             <Route path={"/error"} element={<ErrorPage/>}/>
                             <Route path={"/profile"} element={<ProfilePage/>}/>

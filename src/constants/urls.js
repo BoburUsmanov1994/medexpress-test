@@ -23,4 +23,7 @@ export const URLS = {
     persons: '/persons',
     patients: '/patients',
     roles: '/roles',
+    nationality: '/reference-books/nationality',
+    citizenship: '/reference-books/country',
+    gender: '/reference-books/administrative-gender',
 }

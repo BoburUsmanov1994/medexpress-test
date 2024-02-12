@@ -7,7 +7,7 @@ import {KEYS} from "../../constants/keys";
 import {URLS} from "../../constants/urls";
 import {useTranslation} from "react-i18next";
 
-const Index = ({data}) => {
+const Index = ({data,name='locations',dataKey=null}) => {
     const {t} = useTranslation()
     let [regionId, setRegionId] = useState(null);
     let [districtId, setDistrictId] = useState(null);
@@ -59,47 +59,47 @@ const Index = ({data}) => {
         <>
             <Field type={'select'} isDisabled
                    defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
-                   classNames={'col-span-4'} name={'locations[0].address.country'}
+                   classNames={'col-span-4'} name={dataKey ? `${name}[0].country` : `${name}[0].address.country`}
                    label={<div className={'flex'}><span>{t('Страна')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                    params={{required: true}}
                    options={get(organizationCountryList, 'data', [])}/>
-            <Field type={'select'} defaultValue={get(data, 'locations[0].address.state')}
+            <Field type={'select'} defaultValue={dataKey ? get(data, `${name}[0].state`) : get(data, `${name}[0].address.state`)}
                    classNames={'col-span-4'}
-                   name={'locations[0].address.state'}
+                   name={dataKey ? `${name}[0].state` : `${name}[0].address.state`}
                    label={<div className={'flex'}><span>{t('Регион')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                    params={{required: true}}
                    property={{onChange: (val) => setRegionId(get(val, 'id'))}}
                    options={get(organizationRegions, 'data', [])}/>
-            <Field type={'select'} defaultValue={get(data, 'locations[0].address.city')}
+            <Field type={'select'} defaultValue={dataKey ? get(data, `${name}[0].city`) :get(data, `${name}[0].address.city`)}
                    classNames={'col-span-4'}
-                   name={'locations[0].address.city'}
+                   name={dataKey ? `${name}[0].city` :`${name}[0].address.city`}
                    label={<div className={'flex'}><span>{t('Район')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                    params={{required: true}}
                    property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
                    options={get(organizationDistricts, 'data', [])}
             />
-            <Field type={'select'} defaultValue={get(data, 'locations[0].address.district')}
+            <Field type={'select'} defaultValue={dataKey ? get(data, `${name}[0].district`) : get(data, `${name}[0].address.district`)}
                    classNames={'col-span-4'}
-                   name={'locations[0].address.district'}
+                   name={dataKey ? `${name}[0].district` : `${name}[0].address.district`}
                    label={<div className={'flex'}><span>{t('Махалля')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
                    params={{required: true}}
                    options={get(organizationNeighbors, 'data', [])}
             />
-            <Field type={'input'} defaultValue={get(data, 'locations[0].address.line')}
+            <Field type={'input'} defaultValue={dataKey ? get(data, `${name}[0].line`):get(data, `${name}[0].address.line`)}
                    classNames={'col-span-4'}
-                   name={'locations[0].address.line'}
+                   name={dataKey ? `${name}[0].line` : `${name}[0].address.line`}
                    params={{required: true}}
                    placeholder={t('Улица')}
                    label={<div className={'flex'}><span>{t('Улица')}</span><img
                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
             />
-            <Field type={'input'} defaultValue={get(data, 'locations[0].address.block',null)}
+            <Field type={'input'} defaultValue={dataKey ? get(data, `${name}[0].block`,null) :get(data, `${name}[0].address.block`,null)}
                    classNames={'col-span-2'}
-                   name={'locations[0].address.block'}
+                   name={dataKey ? `${name}[0].address.block` : `${name}[0].block`}
                    params={{required: true,valueAsNumber:true}}
                    placeholder={t('Дом')}
                    label={<div className={'flex'}><span>{t('Дом')}</span><img
@@ -107,8 +107,8 @@ const Index = ({data}) => {
             />
             <Field params={{pattern: {value: /^[0-9]{6}$/, message: 'Invalid value'}}}
                    type={'input-mask'} property={{mask: '999999'}}
-                   defaultValue={get(data, 'locations[0].address.postal_code')}
-                   classNames={'col-span-2'} name={'locations[0].address.postal_code'}
+                   defaultValue={dataKey ? get(data, `${name}[0].postal_code`) : get(data, `${name}[0].address.postal_code`)}
+                   classNames={'col-span-2'} name={`${name}[0].address.postal_code`}
                    placeholder={t('Почтовый индекс')}
                    label={t('Почтовый индекс')}
             />

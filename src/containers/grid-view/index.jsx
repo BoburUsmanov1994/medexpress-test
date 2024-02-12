@@ -19,6 +19,7 @@ import {useNavigate} from "react-router-dom";
 const GridView = ({
                       url = '/',
                       viewUrl = null,
+                      updateUrl = null,
                       listKey = '',
                       params = {},
                       filters = null,
@@ -34,11 +35,12 @@ const GridView = ({
                       },
                       dataKey = 'data.data',
                       rowKey = 'id',
-                      deleteModalTitle = 'Удаление организации',
-                      deleteModalText = 'Вы действительно хотите удалить организацию?',
+                      deleteModalTitle = 'Удаление',
+                      deleteModalText = 'Вы действительно хотите удалить?',
                       getRowId = () => {
                       },
-                      noBorder = false
+                      noBorder = false,
+                      metaDataKey = 'data.meta'
                   }) => {
         const navigate = useNavigate();
         const [page, setPage] = useState(1);
@@ -53,7 +55,6 @@ const GridView = ({
                 }
             }
         })
-        console.log('error', get(error, 'response.data'))
 
         const {data: defaultValues = {}, isLoading: isLoadingOne} = useGetOneQuery({
             id: rowId, key: [listKey, rowId], url: viewUrl ?? url, enabled: !!(rowId)
@@ -113,19 +114,20 @@ const GridView = ({
                 }
             });
         }
-
-        if (isError) {
-            navigate('/error', {
-                state: {data: get(error, 'response.data'), isError: isError}
-            });
-        }
+        //
+        // if (isError) {
+        //     navigate('/error', {
+        //         state: {data: get(error, 'response.data'), isError: isError}
+        //     });
+        // }
 
         if (isLoading) {
             return <OverlayLoader/>
         }
         return (<div className={'bg-white rounded-lg'}>
             {filters}
-            <div className={clsx("overflow-x-auto max-h-[75vh] overflow-y-auto border border-[#E6E6E6] rounded-lg",{'!border-transparent':noBorder})}>
+            <div
+                className={clsx("overflow-x-auto max-h-[75vh] overflow-y-auto border border-[#E6E6E6] rounded-lg", {'!border-transparent': noBorder})}>
 
                 <table className="table">
                     <thead className={'thead'}>
@@ -145,7 +147,7 @@ const GridView = ({
                         return (<>
                             <tr
                                 onClick={() => onRowClick(tr)}
-                                className={clsx("tr",{'no-border':noBorder})}
+                                className={clsx("tr", {'no-border': noBorder})}
                                 key={get(tr, get(columns, '[0].key', index))}
                             >
                                 {columns.map((th, j) => <td key={get(th, 'key', j)}
@@ -160,7 +162,11 @@ const GridView = ({
                                     <Edit2 className={'mx-3.5 inline'} color={'#2F68FC'} size={22}
                                            onClick={(e) => {
                                                e.stopPropagation()
-                                               getRowId(get(tr, 'id'))
+                                               if(updateUrl){
+                                                   navigate(`${updateUrl}/${get(tr, 'id')}`)
+                                               }else {
+                                                   getRowId(get(tr, 'id'))
+                                               }
                                            }}/>
                                     <Trash2 className={'inline'} onClick={(e) => {
                                         e.stopPropagation()
@@ -177,17 +183,18 @@ const GridView = ({
                     </tbody>
                 </table>
             </div>
-            {!noBorder && get(data, 'data.meta.total') > 0 && <div className="flex justify-between items-center p-3">
-                <div className="flex items-center ">
-                    <Select isClearable={false} sm value={pageSize} setValue={setPageSize} options={PER_PAGES}/>
-                    <span
-                        className={'ml-3 text-secondary-300 text-sm font-semibold'}>{t("Show")} 1-{get(pageSize, 'value', 0)} {t("from")} {get(data, 'data.meta.total', 0)}</span>
-                </div>
-                <ReactPaginate forcePage={page - 1} onPageChange={({selected}) => setPage(selected + 1)}
-                               pageCount={ceil(get(data, 'data.meta.total_pages', 0))}
-                               nextLabel={<img src={nextImg} alt="next"/>}
-                               previousLabel={<img src={prevImg} alt="prev"/>} className={'pagination'}/>
-            </div>}
+            {!noBorder && get(data, `${metaDataKey}.total`, 0) > 0 &&
+                <div className="flex justify-between items-center p-3">
+                    <div className="flex items-center ">
+                        <Select isClearable={false} sm value={pageSize} setValue={setPageSize} options={PER_PAGES}/>
+                        <span
+                            className={'ml-3 text-secondary-300 text-sm font-semibold'}>{t("Show")} 1-{get(pageSize, 'value', 0)} {t("from")} {get(data, `${metaDataKey}.data.meta.total`, 0)}</span>
+                    </div>
+                    <ReactPaginate forcePage={page - 1} onPageChange={({selected}) => setPage(selected + 1)}
+                                   pageCount={ceil(get(data, `${metaDataKey}.total_pages`, 0))}
+                                   nextLabel={<img src={nextImg} alt="next"/>}
+                                   previousLabel={<img src={prevImg} alt="prev"/>} className={'pagination'}/>
+                </div>}
             <Modal onClose={() => {
                 setOpenCreateModal(false);
                 setRowId(null)
