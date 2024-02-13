@@ -17,21 +17,15 @@ NProgress.configure({
 
 const request = axios.create({
     baseURL: config.API_ROOT,
-    params: {},
     headers: {
-        common: {
-            "Accept": "application/json",
-            "Content-Type": "application/json; charset=utf-8"
-        }
-    }
-
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    },
 });
 
 const sso = axios.create({
     baseURL: config.SSO_ROOT,
-    params: {},
     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-
 });
 
 
@@ -40,7 +34,7 @@ request.interceptors.request.use((config) => {
         NProgress.inc();
     }
     const token = get(JSON.parse(storage.get('settings')), 'state.token', null);
-
+    config.headers['Organization-Id'] = 11
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`
     }
@@ -60,7 +54,7 @@ request.interceptors.response.use((response) => {
     NProgress.done(true);
     return response;
 }, (error) => {
-    if (error?.response?.status == 401) {
+    if (error?.response?.status === 401) {
         if (!includes(window.locations.pathname, 'auth')) {
             debugger
             Swal.fire({

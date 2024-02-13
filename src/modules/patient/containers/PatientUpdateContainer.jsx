@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Title from "../../../components/title";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
@@ -7,7 +7,7 @@ import Content from "../../../components/content";
 import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import orgIcon from "../../../assets/icons/org.svg";
-import {find, get, head, isEqual} from "lodash";
+import {find, get, head, isEqual, isNil} from "lodash";
 import {KEYS} from "../../../constants/keys";
 import {useGetOneQuery, usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
@@ -53,6 +53,11 @@ const PatientUpdateContainer = ({id}) => {
             }
         })
     }
+    useEffect(() => {
+        if(isNil(personData)){
+            setPersonData(get(data,'data.payload.patient'))
+        }
+    }, [get(data,'data.payload.patient')]);
     if(isLoading){
         return <OverlayLoader />
     }
@@ -114,7 +119,7 @@ const PatientUpdateContainer = ({id}) => {
                         <div className={'col-span-12'}>
                             <hr className={'my-4'}/>
                         </div>
-                        {(personData || get(data,'data.payload.patient'))&& <Form formRequest={(data)=>addPatient(data)}  fieldArrayName={'contacts'} name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'} footer={<div className={'col-span-12 '}>
+                        {(personData)&& <Form formRequest={(data)=>addPatient(data)}  fieldArrayName={'contacts'} name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'} footer={<div className={'col-span-12 '}>
                             <div className="flex">
                                 <button type={'submit'}
                                         className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
@@ -128,7 +133,7 @@ const PatientUpdateContainer = ({id}) => {
                             <Field type={'input'} params={{
                                 required: true,
                             }}
-                                   defaultValue={get(personData, 'display_first_name',get(data,'data.payload.patient.display_first_name'))}
+                                   defaultValue={get(personData, 'display_first_name')}
                                    classNames={'col-span-4'}
                                    name={'display_first_name'}
                                    placeholder={t('Имя')}
@@ -139,7 +144,7 @@ const PatientUpdateContainer = ({id}) => {
                             <Field type={'input'} params={{
                                 required: true,
                             }}
-                                   defaultValue={get(personData, 'display_last_name',get(data,'data.payload.patient.display_last_name'))}
+                                   defaultValue={get(personData, 'display_last_name')}
                                    classNames={'col-span-4'}
                                    name={'display_last_name'}
                                    placeholder={t('Фамилия')}
@@ -150,7 +155,7 @@ const PatientUpdateContainer = ({id}) => {
                             <Field type={'input'} params={{
                                 required: true,
                             }}
-                                   defaultValue={get(personData, 'display_middle_name',get(data,'data.payload.patient.display_middle_name'))}
+                                   defaultValue={get(personData, 'display_middle_name')}
                                    classNames={'col-span-4'}
                                    name={'display_middle_name'}
                                    placeholder={t('Отчество')}

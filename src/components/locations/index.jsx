@@ -99,7 +99,7 @@ const Index = ({data,name='locations',dataKey=null}) => {
             />
             <Field type={'input'} defaultValue={dataKey ? get(data, `${name}[0].block`,null) :get(data, `${name}[0].address.block`,null)}
                    classNames={'col-span-2'}
-                   name={dataKey ? `${name}[0].address.block` : `${name}[0].block`}
+                   name={dataKey ? `${name}[0].block` : `${name}[0].address.block`}
                    params={{required: true,valueAsNumber:true}}
                    placeholder={t('Дом')}
                    label={<div className={'flex'}><span>{t('Дом')}</span><img

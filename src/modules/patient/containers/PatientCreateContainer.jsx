@@ -13,12 +13,15 @@ import {usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
 import {ContentLoader} from "../../../components/loader";
 import Locations from "../../../components/locations";
-import Contacts from "../../../components/contacts";
+import PatientContacts from "../../../components/contacts/patient-contacts";
+import PatientLocations from "../../../components/locations/PatientLocations";
+import Identifiers from "../../../components/identifiers";
 
 const PatientCreateContainer = () => {
     const {t} = useTranslation();
     const navigate = useNavigate()
     const [personData, setPersonData] = useState(null)
+    const [pin, setPin] = useState(null)
     const {
         mutate: getPersonInfo, isLoading: isLoadingPersonInfo
     } = usePostQuery({listKeyId: KEYS.persons})
@@ -39,13 +42,15 @@ const PatientCreateContainer = () => {
             }
         })
     }
-    const addPatient = ({data:formData}) => {
+    const addPatient = ({data: formData}) => {
+        const {contacts,...rest} = formData;
         addPatientRequest({
             url: URLS.patients,
             attributes: {
-                ...formData,
-                person_id: get(personData,'id'),
-                pin:get(head((get(personData,'identifiers',[]))),'value')
+                ...rest,
+                person_id: get(personData, 'id'),
+                identifiers:get(personData,'identifiers'),
+                pin: pin
             }
         }, {
             onSuccess: () => {
@@ -66,7 +71,7 @@ const PatientCreateContainer = () => {
                     {(isLoadingPersonInfo || isLoadingPatient) && <ContentLoader/>}
                     <Content sm>
                         <div className="col-span-12">
-                            <Title  sm className={'mb-3'}>{t("Удостоверяющий личность документ")}</Title>
+                            <Title sm className={'mb-3'}>{t("Удостоверяющий личность документ")}</Title>
                         </div>
                         <Form name={'personForm'} classNames={'grid grid-cols-12 gap-x-6'}
                               formRequest={(data) => addPerson(data)}
@@ -97,6 +102,7 @@ const PatientCreateContainer = () => {
                                        placeholder: t('ПИНФЛ'),
                                        mask: '99999999999999',
                                        maskChar: '_',
+                                       onChange: (val) => setPin(val)
                                    }}
                                    label={<div className={'flex'}><span>{t('ПИНФЛ')}</span><img
                                        className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -111,14 +117,17 @@ const PatientCreateContainer = () => {
                         <div className={'col-span-12'}>
                             <hr className={'my-4'}/>
                         </div>
-                        {personData && <Form formRequest={(data)=>addPatient(data)}  fieldArrayName={'contacts'} name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'} footer={<div className={'col-span-12 '}>
-                            <div className="flex">
-                                <button type={'submit'}
-                                        className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
-                                    {t('Сохранить')}
-                                </button>
-                            </div>
-                        </div>}>
+                        {personData && <Form formRequest={(data) => addPatient(data)} fieldArrayName={'contacts'}
+                                             name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'}
+                                             footer={<div className={'col-span-12 '}>
+                                                 <div className="flex">
+                                                     <button type={'submit'}
+                                                             className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                                         {t('Сохранить')}
+                                                     </button>
+                                                 </div>
+                                             </div>}>
+                            <Identifiers data={personData}/>
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Основные данные")}</Title>
                             </div>
@@ -229,14 +238,14 @@ const PatientCreateContainer = () => {
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Адрес")}</Title>
                             </div>
-                            <Locations dataKey={'addresses'} data={personData} name={'addresses'}/>
+                            <PatientLocations  data={personData} name={'addresses'}/>
                             <div className={'col-span-12'}>
                                 <hr className={'my-4'}/>
                             </div>
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Контакты")}</Title>
                             </div>
-                            <Contacts hasSubtitle={false} data={{...personData}} />
+                            <PatientContacts hasSubtitle={false} data={{...personData}}/>
 
                         </Form>}
                     </Content>

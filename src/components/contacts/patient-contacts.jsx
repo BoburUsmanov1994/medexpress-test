@@ -6,7 +6,7 @@ import {Minus, Plus} from "react-feather";
 import {useTranslation} from "react-i18next";
 import FormConsumer from "../../context/form/FormConsumer";
 
-const Index = ({data,hasSubtitle=true}) => {
+const PatientContacts = ({data,hasSubtitle=true}) => {
     const {t} = useTranslation();
 
     return (
@@ -21,8 +21,8 @@ const Index = ({data,hasSubtitle=true}) => {
                     {
                         get(attrs, 'fieldArrayAttrs.fields', []).map((item, index) => <>
                             <Field type={'phone-number'}
-                                   defaultValue={get(find(get(data, `contacts[${index}].telecoms`, []), item => isEqual(get(item, 'system.id'), 1)), 'value')}
-                                   classNames={'col-span-4'} name={`contacts[${index}].telecoms[0].value`}
+                                   defaultValue={get(find(get(data, `telecoms`, []), item => isEqual(get(item, 'system.id'), 1)), 'value')}
+                                   classNames={'col-span-4'} name={`telecoms[${index}].value`}
                                    params={{
                                        valueAsString: true,
                                        required: true,
@@ -38,8 +38,8 @@ const Index = ({data,hasSubtitle=true}) => {
 
 
                             <Field type={'input'}
-                                   defaultValue={get(find(get(data, `contacts[${index}].telecoms`, []), item => isEqual(get(item, 'system.id'), 2)), 'value')}
-                                   classNames={'col-span-4'} name={`contacts[${index}].telecoms[1].value`}
+                                   defaultValue={get(find(get(data, `telecoms`, []), item => isEqual(get(item, 'system.id'), 2)), 'value')}
+                                   classNames={'col-span-4'} name={`telecoms[${index+1}].value`}
                                    placeholder={t('E-mail')}
                                    params={{
                                        pattern: {
@@ -56,8 +56,8 @@ const Index = ({data,hasSubtitle=true}) => {
                                     message: "Invalid format"
                                 }
                             }}
-                                   defaultValue={get(find(get(data, `contacts[${index}].telecoms`, []), item => isEqual(get(item, 'system.id'), 3)), 'value')}
-                                   classNames={'col-span-3'} name={`contacts[${index}].telecoms[2].value`}
+                                   defaultValue={get(find(get(data, `telecoms`, []), item => isEqual(get(item, 'system.id'), 3)), 'value')}
+                                   classNames={'col-span-3'} name={`telecoms[${index+2}].value`}
                                    placeholder={t('URL адрес')}
                                    label={t('URL адрес')}
                             />
@@ -67,17 +67,17 @@ const Index = ({data,hasSubtitle=true}) => {
                             </div>}
                             <Field type={'input'} params={{valueAsNumber: true}} defaultValue={1}
                                    classNames={'col-span-12'}
-                                   name={`contacts[${index}].telecoms[0].system.id`}
+                                   name={`telecoms[${index}].system.id`}
                                    property={{type: 'hidden'}}
                             />
                             <Field type={'input'} params={{valueAsNumber: true}} defaultValue={2}
                                    classNames={'col-span-12'}
-                                   name={`contacts[${index}].telecoms[1].system.id`}
+                                   name={`telecoms[${index+1}].system.id`}
                                    property={{type: 'hidden'}}
                             />
                             <Field type={'input'} params={{valueAsNumber: true}} defaultValue={3}
                                    classNames={'col-span-12'}
-                                   name={`contacts[${index}].telecoms[2].system.id`}
+                                   name={`telecoms[${index+2}].system.id`}
                                    property={{type: 'hidden'}}
                             />
                         </>)
@@ -104,4 +104,4 @@ const Index = ({data,hasSubtitle=true}) => {
     );
 };
 
-export default Index;
+export default PatientContacts;

@@ -33,6 +33,7 @@
     "react-select-async-paginate": "^0.7.3",
     "react-simple-oauth2-login": "^0.5.4",
     "react-spinners": "^0.13.8",
+    "react-switch": "^7.0.0",
     "react-toastify": "^9.1.2",
     "recharts": "^2.7.2",
     "sweetalert2": "^11.7.3",
