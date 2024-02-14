@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import InputMask from 'react-input-mask';
-import {Controller} from "react-hook-form";
+import {Controller, useFormContext} from "react-hook-form";
 import {get, hasIn} from "lodash";
 import clsx from "clsx";
 import {isFunction} from "lodash/lang";
@@ -8,18 +8,14 @@ import {useTranslation} from "react-i18next";
 
 
 const MaskedInput = ({
-                         control,
-                         disabled = false,
                          name,
-                         errors,
                          params,
                          property,
                          defaultValue = '',
                          label,
                          classNames = '',
-                         getValues = () => {},
-                         watch=()=>{}
                      }) => {
+    const { control,   formState: { errors },getValues = () => {},watch=()=>{}} = useFormContext()
     const {t} = useTranslation()
     useEffect(() => {
         if(isFunction(get(property,'onChange'))){

@@ -117,7 +117,7 @@ const PatientCreateContainer = () => {
                         <div className={'col-span-12'}>
                             <hr className={'my-4'}/>
                         </div>
-                        {personData && <Form formRequest={(data) => addPatient(data)} fieldArrayName={'contacts'}
+                        {personData && <Form formRequest={(data) => addPatient(data)}
                                              name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'}
                                              footer={<div className={'col-span-12 '}>
                                                  <div className="flex">

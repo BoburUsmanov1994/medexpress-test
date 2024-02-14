@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import RSelect, {components} from 'react-select';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
-import {Controller} from "react-hook-form";
+import {Controller, useFormContext} from "react-hook-form";
 import {get, hasIn} from "lodash";
 import {isFunction} from "lodash/lang";
 import {useTranslation} from "react-i18next";
@@ -17,7 +17,7 @@ const DropdownIndicator = props => {
     );
 };
 const customStyles = (hasError = false) => ({
-    control: (base, state, error) => ({
+    control: (base) => ({
         ...base,
         background: "#fff",
         borderColor: hasError ? "red" : "rgba(0, 0, 0, 0.1)",
@@ -40,28 +40,25 @@ const customStyles = (hasError = false) => ({
             outline: "none",
         }
     }),
-    indicatorSeparator: (base, state) => ({
+    indicatorSeparator: (base) => ({
         ...base,
         display: 'none'
     })
 });
 const Select = ({
-                    control,
                     property,
                     isMulti = false,
                     name,
-                    errors,
                     placeholder = 'Не выбран',
                     params,
                     label = '',
                     options = [],
                     classNames = '',
                     defaultValue=undefined,
-                    getValues=()=>{},
-                    watch=()=>{},
                     isDisabled = false,
                     isLoading=false
                 }) => {
+    const { control,   formState: { errors },getValues=()=>{},watch=()=>{}} = useFormContext()
     const {t} = useTranslation()
     useEffect(() => {
         if(isFunction(get(property,'onChange'))){

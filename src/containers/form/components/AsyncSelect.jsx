@@ -3,7 +3,7 @@ import {components} from 'react-select';
 import RAsyncSelect from 'react-select/async';
 import clsx from "clsx";
 import arrowIcon from "../../../assets/icons/select-arrow.svg";
-import {Controller} from "react-hook-form";
+import {Controller, useFormContext} from "react-hook-form";
 import {get, hasIn, isEmpty} from "lodash";
 import {useTranslation} from "react-i18next";
 import {useGetAllQuery} from "../../../hooks/api";
@@ -49,11 +49,9 @@ const customStyles = (hasError = false) => ({
     })
 });
 const AsyncSelect = ({
-                         control,
                          property,
                          isMulti = false,
                          name,
-                         errors,
                          placeholder = 'Не выбран',
                          params,
                          label = '',
@@ -62,8 +60,8 @@ const AsyncSelect = ({
                          url = '',
                          limit = 100,
                          keyId = 'list',
-                         isDisabledSearch = false
                      }) => {
+    const {control, formState: {errors}} = useFormContext()
     const token = useSettingsStore(state => get(state, 'token', null))
     const [options, setOptions] = useState([])
     const {data, isLoading: loading} = useGetAllQuery({

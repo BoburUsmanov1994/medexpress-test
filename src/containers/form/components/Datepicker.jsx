@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {Controller} from "react-hook-form";
+import {Controller, useFormContext} from "react-hook-form";
 import {get, hasIn} from "lodash";
 import dayjs from "dayjs";
 import clsx from "clsx";
@@ -9,10 +9,8 @@ import {useTranslation} from "react-i18next";
 
 
 const CustomDatepicker = ({
-                              control,
                               disabled = false,
                               name,
-                              errors,
                               params,
                               property,
                               defaultValue = new Date(),
@@ -20,6 +18,7 @@ const CustomDatepicker = ({
                               dateFormat = "yyyy/MM/dd",
                               classNames = ""
                           }) => {
+    const {   control,   formState: { errors } } = useFormContext()
     const [selected, setSelected] = useState(defaultValue)
     const {t} = useTranslation()
     useEffect(() => {
