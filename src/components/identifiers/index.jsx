@@ -1,35 +1,32 @@
-import React from 'react';
-import {get, isEqual, find, forEach} from "lodash";
+import React, {useEffect} from 'react';
+import {get, isEqual, find} from "lodash";
 import Field from "../../containers/form/field";
 import orgIcon from "../../assets/icons/org.svg";
 import {Minus, Plus} from "react-feather";
 import {useTranslation} from "react-i18next";
-import FormConsumer from "../../context/form/FormConsumer";
 import {URLS} from "../../constants/urls";
 import {KEYS} from "../../constants/keys";
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
 
-const Identifiers = ({data, name = 'identifiers'}) => {
+const Identifiers = ({name = 'identifiers'}) => {
     const {t} = useTranslation();
-    const {control, register} = useFormContext({
-        defaultValues: {}
-    });
+    const {control} = useFormContext();
     const {fields, append, prepend, remove, swap, move, insert} = useFieldArray({
         control,
         name: name,
     });
-    console.log(get(data, name, []), data)
     return (
-        <>
+        <div className={'col-span-12'}>
             {
-                fields.map((field, index) => <>
+                fields.map(({id,type,value,assigner_string}, index) => <div key={id} className={'grid grid-cols-12 gap-x-6 items-end'}>
                     <Field type={'async-select'}
                            url={URLS.identifierType}
                            keyId={KEYS.identifierType}
-                           classNames={'col-span-4'} name={`${name}[${index}].type.value`}
+                           classNames={'col-span-4'} name={`${name}[${index}].type`}
                            params={{
                                required: true,
                            }}
+                           defaultValue={type}
                            placeholder={t('Тип документа')}
                            label={<div className={'flex'}><span>{t('Тип документа')}</span><img
                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -39,28 +36,34 @@ const Identifiers = ({data, name = 'identifiers'}) => {
                         params={{
                             required: true,
                         }}
+                        defaultValue={value}
                         type={'input'}
                         classNames={'col-span-4'} name={`${name}[${index}].value`}
                         placeholder={t('Серия и номер документа')}
                         label={<div className={'flex'}><span>{t('Серия и номер документа')}</span><img
                             className={'ml-1'} src={orgIcon} alt="org"/></div>}
                     />
+                    {assigner_string && <Field
+                        params={{
+                            required: true,
+                        }}
+                        defaultValue={assigner_string}
+                        type={'input'}
+                        classNames={'col-span-4'} name={`${name}[${index}].assigner_string`}
+                        placeholder={t('Название организации')}
+                        label={t('Название организации')}
+                    />}
 
-                    <Field type={'input'} params={{
-                        pattern: {
-                            value: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/,
-                            message: "Invalid format"
-                        }
-                    }}
-                           defaultValue={get(find(get(data, `telecoms`, []), item => isEqual(get(item, 'system.id'), 3)), 'value')}
-                           classNames={'col-span-3'} name={`telecoms[${index + 2}].value`}
-                           placeholder={t('URL адрес')}
-                           label={t('URL адрес')}
-                    />
-                    {index > 0 && <div className="col-span-1 pt-8 text-center">
-                        <Minus onClick={() => remove(index)} className={'cursor-pointer text-red-500'} size={32}/>
+                    {(index > 0) && <div className="col-span-4 mb-4">
+                        <button
+                            type={"button"}
+                            onClick={() => remove(index)}
+                            className={'cursor-pointer text-red-500 border-red-500 mr-6 p-2.5 !pr-6  rounded-lg inline-flex  border  font-bold text-center   items-center '}>
+                            <Minus  className={'cursor-pointer text-red-500'} /> <span>{t("Удалить")}</span>
+                        </button>
+
                     </div>}
-                </>)
+                </div>)
             }
             <div className={'col-span-12'}>
                 <button
@@ -73,7 +76,7 @@ const Identifiers = ({data, name = 'identifiers'}) => {
             <div className={'col-span-12'}>
                 <hr className={'my-4'}/>
             </div>
-        </>
+        </div>
     )
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import {useForm, FormProvider } from "react-hook-form";
+import {useForm, FormProvider} from "react-hook-form";
 
 const Form = ({
                   children,
@@ -11,12 +11,11 @@ const Form = ({
                   defaultValues = {},
                   ...rest
               }) => {
-    const methods = useForm()
+    const methods = useForm({defaultValues: {...defaultValues}})
 
     const onSubmit = (data) => {
         formRequest({data});
     };
-
 
     return (
         <FormProvider {...methods}>

@@ -43,13 +43,13 @@ const PatientCreateContainer = () => {
         })
     }
     const addPatient = ({data: formData}) => {
-        const {contacts,...rest} = formData;
+        const {contacts, ...rest} = formData;
         addPatientRequest({
             url: URLS.patients,
             attributes: {
                 ...rest,
                 person_id: get(personData, 'id'),
-                identifiers:get(personData,'identifiers'),
+                identifiers: get(personData, 'identifiers'),
                 pin: pin
             }
         }, {
@@ -70,9 +70,7 @@ const PatientCreateContainer = () => {
                 <div className="col-span-12">
                     {(isLoadingPersonInfo || isLoadingPatient) && <ContentLoader/>}
                     <Content sm>
-                        <div className="col-span-12">
-                            <Title sm className={'mb-3'}>{t("Удостоверяющий личность документ")}</Title>
-                        </div>
+
                         <Form name={'personForm'} classNames={'grid grid-cols-12 gap-x-6'}
                               formRequest={(data) => addPerson(data)}
                               footer={null}>
@@ -117,7 +115,7 @@ const PatientCreateContainer = () => {
                         <div className={'col-span-12'}>
                             <hr className={'my-4'}/>
                         </div>
-                        {personData && <Form formRequest={(data) => addPatient(data)}
+                        {personData && <Form defaultValues={{...personData}} formRequest={(data) => addPatient(data)}
                                              name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'}
                                              footer={<div className={'col-span-12 '}>
                                                  <div className="flex">
@@ -127,7 +125,10 @@ const PatientCreateContainer = () => {
                                                      </button>
                                                  </div>
                                              </div>}>
-                            <Identifiers data={personData}/>
+                            <div className="col-span-12">
+                                <Title sm className={'mb-3'}>{t("Удостоверяющий личность документ")}</Title>
+                            </div>
+                            <Identifiers/>
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Основные данные")}</Title>
                             </div>
@@ -238,7 +239,7 @@ const PatientCreateContainer = () => {
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Адрес")}</Title>
                             </div>
-                            <PatientLocations  data={personData} name={'addresses'}/>
+                            <PatientLocations data={personData} name={'addresses'}/>
                             <div className={'col-span-12'}>
                                 <hr className={'my-4'}/>
                             </div>
