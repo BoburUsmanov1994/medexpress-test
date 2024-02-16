@@ -15,7 +15,7 @@ const CustomDatepicker = ({
                               property,
                               defaultValue = new Date(),
                               label,
-                              dateFormat = "yyyy/MM/dd",
+                              dateFormat = "yyyy-MM-dd",
                               classNames = ""
                           }) => {
     const {   control,   formState: { errors } } = useFormContext()

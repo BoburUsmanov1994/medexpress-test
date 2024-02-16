@@ -14,14 +14,8 @@ import {usePostQuery} from "../../../hooks/api";
 
 const PatientsContainer = () => {
     const navigate = useNavigate();
-    const [_, setSearchParams] = useSearchParams();
     const [filter, setFilter] = useState({name: ''})
-    const [open, setOpen] = useState(false);
-    const [personData, setPersonData] = useState(null)
     const {t} = useTranslation();
-    const {
-        mutate: getPersonInfo, isLoading: isLoadingPersonInfo
-    } = usePostQuery({listKeyId: KEYS.persons})
     const {
         mutate: addRequest, isLoading: isLoadingPost
     } = usePostQuery({listKeyId: KEYS.practitioners})
@@ -42,58 +36,7 @@ const PatientsContainer = () => {
         },
     ]
 
-    const closeModal = () => {
-        setOpen(false)
-        setPersonData({})
-        setSearchParams(``)
-    }
 
-    const onSubmit = ({data}, tab) => {
-        if (tab === 'person') {
-            const {contacts, ...rest} = data;
-            getPersonInfo({
-                url: URLS.persons,
-                attributes: {
-                    ...rest
-                }
-            }, {
-                onSuccess: (response) => {
-                    setPersonData(prev => ({...prev, ...get(response, 'data.payload.person')}))
-                }
-            })
-        } else {
-            setPersonData(prev => ({...prev, ...data}))
-        }
-        setSearchParams(`tab=${tab}`)
-    }
-
-    const add = () => {
-        const {...rest} = personData;
-        addRequest({
-            url: URLS.organizations,
-            attributes: {
-                ...rest,
-            }
-        }, {
-            onSuccess: () => {
-                closeModal();
-            }
-        })
-    }
-    const addPatient = () => {
-        const {id, ...rest} = personData;
-        addRequest({
-            url: URLS.practitioners,
-            attributes: {
-                ...rest,
-                person_id: id
-            }
-        }, {
-            onSuccess: () => {
-                closeModal();
-            }
-        })
-    }
     return (
         <div>
             <div className="grid grid-cols-12 items-center">
@@ -123,6 +66,7 @@ const PatientsContainer = () => {
                 <div className="col-span-12 mt-6">
                     <GridView
                         updateUrl={'/patient/update'}
+                        viewUrl={'/patient/view'}
                         dataKey={'data.payload.patients'}
                         metaDataKey={'data.payload.meta'}
                         params={{}}

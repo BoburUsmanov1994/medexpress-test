@@ -146,7 +146,12 @@ const GridView = ({
                     {get(data, dataKey, []).length > 0 ? get(data, dataKey, []).map((tr, index) => {
                         return (<>
                             <tr
-                                onClick={() => onRowClick(tr)}
+                                onClick={() => {
+                                    onRowClick(tr)
+                                    if(viewUrl) {
+                                        navigate(`${viewUrl}/${get(tr, 'id')}`)
+                                    }
+                                }}
                                 className={clsx("tr", {'no-border': noBorder})}
                                 key={get(tr, get(columns, '[0].key', index))}
                             >

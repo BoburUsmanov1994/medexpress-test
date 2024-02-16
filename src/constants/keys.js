@@ -26,4 +26,5 @@ export const KEYS = {
     citizenship: 'citizenship',
     gender: 'gender',
     identifierType: 'identifierType',
+    addressUse: 'addressUse',
 }

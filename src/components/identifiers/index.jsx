@@ -18,7 +18,7 @@ const Identifiers = ({name = 'identifiers'}) => {
     return (
         <div className={'col-span-12'}>
             {
-                fields.map(({id,type,value,assigner_string}, index) => <div key={id} className={'grid grid-cols-12 gap-x-6 items-end'}>
+                fields.map(({id,type,value,assigner_string,period_start,period_end}, index) => <div key={id} className={'grid grid-cols-12 gap-x-6 items-end pt-6 pb-3 border-b border-dashed'}>
                     <Field type={'async-select'}
                            url={URLS.identifierType}
                            keyId={KEYS.identifierType}
@@ -44,14 +44,25 @@ const Identifiers = ({name = 'identifiers'}) => {
                             className={'ml-1'} src={orgIcon} alt="org"/></div>}
                     />
                     {assigner_string && <Field
-                        params={{
-                            required: true,
-                        }}
                         defaultValue={assigner_string}
                         type={'input'}
                         classNames={'col-span-4'} name={`${name}[${index}].assigner_string`}
                         placeholder={t('Название организации')}
                         label={t('Название организации')}
+                    />}
+                    {period_start && <Field
+                        defaultValue={period_start}
+                        type={'datepicker'}
+                        classNames={'col-span-4'} name={`${name}[${index}].period_start`}
+                        placeholder={t('Дата начала')}
+                        label={t('Дата начала')}
+                    />}
+                    {period_end && <Field
+                        defaultValue={period_end}
+                        type={'datepicker'}
+                        classNames={'col-span-4'} name={`${name}[${index}].period_end`}
+                        placeholder={t('Дата окончания')}
+                        label={t('Дата окончания')}
                     />}
 
                     {(index > 0) && <div className="col-span-4 mb-4">
@@ -65,7 +76,7 @@ const Identifiers = ({name = 'identifiers'}) => {
                     </div>}
                 </div>)
             }
-            <div className={'col-span-12'}>
+            <div className={'col-span-12 mt-3'}>
                 <button
                     type={"button"}
                     onClick={() => append({})}

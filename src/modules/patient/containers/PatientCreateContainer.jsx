@@ -7,12 +7,11 @@ import Content from "../../../components/content";
 import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import orgIcon from "../../../assets/icons/org.svg";
-import {get, head} from "lodash";
+import {get} from "lodash";
 import {KEYS} from "../../../constants/keys";
 import {usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
 import {ContentLoader} from "../../../components/loader";
-import Locations from "../../../components/locations";
 import PatientContacts from "../../../components/contacts/patient-contacts";
 import PatientLocations from "../../../components/locations/PatientLocations";
 import Identifiers from "../../../components/identifiers";
@@ -49,7 +48,6 @@ const PatientCreateContainer = () => {
             attributes: {
                 ...rest,
                 person_id: get(personData, 'id'),
-                identifiers: get(personData, 'identifiers'),
                 pin: pin
             }
         }, {
@@ -115,7 +113,8 @@ const PatientCreateContainer = () => {
                         <div className={'col-span-12'}>
                             <hr className={'my-4'}/>
                         </div>
-                        {personData && <Form defaultValues={{...personData}} formRequest={(data) => addPatient(data)}
+                        {personData && <Form defaultValues={{identifiers: [{}], telecoms: [{}], ...personData}}
+                                             formRequest={(data) => addPatient(data)}
                                              name={'patientForm'} classNames={'grid grid-cols-12 gap-x-6 mt-3'}
                                              footer={<div className={'col-span-12 '}>
                                                  <div className="flex">

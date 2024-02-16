@@ -27,4 +27,5 @@ export const URLS = {
     citizenship: '/reference-books/country',
     gender: '/reference-books/administrative-gender',
     identifierType: '/reference-books/identifier-type',
+    addressUse: '/reference-books/address-use',
 }

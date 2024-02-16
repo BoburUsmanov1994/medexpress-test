@@ -19,9 +19,12 @@ module.exports = {
             },
             boxShadow: {
                 box: '0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25)',
+                card: '0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25)',
             },
+
             dropShadow: {
                 tr: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                card: '0px 0px 34px rgba(0, 0, 0, 0.1)',
             },
             content: {},
             border: '1px solid '

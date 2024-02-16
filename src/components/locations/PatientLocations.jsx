@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
 import Field from "../../containers/form/field";
 import orgIcon from "../../assets/icons/org.svg";
-import {get, isNil, isObject} from "lodash";
+import {get,  isObject} from "lodash";
 import {useGetAllQuery} from "../../hooks/api";
 import {KEYS} from "../../constants/keys";
 import {URLS} from "../../constants/urls";
 import {useTranslation} from "react-i18next";
-import Title from "../title";
 
-const PatientLocations = ({data,name='locations',dataKey=null}) => {
+const PatientLocations = ({data, name = 'locations', dataKey = null}) => {
     const {t} = useTranslation()
     let [regionId, setRegionId] = useState(null);
     let [districtId, setDistrictId] = useState(null);
@@ -58,10 +57,17 @@ const PatientLocations = ({data,name='locations',dataKey=null}) => {
     })
     return (
         <>
-            {get(data,name,[]).length > 1 ? <>
+            {get(data, name, []).length > 1 ? <>
                 {
-                    get(data,name,[]).map((_item,i)=><>
-                        <Title className={'col-span-12 text-lg mb-2 font-semibold'}>{i+1}. {t(get(_item,'use.display'))}</Title>
+                    get(data, name, []).map((_item, i) => <>
+                        <Field type={'async-select'}
+                               key={KEYS.addressUse}
+                               url={URLS.addressUse}
+                               isDisabled
+                               defaultValue={get(_item, 'use')}
+                               classNames={'col-span-4'} name={`${name}[${i}].use`}
+                               label={t('Address type')}
+                        />
                         <Field type={'select'} isDisabled
                                defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
                                classNames={'col-span-4'} name={`${name}[${i}].country`}
@@ -86,7 +92,7 @@ const PatientLocations = ({data,name='locations',dataKey=null}) => {
                                property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
                                options={get(organizationDistricts, 'data', [])}
                         />
-                        <Field type={'select'} defaultValue={get(data, `${name}[${i}].district`) }
+                        <Field type={'select'} defaultValue={get(data, `${name}[${i}].district`)}
                                classNames={'col-span-4'}
                                name={`${name}[${i}].district`}
                                label={<div className={'flex'}><span>{t('Махалля')}</span><img
@@ -102,10 +108,10 @@ const PatientLocations = ({data,name='locations',dataKey=null}) => {
                                label={<div className={'flex'}><span>{t('Улица')}</span><img
                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
                         />
-                        <Field type={'input'} defaultValue={get(data, `${name}[${i}].block`,null)}
-                               classNames={'col-span-2'}
+                        <Field type={'input'} defaultValue={get(data, `${name}[${i}].block`, null)}
+                               classNames={'col-span-4'}
                                name={`${name}[${i}].block`}
-                               params={{required: true}}
+                               params={{required: true,valueAsNumber:true}}
                                placeholder={t('Дом')}
                                label={<div className={'flex'}><span>{t('Дом')}</span><img
                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
@@ -113,13 +119,16 @@ const PatientLocations = ({data,name='locations',dataKey=null}) => {
                         <Field params={{pattern: {value: /^[0-9]{6}$/, message: 'Invalid value'}}}
                                type={'input-mask'} property={{mask: '999999'}}
                                defaultValue={get(data, `${name}[${i}].postal_code`)}
-                               classNames={'col-span-2'} name={`${name}[${i}].postal_code`}
+                               classNames={'col-span-4'} name={`${name}[${i}].postal_code`}
                                placeholder={t('Почтовый индекс')}
                                label={t('Почтовый индекс')}
                         />
+                        {get(data, name, [])?.length-1 > i  && <div className="col-span-12">
+                            <hr className={'border-b border-dashed mt-3 mb-6'}/>
+                        </div>}
                     </>)
                 }
-            </>:<>
+            </> : <>
 
                 <Field type={'select'} isDisabled
                        defaultValue={{id: 244, display: "O'ZBEKISTON", code: "UZB"}}
@@ -145,7 +154,8 @@ const PatientLocations = ({data,name='locations',dataKey=null}) => {
                        property={{onChange: (val) => setDistrictId(get(val, 'id'))}}
                        options={get(organizationDistricts, 'data', [])}
                 />
-                <Field type={'select'} defaultValue={dataKey ? get(data, `${name}[0].district`) : get(data, `${name}[0].address.district`)}
+                <Field type={'select'}
+                       defaultValue={dataKey ? get(data, `${name}[0].district`) : get(data, `${name}[0].address.district`)}
                        classNames={'col-span-4'}
                        name={`${name}[0].district`}
                        label={<div className={'flex'}><span>{t('Махалля')}</span><img
@@ -161,10 +171,10 @@ const PatientLocations = ({data,name='locations',dataKey=null}) => {
                        label={<div className={'flex'}><span>{t('Улица')}</span><img
                            className={'ml-1'} src={orgIcon} alt="org"/></div>}
                 />
-                <Field type={'input'} defaultValue={get(data, `${name}[0].block`,null)}
+                <Field type={'input'} defaultValue={get(data, `${name}[0].block`, null)}
                        classNames={'col-span-2'}
                        name={`${name}[0].block`}
-                       params={{required: true,valueAsNumber:true}}
+                       params={{required: true, valueAsNumber: true}}
                        placeholder={t('Дом')}
                        label={<div className={'flex'}><span>{t('Дом')}</span><img
                            className={'ml-1'} src={orgIcon} alt="org"/></div>}

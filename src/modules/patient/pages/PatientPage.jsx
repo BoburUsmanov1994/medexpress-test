@@ -1,12 +1,12 @@
 import React from 'react';
 import {useParams} from "react-router-dom"
-import OrganizationContainer from "../containers/OrganizationContainer";
+import PatientContainer from "../containers/PatientContainer";
 
 const PatientPage = () => {
     const {id} = useParams()
     return (
         <>
-            <OrganizationContainer id={id}/>
+            <PatientContainer id={id}/>
         </>
     );
 };
