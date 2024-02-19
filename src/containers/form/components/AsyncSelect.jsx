@@ -90,7 +90,7 @@ const AsyncSelect = ({
         if (results.status !== 200) {
             return [];
         }
-
+        
         return results;
     }
     return (
@@ -121,9 +121,9 @@ const AsyncSelect = ({
                     cacheOptions
                 />}
             />
-            {errors[name]?.type === 'required' &&
+            {get(errors, `${name}.type`) === 'required' &&
                 <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
-            {errors[name]?.type === 'validation' &&
+            {get(errors, `${name}.type`) === 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
         </div>
     );

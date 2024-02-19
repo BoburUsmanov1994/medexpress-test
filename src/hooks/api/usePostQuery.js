@@ -1,4 +1,3 @@
-import React from 'react';
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {request, sso} from "../../services/api";
 import {toast} from "react-toastify";
@@ -49,7 +48,7 @@ const usePostQuery = ({
                             toast.error(val ?? 'ERROR')
                         })
                     } else {
-                        toast.error(t(data?.response?.data?.detail) || t('ERROR'))
+                        toast.error(t(data?.response?.data?.detail) || t(data?.response?.data?.message) || t('ERROR'))
                     }
                 }
             }

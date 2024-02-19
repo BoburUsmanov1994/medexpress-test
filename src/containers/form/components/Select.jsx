@@ -91,9 +91,9 @@ const Select = ({
                     isLoading={isLoading}
                 />}
             />
-            {get(errors,`${name}.type`) == 'required' &&
+            {get(errors,`${name}.type`) === 'required' &&
                 <span className={'form-error'}>{t('Заполните обязательное поле')}</span>}
-            {get(errors,`${name}.type`) == 'validation' &&
+            {get(errors,`${name}.type`) === 'validation' &&
                 <span className={'form-error'}>{get(errors, `${name}.message`)}</span>}
         </div>
     );

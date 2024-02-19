@@ -14,7 +14,7 @@ import {usePostQuery} from "../../../hooks/api";
 
 const PatientsContainer = () => {
     const navigate = useNavigate();
-    const [filter, setFilter] = useState({name: ''})
+    const [filter, setFilter] = useState({first_name: ''})
     const {t} = useTranslation();
     const {
         mutate: addRequest, isLoading: isLoadingPost
@@ -52,7 +52,7 @@ const PatientsContainer = () => {
                     </button>
                 </div>
                 <div className="col-span-6 mt-5">
-                    <Search handleSearch={(val) => setFilter(prev => ({...prev, name: val}))}/>
+                    <Search handleSearch={(val) => setFilter(prev => ({...prev, first_name: val}))}/>
                 </div>
                 <div className="col-span-6 mt-5 flex justify-end">
                     <div>
@@ -69,7 +69,9 @@ const PatientsContainer = () => {
                         viewUrl={'/patient/view'}
                         dataKey={'data.payload.patients'}
                         metaDataKey={'data.payload.meta'}
-                        params={{}}
+                        params={{
+                            // ...filter
+                        }}
                         hasActionColumn
                         listKey={KEYS.patients}
                         url={URLS.patients}

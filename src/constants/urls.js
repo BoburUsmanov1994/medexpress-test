@@ -28,4 +28,7 @@ export const URLS = {
     gender: '/reference-books/administrative-gender',
     identifierType: '/reference-books/identifier-type',
     addressUse: '/reference-books/address-use',
+    episodeOfCares: '/episode-of-cares',
+    conditionSeverity: '/reference-books/condition-severity',
+    icd10: '/reference-books/icd-10',
 }

@@ -27,4 +27,7 @@ export const KEYS = {
     gender: 'gender',
     identifierType: 'identifierType',
     addressUse: 'addressUse',
+    episodeOfCares:'episodeOfCares',
+    conditionSeverity:'conditionSeverity',
+    icd10:'icd10',
 }

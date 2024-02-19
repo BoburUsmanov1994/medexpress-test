@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React  from 'react';
 import Title from "../../../components/title";
 import {useTranslation} from "react-i18next";
 import {Link, useNavigate} from "react-router-dom";
@@ -50,7 +50,7 @@ const PatientUpdateContainer = ({id}) => {
                     <Title>{t("Обновить информацию о пациенте")}</Title>
                 </div>
                 <div className="col-span-12">
-                    {(isLoadingPatient) && <ContentLoader/>}
+                    {(isLoadingPatient) && <OverlayLoader/>}
                     <Content sm>
 
                         <Form defaultValues={{

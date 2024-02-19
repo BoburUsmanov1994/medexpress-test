@@ -25,7 +25,6 @@ const PatientContainer = ({id}) => {
     if (isLoading) {
         return <OverlayLoader/>
     }
-    console.log('data', data)
     return (<>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 mb-5">
@@ -63,11 +62,12 @@ const PatientContainer = ({id}) => {
                                                 <span
                                                     className={'ml-4'}>{get(find(get(data, 'data.payload.patient.telecoms', []), item => isEqual(get(item, 'system.id'), 2)), 'value')}</span>
                                             </li>}
-                                        <li className={'flex items-center mt-4'}>
-                                            <img className={'flex-none'} src={homeIcon} alt=""/>
-                                            <span
-                                                className={'ml-4'}>{get(find(get(data, 'data.payload.patient.addresses', []), item => isEqual(get(item, 'use.id'), 4)), 'line')}</span>
-                                        </li>
+                                        {get(find(get(data, 'data.payload.patient.addresses', []), item => isEqual(get(item, 'use.id'), 4)), 'line') &&
+                                            <li className={'flex items-center mt-4'}>
+                                                <img className={'flex-none'} src={homeIcon} alt=""/>
+                                                <span
+                                                    className={'ml-4'}>{get(find(get(data, 'data.payload.patient.addresses', []), item => isEqual(get(item, 'use.id'), 4)), 'line')}</span>
+                                            </li>}
                                     </ul>
                                 </div>
                             </div>
@@ -77,28 +77,32 @@ const PatientContainer = ({id}) => {
                                     <h4 className={'text-lg font-bold mb-6'}>Информация о пациенте:</h4>
                                     <div className="grid grid-cols-12">
                                         <div className="col-span-4">
-                                           <div className={'mb-4'}>
-                                               <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Пол:</h4>
-                                               <p className={' font-semibold'}>{get(data,'data.payload.patient.gender.display')}</p>
-                                           </div>
                                             <div className={'mb-4'}>
-                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Предыдущий визит:</h4>
+                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Пол:</h4>
+                                                <p className={' font-semibold'}>{get(data, 'data.payload.patient.gender.display')}</p>
+                                            </div>
+                                            <div className={'mb-4'}>
+                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Предыдущий
+                                                    визит:</h4>
                                                 <p className={' font-semibold'}>25.11.2022</p>
                                             </div>
                                         </div>
                                         <div className="col-span-4">
                                             <div className={'mb-4'}>
-                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Дата рождения:</h4>
-                                                <p className={' font-semibold'}>{get(data,'data.payload.patient.birth_date')}</p>
+                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Дата
+                                                    рождения:</h4>
+                                                <p className={' font-semibold'}>{get(data, 'data.payload.patient.birth_date')}</p>
                                             </div>
                                             <div className={'mb-4'}>
-                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Следующий визит:</h4>
+                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Следующий
+                                                    визит:</h4>
                                                 <p className={' font-semibold'}>27.11.2022</p>
                                             </div>
                                         </div>
                                         <div className="col-span-4">
                                             <div className={'mb-4'}>
-                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Экстренный контакт:</h4>
+                                                <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Экстренный
+                                                    контакт:</h4>
                                                 {/*<p className={' font-semibold'}>{get(data,'data.payload.patient.birth_date')}</p>*/}
                                             </div>
                                         </div>
@@ -107,18 +111,21 @@ const PatientContainer = ({id}) => {
                                 <div
                                     className={"p-6 rounded-xl shadow-xl drop-shadow-xl border-[3px] border-[rgba(0,0,0,0.1)] mt-6"}>
                                     <div className="grid grid-cols-12 gap-x-6">
-                                        <div className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6">
+                                        <div
+                                            className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
-                                           <span className={'ml-3'}> Амбулаторный прием
+                                            <span className={'ml-3'}> Амбулаторный прием
                                             025 форма</span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
                                         </div>
-                                        <div className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6">
+                                        <div
+                                            className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
                                             <span className={'ml-3'}> Больничные листы</span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
                                         </div>
-                                        <div className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6">
+                                        <div onClick={() => navigate(`/patient/episode-of-cares/${id}`)}
+                                             className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
                                             <span className={'ml-3'}> "Д" учета </span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>

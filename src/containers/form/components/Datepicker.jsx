@@ -18,14 +18,8 @@ const CustomDatepicker = ({
                               dateFormat = "yyyy-MM-dd",
                               classNames = ""
                           }) => {
-    const {   control,   formState: { errors } } = useFormContext()
-    const [selected, setSelected] = useState(defaultValue)
+    const {   control,   formState: { errors }} = useFormContext()
     const {t} = useTranslation()
-    useEffect(() => {
-        if (defaultValue) {
-            setSelected(defaultValue)
-        }
-    }, [defaultValue]);
     return (
         <div className={clsx("form-group", classNames)}>
             <label className={'form-label'}>{label ?? name}</label>
@@ -36,8 +30,8 @@ const CustomDatepicker = ({
                 defaultValue={defaultValue}
                 render={({field}) => (<DatePicker
                     dateFormat={dateFormat}
-                    selected={dayjs(selected).toDate()}
-                    onChange={(date) => setSelected(date)}
+                    selected={dayjs(field.value).toDate()}
+                    onChange={(date) => field.onChange(date)}
                     readOnly={disabled}
                     showMonthYearPicker={get(property, 'showMonthYearPicker')}
                     className={clsx('form-input pr-10', {'border-red-600': hasIn(errors, name)})}

@@ -7,6 +7,7 @@ import MaskedInput from "./components/Masked-Input";
 import PhoneNumber from "./components/PhoneNumber";
 import Dropzone from "./components/Dropzone";
 import Datepicker from "./components/Datepicker";
+import {Textarea} from "./components";
 
 const Field = ({type, ...rest}) => {
     return (
@@ -35,6 +36,9 @@ const Field = ({type, ...rest}) => {
                         case 'datepicker':
                             return <FormConsumer>{({attrs, getValueFromField}) => <Datepicker {...rest} {...attrs}
                                                                                                     getValueFromField={getValueFromField}/>}</FormConsumer>;
+                        case 'textarea':
+                            return <FormConsumer>{({attrs, getValueFromField}) => <Textarea {...rest} {...attrs}
+                                                                                              getValueFromField={getValueFromField}/>}</FormConsumer>;
                         default:
                             return <FormConsumer>{({attrs, getValueFromField}) => <Input {...rest} {...attrs}
                                                                                          getValueFromField={getValueFromField}/>}</FormConsumer>

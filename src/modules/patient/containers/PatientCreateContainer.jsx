@@ -7,11 +7,11 @@ import Content from "../../../components/content";
 import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import orgIcon from "../../../assets/icons/org.svg";
-import {get} from "lodash";
+import {get, toUpper} from "lodash";
 import {KEYS} from "../../../constants/keys";
 import {usePostQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
-import {ContentLoader} from "../../../components/loader";
+import {ContentLoader, OverlayLoader} from "../../../components/loader";
 import PatientContacts from "../../../components/contacts/patient-contacts";
 import PatientLocations from "../../../components/locations/PatientLocations";
 import Identifiers from "../../../components/identifiers";
@@ -29,11 +29,12 @@ const PatientCreateContainer = () => {
     } = usePostQuery({listKeyId: KEYS.patients})
     const addPerson = ({data: attrs}) => {
         setPersonData(null)
-        const {contacts, ...rest} = attrs;
+        const {contacts, passport,...rest} = attrs;
         getPersonInfo({
             url: URLS.persons,
             attributes: {
-                ...rest
+                ...rest,
+                passport:toUpper(passport)
             }
         }, {
             onSuccess: (response) => {
@@ -66,7 +67,7 @@ const PatientCreateContainer = () => {
                     <Title>{t("Добавить пациента")}</Title>
                 </div>
                 <div className="col-span-12">
-                    {(isLoadingPersonInfo || isLoadingPatient) && <ContentLoader/>}
+                    {(isLoadingPersonInfo || isLoadingPatient) && <OverlayLoader/>}
                     <Content sm>
 
                         <Form name={'personForm'} classNames={'grid grid-cols-12 gap-x-6'}
