@@ -160,7 +160,8 @@ const GridView = ({
                                     {get(th, 'render') ? get(th, 'render')({
                                         value: get(tr, get(th, 'key')),
                                         row: tr,
-                                        index: index + (page - 1) * pageSize + 1
+                                        index: index + (page - 1) * pageSize + 1,
+                                        number:index+1
                                     }) : get(tr, get(th, 'key'))}
                                 </td>)}
                                 {hasActionColumn && <td className={'td  !max-w-full pr-10 '}>

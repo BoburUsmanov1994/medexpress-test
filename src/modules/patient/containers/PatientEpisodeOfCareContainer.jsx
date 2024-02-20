@@ -26,7 +26,7 @@ const PatientEpisodeOfCareContainer = ({id}) => {
         mutate: createEpisodeOfCareRequest, isLoading: isLoadingPost
     } = usePostQuery({listKeyId: KEYS.patients})
     const createEpisodeOfCare = ({data: attrs}) => {
-        createEpisodeOfCareRequest({url:URLS.episodeOfCares,attributes:{...attrs,patient:{id:parseInt(id)}}})
+        createEpisodeOfCareRequest({url:URLS.episodeOfCares,attributes:{...attrs,patient:{id:id},status:{id:1}}})
     }
     if (isLoading) {
         return <OverlayLoader/>
