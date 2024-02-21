@@ -30,4 +30,5 @@ export const KEYS = {
     episodeOfCares:'episodeOfCares',
     conditionSeverity:'conditionSeverity',
     icd10:'icd10',
+    episodeOfCareStatus:'episodeOfCareStatus',
 }

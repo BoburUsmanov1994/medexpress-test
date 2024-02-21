@@ -19,6 +19,7 @@ import Form from "../../../containers/form";
 import Field from "../../../containers/form/field";
 import GridView from "../../../containers/grid-view";
 import Badge from "../../../components/badge";
+import dayjs from "dayjs";
 
 const PatientEpisodeOfCareListContainer = ({id}) => {
     const {t} = useTranslation();
@@ -87,21 +88,19 @@ const PatientEpisodeOfCareListContainer = ({id}) => {
                                 <div
                                     className={"rounded-xl shadow-xl drop-shadow-xl border-[3px] border-[rgba(0,0,0,0.1)]"}>
                                     <GridView
-                                        // updateUrl={'/patient/update'}
-                                        // viewUrl={'/patient/view'}
                                         dataKey={'data.payload.data'}
                                         metaDataKey={'data.payload.meta'}
                                         params={{
                                             patient_id: id
                                         }}
-                                        hasActionColumn={false}
+                                        hasActionColumn={true}
                                         listKey={KEYS.episodeOfCares}
                                         url={URLS.episodeOfCares}
                                         columns={[
                                             {
                                                 title: t('№'),
                                                 key: 'id',
-                                                render:({number})=>number
+                                                render: ({number}) => number
                                             },
                                             {
                                                 title: t('Статус Д учета'),
@@ -119,75 +118,112 @@ const PatientEpisodeOfCareListContainer = ({id}) => {
                                             {
                                                 title: t('Дата внесения данных'),
                                                 key: 'main_diagnosis.onset_date',
+                                                render: ({value}) => dayjs(value).format('DD.MM.YYYY HH:mm')
                                             },
-                                        ]}/>
-                                    {/*<Form classNames={'grid grid-cols-12 gap-x-6'} formRequest={createEpisodeOfCare}*/}
-                                    {/*      footer={<div className={'col-span-12 '}>*/}
-                                    {/*          <div className="flex justify-end">*/}
-                                    {/*              <button onClick={() => navigate(-1)} type={'button'}*/}
-                                    {/*                      className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>*/}
-                                    {/*                  {t('Отмена')}*/}
-                                    {/*              </button>*/}
-                                    {/*              <button type={'submit'}*/}
-                                    {/*                      className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>*/}
-                                    {/*                  {t('Сохранить')}*/}
-                                    {/*              </button>*/}
-                                    {/*          </div>*/}
-                                    {/*      </div>}>*/}
-                                    {/*    <Field*/}
-                                    {/*        type={'async-select'}*/}
-                                    {/*        url={URLS.icd10}*/}
-                                    {/*        keyId={KEYS.icd10}*/}
-                                    {/*        classNames={'col-span-6'}*/}
-                                    {/*        name={'main_diagnosis.code'}*/}
-                                    {/*        params={{*/}
-                                    {/*            required: true,*/}
-                                    {/*        }}*/}
-                                    {/*        label={<div className={'flex'}><span>{t('Диагноз')}</span><img*/}
-                                    {/*            className={'ml-1'} src={orgIcon} alt="org"/></div>}*/}
-                                    {/*    />*/}
-                                    {/*    <Field*/}
-                                    {/*        type={'async-select'}*/}
-                                    {/*        url={URLS.conditionSeverity}*/}
-                                    {/*        keyId={KEYS.conditionSeverity}*/}
-                                    {/*        classNames={'col-span-6'}*/}
-                                    {/*        name={'main_diagnosis.severity'}*/}
-                                    {/*        params={{*/}
-                                    {/*            required: true,*/}
-                                    {/*        }}*/}
-                                    {/*        label={<div className={'flex'}><span>{t('Серьезность диагноза')}</span><img*/}
-                                    {/*            className={'ml-1'} src={orgIcon} alt="org"/></div>}*/}
-                                    {/*    />*/}
-                                    {/*    <Field*/}
-                                    {/*        dateFormat={"yyyy-MM-dd"}*/}
-                                    {/*        type={'datepicker'}*/}
-                                    {/*        classNames={'col-span-6'}*/}
-                                    {/*        name={'main_diagnosis.onset_date'}*/}
-                                    {/*        params={{*/}
-                                    {/*            required: true,*/}
-                                    {/*        }}*/}
-                                    {/*        label={<div className={'flex'}>*/}
-                                    {/*            <span>{t('Дата начала заболевания')}</span><img*/}
-                                    {/*            className={'ml-1'} src={orgIcon} alt="org"/></div>}*/}
-                                    {/*    />*/}
-                                    {/*    <Field*/}
-                                    {/*        dateFormat={"yyyy-MM-dd"}*/}
-                                    {/*        type={'datepicker'}*/}
-                                    {/*        classNames={'col-span-6'}*/}
-                                    {/*        name={'period_start'}*/}
-                                    {/*        params={{*/}
-                                    {/*            required: true,*/}
-                                    {/*        }}*/}
-                                    {/*        label={<div className={'flex'}><span>{t('Дата внесения данных')}</span><img*/}
-                                    {/*            className={'ml-1'} src={orgIcon} alt="org"/></div>}*/}
-                                    {/*    />*/}
-                                    {/*    <Field*/}
-                                    {/*        type={'textarea'}*/}
-                                    {/*        classNames={'col-span-12'}*/}
-                                    {/*        name={'note'}*/}
-                                    {/*        label={t('Дата внесения данных')}*/}
-                                    {/*    />*/}
-                                    {/*</Form>*/}
+                                            {
+                                                title: t('Дата снятия с учета'),
+                                                key: 'period_end',
+                                            },
+                                            // {
+                                            //     title: t('Причина снятия с учета'),
+                                            //     key: 'period_end',
+                                            // },
+                                            // {
+                                            //     title: t('Диагноз смерти'),
+                                            //     key: 'period_end',
+                                            // },
+                                            {
+                                                title: t('Примечание'),
+                                                key: 'note',
+                                            },
+                                        ]}
+                                        modalClassNames={'w-[800px]'}
+                                        ModalBody={(onSubmit, defaultValues = {}) => <Form
+                                            classNames={'grid grid-cols-12 gap-x-6'} formRequest={onSubmit}
+                                            defaultValues={{
+                                                ...get(defaultValues, 'data', {}),
+                                            }} footer={<div className={'col-span-12 '}>
+                                            <div className="flex justify-end">
+                                                <button onClick={() => navigate(-1)} type={'button'}
+                                                        className={'text-[#7A7A7A] border-2 border-[#7A7A7A] py-3 px-6 rounded-lg mr-4 inline-block   font-bold text-center  mt-6'}>
+                                                    {t('Отмена')}
+                                                </button>
+                                                <button type={'submit'}
+                                                        className={' py-3 px-6 rounded-lg bg-primary inline-block  text-white font-bold text-center  mt-6'}>
+                                                    {t('Сохранить')}
+                                                </button>
+                                            </div>
+                                        </div>}>
+                                            <Field
+                                                type={'async-select'}
+                                                url={URLS.icd10}
+                                                keyId={KEYS.icd10}
+                                                classNames={'col-span-6'}
+                                                name={'main_diagnosis.code'}
+                                                params={{
+                                                    required: true,
+                                                }}
+                                                label={<div className={'flex'}><span>{t('Диагноз')}</span><img
+                                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                            />
+                                            <Field
+                                                type={'async-select'}
+                                                url={URLS.conditionSeverity}
+                                                keyId={KEYS.conditionSeverity}
+                                                classNames={'col-span-6'}
+                                                name={'main_diagnosis.severity'}
+                                                params={{
+                                                    required: true,
+                                                }}
+                                                label={<div className={'flex'}>
+                                                    <span>{t('Серьезность диагноза')}</span><img
+                                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                            />
+                                            <Field
+                                                type={'async-select'}
+                                                url={URLS.episodeOfCareStatus}
+                                                keyId={KEYS.episodeOfCareStatus}
+                                                classNames={'col-span-6'}
+                                                name={'status'}
+                                                params={{
+                                                    required: true,
+                                                }}
+                                                label={<div className={'flex'}><span>{t('Статус')}</span><img
+                                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                            />
+                                            <Field
+                                                dateFormat={"yyyy-MM-dd"}
+                                                type={'datepicker'}
+                                                classNames={'col-span-3'}
+                                                name={'main_diagnosis.onset_date'}
+                                                params={{
+                                                    required: true,
+                                                }}
+                                                label={<div className={'flex'}>
+                                                    <span>{t('Дата начала заболевания')}</span><img
+                                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                            />
+
+                                            <Field
+                                                dateFormat={"yyyy-MM-dd"}
+                                                type={'datepicker'}
+                                                classNames={'col-span-3'}
+                                                name={'period_start'}
+                                                params={{
+                                                    required: true,
+                                                }}
+                                                label={<div className={'flex'}>
+                                                    <span>{t('Дата внесения данных')}</span><img
+                                                    className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                            />
+                                            <Field
+                                                type={'textarea'}
+                                                classNames={'col-span-12'}
+                                                name={'note'}
+                                                label={t('Дата внесения данных')}
+                                            />
+                                        </Form>}
+                                    />
                                 </div>
                             </div>
                         </div>

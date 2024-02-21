@@ -26,7 +26,11 @@ const PatientEpisodeOfCareContainer = ({id}) => {
         mutate: createEpisodeOfCareRequest, isLoading: isLoadingPost
     } = usePostQuery({listKeyId: KEYS.patients})
     const createEpisodeOfCare = ({data: attrs}) => {
-        createEpisodeOfCareRequest({url:URLS.episodeOfCares,attributes:{...attrs,patient:{id:id},status:{id:1}}})
+        createEpisodeOfCareRequest({url:URLS.episodeOfCares,attributes:{...attrs,patient:{id:id}}},{
+            onSuccess:()=>{
+                navigate(`/patient/view/${id}`)
+            }
+        })
     }
     if (isLoading) {
         return <OverlayLoader/>
@@ -118,9 +122,21 @@ const PatientEpisodeOfCareContainer = ({id}) => {
                                                 className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                         />
                                         <Field
+                                            type={'async-select'}
+                                            url={URLS.episodeOfCareStatus}
+                                            keyId={KEYS.episodeOfCareStatus}
+                                            classNames={'col-span-6'}
+                                            name={'status'}
+                                            params={{
+                                                required: true,
+                                            }}
+                                            label={<div className={'flex'}><span>{t('Статус')}</span><img
+                                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                        />
+                                        <Field
                                             dateFormat={"yyyy-MM-dd"}
                                             type={'datepicker'}
-                                            classNames={'col-span-6'}
+                                            classNames={'col-span-3'}
                                             name={'main_diagnosis.onset_date'}
                                             params={{
                                                 required: true,
@@ -129,10 +145,11 @@ const PatientEpisodeOfCareContainer = ({id}) => {
                                                 <span>{t('Дата начала заболевания')}</span><img
                                                 className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                         />
+
                                         <Field
                                             dateFormat={"yyyy-MM-dd"}
                                             type={'datepicker'}
-                                            classNames={'col-span-6'}
+                                            classNames={'col-span-3'}
                                             name={'period_start'}
                                             params={{
                                                 required: true,

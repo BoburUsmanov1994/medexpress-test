@@ -31,4 +31,5 @@ export const URLS = {
     episodeOfCares: '/episode-of-cares',
     conditionSeverity: '/reference-books/condition-severity',
     icd10: '/reference-books/icd-10',
+    episodeOfCareStatus: '/reference-books/episode-of-care-status',
 }

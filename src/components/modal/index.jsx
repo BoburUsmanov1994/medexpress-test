@@ -8,7 +8,8 @@ const Modal = ({
                    },
                    open = false,
                    title = '',
-                   classNames = ''
+                   classNames = '',
+
                }) => {
     useEffect(() => {
         if (open) {
@@ -20,7 +21,7 @@ const Modal = ({
     return (
         <>
             {
-                open && <div className={'h-screen fixed top-0 left-0 w-full z-50'}>
+                true && <div className={'h-screen fixed top-0 left-0 w-full z-50'}>
                     <div onClick={onClose} className={'absolute top-0 left-0 h-full w-full z-5 bg-[rgba(34,34,34,0.75)]'}/>
                     <div
                         className={clsx('bg-white p-6 z-10 absolute top-1/2 left-1/2 min-w-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded shadow-card max-h-[85vh] overflow-y-auto', classNames)}>

@@ -5,7 +5,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {ChevronLeft} from "react-feather";
 import Content from "../../../components/content";
 import {KEYS} from "../../../constants/keys";
-import {useGetOneQuery} from "../../../hooks/api";
+import {useGetAllQuery, useGetOneQuery} from "../../../hooks/api";
 import {URLS} from "../../../constants/urls";
 import {OverlayLoader} from "../../../components/loader";
 import patientImg from "../../../assets/images/patient.png";
@@ -21,10 +21,18 @@ const PatientContainer = ({id}) => {
     const {t} = useTranslation();
     const navigate = useNavigate()
     const {data, isLoading} = useGetOneQuery({id: id, url: URLS.patients, key: [KEYS.patients, id]})
+    const {data: episodeOfCareData, isLoading: isLoadingEpisodeOfCare} = useGetAllQuery({
+        url: URLS.episodeOfCares, key: [KEYS.episodeOfCares, id], params: {
+            params: {
+                patient_id: id
+            }
+        }
+    })
 
-    if (isLoading) {
+    if (isLoading || isLoadingEpisodeOfCare) {
         return <OverlayLoader/>
     }
+
     return (<>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 mb-5">
@@ -103,9 +111,15 @@ const PatientContainer = ({id}) => {
                                             <div className={'mb-4'}>
                                                 <h4 className={'mb-1.5 text-[#808080] font-semibold'}>Экстренный
                                                     контакт:</h4>
-                                                {/*<p className={' font-semibold'}>{get(data,'data.payload.patient.birth_date')}</p>*/}
                                             </div>
                                         </div>
+                                        {get(episodeOfCareData,'data.payload.data',[])?.length > 0 && <div className="col-span-4">
+                                            <div className={'mb-4 mt-2'}>
+                                                <Link
+                                                    className={'py-2 px-5 inline-block border-2 border-[#E5E5E5] rounded-lg text-black font-semibold hover:shadow-lg'}
+                                                    to={`/patient/episode-of-cares/list/${id}`}>{t('"Д" учет')}</Link>
+                                            </div>
+                                        </div>}
                                     </div>
                                 </div>
                                 <div
