@@ -15,6 +15,7 @@ const Identifiers = ({name = 'identifiers'}) => {
         control,
         name: name,
     });
+    console.log('fields',fields)
     return (
         <div className={'col-span-12'}>
             {

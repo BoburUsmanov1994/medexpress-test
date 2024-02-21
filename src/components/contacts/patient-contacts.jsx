@@ -78,7 +78,7 @@ const PatientContacts = ({data, hasSubtitle = true, name = 'telecoms'}) => {
                     />
                 </>)
             }
-            <div className={'col-span-12'}>
+            <div className={'col-span-12 hidden'}>
                 <button
                     type={"button"}
                     onClick={() => append({})}

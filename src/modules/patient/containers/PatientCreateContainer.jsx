@@ -246,7 +246,7 @@ const PatientCreateContainer = () => {
                             <div className="col-span-12">
                                 <Title sm className={'mb-3'}>{t("Контакты")}</Title>
                             </div>
-                            <PatientContacts hasSubtitle={false} data={{...personData}}/>
+                            <PatientContacts  hasSubtitle={false} data={{...personData}}/>
 
                         </Form>}
                     </Content>
