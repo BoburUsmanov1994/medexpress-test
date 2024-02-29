@@ -138,7 +138,7 @@ const PatientEpisodeOfCareListContainer = ({id}) => {
                                                 key: 'note',
                                             },
                                         ]}
-                                        modalClassNames={'w-[1200px]'}
+                                        modalClassNames={'!w-[1080px]'}
                                         ModalBody={(onSubmit, defaultValues = {}) => <Form
                                             classNames={'grid grid-cols-12 gap-x-6'} formRequest={onSubmit}
                                             defaultValues={{
