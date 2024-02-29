@@ -86,8 +86,9 @@ const PatientEpisodeOfCareListContainer = ({id}) => {
                             </div>
                             <div className="col-span-12 mt-6">
                                 <div
-                                    className={"rounded-xl shadow-xl drop-shadow-xl border-[3px] border-[rgba(0,0,0,0.1)]"}>
+                                    className={"rounded-xl shadow-xl  border-[3px] border-[rgba(0,0,0,0.1)]"}>
                                     <GridView
+                                        bordered
                                         dataKey={'data.payload.data'}
                                         metaDataKey={'data.payload.meta'}
                                         params={{
@@ -100,7 +101,7 @@ const PatientEpisodeOfCareListContainer = ({id}) => {
                                             {
                                                 title: t('№'),
                                                 key: 'id',
-                                                render: ({number}) => number
+                                                render: ({number}) => number,
                                             },
                                             {
                                                 title: t('Статус Д учета'),
@@ -137,11 +138,11 @@ const PatientEpisodeOfCareListContainer = ({id}) => {
                                                 key: 'note',
                                             },
                                         ]}
-                                        modalClassNames={'w-[800px]'}
+                                        modalClassNames={'w-[1200px]'}
                                         ModalBody={(onSubmit, defaultValues = {}) => <Form
                                             classNames={'grid grid-cols-12 gap-x-6'} formRequest={onSubmit}
                                             defaultValues={{
-                                                ...get(defaultValues, 'data', {}),
+                                                ...get(defaultValues, 'data.payload.episode_of_care', {}),
                                             }} footer={<div className={'col-span-12 '}>
                                             <div className="flex justify-end">
                                                 <button onClick={() => navigate(-1)} type={'button'}

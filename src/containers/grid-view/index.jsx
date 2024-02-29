@@ -29,7 +29,8 @@ const GridView = ({
                       doubleRow = false,
                       modalClassNames = '',
                       hasActionColumn = false,
-                      ModalBody = ()=>{},
+                      ModalBody = () => {
+                      },
                       openCreateModal = false,
                       setOpenCreateModal = () => {
                       },
@@ -40,7 +41,8 @@ const GridView = ({
                       getRowId = () => {
                       },
                       noBorder = false,
-                      metaDataKey = 'data.meta'
+                      metaDataKey = 'data.meta',
+                      bordered = false
                   }) => {
         const navigate = useNavigate();
         const [page, setPage] = useState(1);
@@ -114,27 +116,20 @@ const GridView = ({
                 }
             });
         }
-        //
-        // if (isError) {
-        //     navigate('/error', {
-        //         state: {data: get(error, 'response.data'), isError: isError}
-        //     });
-        // }
 
         if (isLoading) {
             return <OverlayLoader/>
         }
-        console.log('rowId',rowId)
         return (<div className={'bg-white rounded-lg'}>
             {filters}
             <div
                 className={clsx("overflow-x-auto max-h-[75vh] overflow-y-auto border border-[#E6E6E6] rounded-lg", {'!border-transparent': noBorder})}>
 
-                <table className="table">
+                <table className={clsx("table", {'bordered': bordered})}>
                     <thead className={'thead'}>
-                    <tr className={'tr'}>
+                    <tr className={'tr '}>
                         {columns && columns.map(th => <th
-                            className={clsx(`th`, get(th, "classnames", ""))}
+                            className={clsx(`th `, get(th, "classnames", ""))}
                             key={get(th, 'title')}>
                             {get(th, 'title')}
                         </th>)}
@@ -149,7 +144,7 @@ const GridView = ({
                             <tr
                                 onClick={() => {
                                     onRowClick(tr)
-                                    if(viewUrl) {
+                                    if (viewUrl) {
                                         navigate(`${viewUrl}/${get(tr, 'id')}`)
                                     }
                                 }}
@@ -162,16 +157,16 @@ const GridView = ({
                                         value: get(tr, get(th, 'key')),
                                         row: tr,
                                         index: index + (page - 1) * pageSize + 1,
-                                        number:index+1
+                                        number: index + 1
                                     }) : get(tr, get(th, 'key'))}
                                 </td>)}
                                 {hasActionColumn && <td className={'td  !max-w-full pr-10 whitespace-nowrap'}>
                                     <Edit2 className={'mx-3.5 inline'} color={'#2F68FC'} size={22}
                                            onClick={(e) => {
                                                e.stopPropagation()
-                                               if(updateUrl){
+                                               if (updateUrl) {
                                                    navigate(`${updateUrl}/${get(tr, 'id')}`)
-                                               }else {
+                                               } else {
                                                    setRowId(get(tr, 'id'))
                                                }
                                            }}/>
@@ -202,7 +197,7 @@ const GridView = ({
                                    nextLabel={<img src={nextImg} alt="next"/>}
                                    previousLabel={<img src={prevImg} alt="prev"/>} className={'pagination'}/>
                 </div>}
-            <Modal  onClose={() => {
+            <Modal onClose={() => {
                 setOpenCreateModal(false);
                 setRowId(null)
             }}

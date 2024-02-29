@@ -34,7 +34,7 @@ request.interceptors.request.use((config) => {
         NProgress.inc();
     }
     const token = get(JSON.parse(storage.get('settings')), 'state.token', null);
-    config.headers['Organization-Id'] = 11
+    config.headers['PractitionerRole-Id'] = 8
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`
     }

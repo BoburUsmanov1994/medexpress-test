@@ -119,6 +119,9 @@ input.checked::before {
     .table {
         @apply w-full
     }
+    .table.bordered .td,.table.bordered .th {
+        @apply border border-2
+    }
 
 
     .thead .tr {

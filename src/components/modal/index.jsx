@@ -13,7 +13,7 @@ const Modal = ({
                }) => {
     useEffect(() => {
         if (open) {
-            document.body.style.overflow = 'hidden';
+            // document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'auto';
         }
@@ -21,7 +21,7 @@ const Modal = ({
     return (
         <>
             {
-                true && <div className={'h-screen fixed top-0 left-0 w-full z-50'}>
+                open && <div className={'h-screen min-h-screen fixed left-0 right-0 top-0 bottom-0 w-full z-50 block'}>
                     <div onClick={onClose} className={'absolute top-0 left-0 h-full w-full z-5 bg-[rgba(34,34,34,0.75)]'}/>
                     <div
                         className={clsx('bg-white p-6 z-10 absolute top-1/2 left-1/2 min-w-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded shadow-card max-h-[85vh] overflow-y-auto', classNames)}>
