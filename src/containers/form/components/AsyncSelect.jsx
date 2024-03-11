@@ -60,6 +60,7 @@ const AsyncSelect = ({
                          url = '',
                          limit = 100,
                          keyId = 'list',
+                         dataKey = 'data',
                      }) => {
     const {control, formState: {errors}} = useFormContext()
     const token = useSettingsStore(state => get(state, 'token', null))
@@ -75,7 +76,7 @@ const AsyncSelect = ({
 
     useEffect(() => {
         if (data) {
-            setOptions(get(data, 'data.data', get(data, 'data', [])))
+            setOptions(get(data, `data.${dataKey}`, get(data, 'data', [])))
         }
     }, [data]);
 
@@ -84,13 +85,14 @@ const AsyncSelect = ({
         const res = await fetch(`${config.API_ROOT}${url}?name=${inputValue}`, {headers: {Authorization: `Bearer ${token}`}});
         const data = await res.json();
         const results = data;
+        console.log('results', results)
         if (isEmpty(data)) {
             return [];
         }
         if (results.status !== 200) {
             return [];
         }
-        
+
         return results;
     }
     return (

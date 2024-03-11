@@ -125,23 +125,24 @@ const PatientContainer = ({id}) => {
                                 <div
                                     className={"p-6 rounded-xl shadow-xl drop-shadow-xl border-[3px] border-[rgba(0,0,0,0.1)] mt-6"}>
                                     <div className="grid grid-cols-12 gap-x-6">
-                                        <div
+                                        <div onClick={() => navigate(`/patient/encounter/${id}`)}
                                             className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
                                             <span className={'ml-3'}> Амбулаторный прием
                                             025 форма</span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
                                         </div>
-                                        <div
-                                            className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
-                                            <img src={serviceIcon} alt="service"/>
-                                            <span className={'ml-3'}> Больничные листы</span>
-                                            <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
-                                        </div>
+
                                         <div onClick={() => navigate(`/patient/episode-of-cares/${id}`)}
                                              className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
                                             <span className={'ml-3'}> "Д" учета </span>
+                                            <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
+                                        </div>
+                                        <div
+                                            className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
+                                            <img src={serviceIcon} alt="service"/>
+                                            <span className={'ml-3'}>Рецепт</span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
                                         </div>
                                     </div>

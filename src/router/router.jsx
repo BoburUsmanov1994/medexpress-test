@@ -18,6 +18,7 @@ import PatientUpdatePage from "../modules/patient/pages/PatientUpdatePage";
 import PatientPage from "../modules/patient/pages/PatientPage";
 import PatientEpisodeOfCarePage from "../modules/patient/pages/PatientEpisodeOfCarePage";
 import PatientEpisodeOfCareListPage from "../modules/patient/pages/PatientEpisodeOfCareListPage";
+import PatientEncounterPage from "../modules/patient/pages/PatientEncounterPage";
 
 const LoginPage = lazy(() => import("../modules/auth/pages/LoginPage"));
 const OrganizationsPage = lazy(() => import("../modules/hrm/pages/OrganizationsPage"));
@@ -48,6 +49,7 @@ const Router = ({...rest}) => {
                                 <Route path={"view/:id"} element={<PatientPage/>}/>
                                 <Route path={"episode-of-cares/:id"} element={<PatientEpisodeOfCarePage/>}/>
                                 <Route path={"episode-of-cares/list/:id"} element={<PatientEpisodeOfCareListPage/>}/>
+                                <Route path={"encounter/:id"} element={<PatientEncounterPage/>}/>
                             </Route>
                             <Route path={"/error"} element={<ErrorPage/>}/>
                             <Route path={"/profile"} element={<ProfilePage/>}/>

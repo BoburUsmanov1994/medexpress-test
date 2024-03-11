@@ -31,4 +31,8 @@ export const KEYS = {
     conditionSeverity:'conditionSeverity',
     icd10:'icd10',
     episodeOfCareStatus:'episodeOfCareStatus',
+    encounters:'encounters',
+    encounterClass:'encounterClass',
+    encounterLocationStatus:'encounterLocationStatus',
+    serviceType:'serviceType',
 }

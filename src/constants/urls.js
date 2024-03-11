@@ -32,4 +32,8 @@ export const URLS = {
     conditionSeverity: '/reference-books/condition-severity',
     icd10: '/reference-books/icd-10',
     episodeOfCareStatus: '/reference-books/episode-of-care-status',
+    encounterClass: '/reference-books/encounter-class',
+    encounterLocationStatus: '/reference-books/encounter-location-status',
+    serviceType: '/reference-books/service-type',
+    encounters: '/encounters',
 }
