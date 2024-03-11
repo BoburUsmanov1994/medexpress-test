@@ -35,5 +35,9 @@ export const URLS = {
     encounterClass: '/reference-books/encounter-class',
     encounterLocationStatus: '/reference-books/encounter-location-status',
     serviceType: '/reference-books/service-type',
+    medicationRequestCategory: '/reference-books/medicationrequest-category',
+    medicationInn: '/reference-books/medication-inn',
+    ucumCommon: '/reference-books/ucum-common',
+    medicationFormCode: '/reference-books/medication-form-code',
     encounters: '/encounters',
 }

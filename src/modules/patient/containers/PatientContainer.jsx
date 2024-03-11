@@ -113,20 +113,21 @@ const PatientContainer = ({id}) => {
                                                     контакт:</h4>
                                             </div>
                                         </div>
-                                        {get(episodeOfCareData,'data.payload.data',[])?.length > 0 && <div className="col-span-4">
-                                            <div className={'mb-4 mt-2'}>
-                                                <Link
-                                                    className={'py-2 px-5 inline-block border-2 border-[#E5E5E5] rounded-lg text-black font-semibold hover:shadow-lg'}
-                                                    to={`/patient/episode-of-cares/list/${id}`}>{t('"Д" учет')}</Link>
-                                            </div>
-                                        </div>}
+                                        {get(episodeOfCareData, 'data.payload.data', [])?.length > 0 &&
+                                            <div className="col-span-4">
+                                                <div className={'mb-4 mt-2'}>
+                                                    <Link
+                                                        className={'py-2 px-5 inline-block border-2 border-[#E5E5E5] rounded-lg text-black font-semibold hover:shadow-lg'}
+                                                        to={`/patient/episode-of-cares/list/${id}`}>{t('"Д" учет')}</Link>
+                                                </div>
+                                            </div>}
                                     </div>
                                 </div>
                                 <div
                                     className={"p-6 rounded-xl shadow-xl drop-shadow-xl border-[3px] border-[rgba(0,0,0,0.1)] mt-6"}>
                                     <div className="grid grid-cols-12 gap-x-6">
                                         <div onClick={() => navigate(`/patient/encounter/${id}`)}
-                                            className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
+                                             className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
                                             <span className={'ml-3'}> Амбулаторный прием
                                             025 форма</span>
@@ -139,8 +140,8 @@ const PatientContainer = ({id}) => {
                                             <span className={'ml-3'}> "Д" учета </span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>
                                         </div>
-                                        <div
-                                            className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
+                                        <div onClick={() => navigate(`/patient/recipe/${id}`)}
+                                             className="col-span-4  border-2 border-[#E5E5E5] rounded py-2 px-3 flex items-center cursor-pointer mb-6 justify-between pr-6 hover:shadow-xl">
                                             <img src={serviceIcon} alt="service"/>
                                             <span className={'ml-3'}>Рецепт</span>
                                             <img className={'ml-4'} src={chevronRightIcon} alt="chevronRightIcon"/>

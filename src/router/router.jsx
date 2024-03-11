@@ -19,6 +19,7 @@ import PatientPage from "../modules/patient/pages/PatientPage";
 import PatientEpisodeOfCarePage from "../modules/patient/pages/PatientEpisodeOfCarePage";
 import PatientEpisodeOfCareListPage from "../modules/patient/pages/PatientEpisodeOfCareListPage";
 import PatientEncounterPage from "../modules/patient/pages/PatientEncounterPage";
+import PatientRecipePage from "../modules/patient/pages/PatientRecipePage";
 
 const LoginPage = lazy(() => import("../modules/auth/pages/LoginPage"));
 const OrganizationsPage = lazy(() => import("../modules/hrm/pages/OrganizationsPage"));
@@ -40,7 +41,7 @@ const Router = ({...rest}) => {
                                 <Route path={'practitioners'} element={<PractitionersPage/>}/>
                             </Route>
                             <Route path={'settings'}>
-                                <Route path={'translations'} element={<TranslationsPage />} />
+                                <Route path={'translations'} element={<TranslationsPage/>}/>
                             </Route>
                             <Route path={"patient"}>
                                 <Route index element={<PatientsPage/>}/>
@@ -50,6 +51,7 @@ const Router = ({...rest}) => {
                                 <Route path={"episode-of-cares/:id"} element={<PatientEpisodeOfCarePage/>}/>
                                 <Route path={"episode-of-cares/list/:id"} element={<PatientEpisodeOfCareListPage/>}/>
                                 <Route path={"encounter/:id"} element={<PatientEncounterPage/>}/>
+                                <Route path={"recipe/:id"} element={<PatientRecipePage/>}/>
                             </Route>
                             <Route path={"/error"} element={<ErrorPage/>}/>
                             <Route path={"/profile"} element={<ProfilePage/>}/>

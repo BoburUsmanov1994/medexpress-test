@@ -35,4 +35,8 @@ export const KEYS = {
     encounterClass:'encounterClass',
     encounterLocationStatus:'encounterLocationStatus',
     serviceType:'serviceType',
+    medicationRequestCategory:'medicationRequestCategory',
+    medicationInn:'medicationInn',
+    ucumCommon:'ucumCommon',
+    medicationFormCode:'medicationFormCode',
 }
