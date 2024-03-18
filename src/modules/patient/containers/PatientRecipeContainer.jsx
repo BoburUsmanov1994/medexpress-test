@@ -169,7 +169,19 @@ const PatientRecipeContainer = ({id}) => {
                                                 <span>{t('Срок действия')}</span><img
                                                 className={'ml-1'} src={orgIcon} alt="org"/></div>}
                                         />
-
+                                        <Field
+                                            isMulti
+                                            type={'async-select'}
+                                            url={URLS.medicationDosageMethod}
+                                            keyId={KEYS.medicationDosageMethod}
+                                            classNames={'col-span-12'}
+                                            name={'instructions'}
+                                            params={{
+                                                required: true,
+                                            }}
+                                            label={<div className={'flex'}><span>{t('Instructions')}</span><img
+                                                className={'ml-1'} src={orgIcon} alt="org"/></div>}
+                                        />
                                     </Form>
                                 </div>
                             </div>

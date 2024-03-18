@@ -39,4 +39,5 @@ export const KEYS = {
     medicationInn:'medicationInn',
     ucumCommon:'ucumCommon',
     medicationFormCode:'medicationFormCode',
+    medicationDosageMethod:'medicationDosageMethod',
 }

@@ -39,5 +39,6 @@ export const URLS = {
     medicationInn: '/reference-books/medication-inn',
     ucumCommon: '/reference-books/ucum-common',
     medicationFormCode: '/reference-books/medication-form-code',
+    medicationDosageMethod: '/reference-books/medication-dosage-method',
     encounters: '/encounters',
 }
